@@ -53,6 +53,11 @@ htmlcov/
 # Jupyter Notebook
 .ipynb_checkpoints
 
+# Pipeline checkpoint (P2 resilience)
+data_pipeline/checkpoint.json
+data_pipeline/checkpoint.json.tmp
+
 # OS
 .DS_Store
 Thumbs.db
+

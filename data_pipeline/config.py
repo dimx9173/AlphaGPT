@@ -20,5 +20,6 @@ class Config:
     BASE_URL = BIRDEYE_BASE_URL
     BIRDEYE_IS_PAID = True
     USE_DEXSCREENER = False
-    CONCURRENCY = 20
-    HISTORY_DAYS = 7
+    CONCURRENCY = int(os.getenv("PIPELINE_CONCURRENCY", "20"))
+    HISTORY_DAYS = int(os.getenv("PIPELINE_HISTORY_DAYS", "7"))
+    CHECKPOINT_PATH = os.getenv("PIPELINE_CHECKPOINT_PATH", "data_pipeline/checkpoint.json")

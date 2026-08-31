@@ -75,3 +75,72 @@ class DashboardService:
         with open(log_file, "r") as f:
             lines = f.readlines()
             return lines[-n:]
+
+    def get_training_metrics(self):
+        for path in ("training_history.json", "metrics.jsonl"):
+            if not os.path.exists(path):
+                continue
+            try:
+                if path.endswith(".jsonl"):
+                    rows = []
+                    with open(path, "r", encoding="utf-8") as f:
+                        for line in f:
+                            line=line.strip()
+                            if not line: continue
+                            try: rows.append(json.loads(line))
+                            except Exception: continue
+                    if rows:
+                        train_rows = [r for r in rows if r.get("kind")=="train_step"]
+                        latest = train_rows[-1] if train_rows else rows[-1]
+                        return {"source": path, "latest": latest, "history": rows[-200:]}
+                else:
+                    with open(path, "r", encoding="utf-8") as f:
+                        data=json.load(f)
+                    if isinstance(data, dict) and data.get("step"):
+                        def _last(k):
+                            v=data.get(k)
+                            return v[-1] if isinstance(v,list) and v else None
+                        return {"source": path, "latest": {"step": data["step"][-1], "avg_reward": _last("avg_reward"), "best_score": _last("best_score"), "sharpe": _last("sharpe"), "max_dd": _last("max_dd"), "turnover": _last("turnover")}, "history": data}
+            except Exception:
+                continue
+        return {"source": None, "latest": None, "history": None}
+
+    def get_pipeline_status(self):
+        info={"last_updated": None, "token_count": None, "ohlcv_count": None, "checkpoint_exists": os.path.exists("checkpoint.json") or os.path.exists("data_pipeline/checkpoint.json")}
+        try:
+            df=pd.read_sql("SELECT MAX(last_updated) as lu, COUNT(*) as cnt FROM tokens", self.engine)
+            if not df.empty:
+                info["last_updated"]=str(df.iloc[0]["lu"]) if pd.notna(df.iloc[0]["lu"]) else None
+                info["token_count"]=int(df.iloc[0]["cnt"]) if pd.notna(df.iloc[0]["cnt"]) else 0
+        except Exception:
+            pass
+        try:
+            df2=pd.read_sql("SELECT COUNT(*) as c FROM ohlcv", self.engine)
+            if not df2.empty:
+                info["ohlcv_count"]=int(df2.iloc[0]["c"])
+        except Exception:
+            pass
+        for p in ("metrics.jsonl","training_history.json","best_meme_strategy.json"):
+            info[p]=os.path.exists(p)
+        return info
+
+if __name__ == "__main__":
+    import argparse, sys
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--metrics", action="store_true", help="print training metrics json")
+    ap.add_argument("--status", action="store_true", help="print pipeline status json")
+    ap.add_argument("--jsonl", type=str, default=None, help="path to metrics.jsonl to dump")
+    args = ap.parse_args()
+    svc = DashboardService()
+    if args.metrics:
+        print(json.dumps(svc.get_training_metrics(), indent=2, default=str))
+    elif args.status:
+        print(json.dumps(svc.get_pipeline_status(), indent=2, default=str))
+    elif args.jsonl:
+        j = args.jsonl
+        if os.path.exists(j):
+            with open(j) as f: sys.stdout.write(f.read())
+        else:
+            print(f"not found: {j}", file=sys.stderr); sys.exit(1)
+    else:
+        print(json.dumps({"metrics": svc.get_training_metrics(), "status": svc.get_pipeline_status()}, indent=2, default=str))

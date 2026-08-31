@@ -63,6 +63,30 @@ class DBManager:
                 SET symbol = EXCLUDED.symbol, last_updated = NOW();
             """, tokens)
 
+    async def get_existing_ohlcv_keys(self, address, since=None):
+        if not self.pool:
+            return set()
+        async with self.pool.acquire() as conn:
+            if since is not None:
+                rows = await conn.fetch("SELECT time FROM ohlcv WHERE address=$1 AND time >= $2", address, since)
+            else:
+                rows = await conn.fetch("SELECT time FROM ohlcv WHERE address=$1", address)
+            return {r['time'] for r in rows}
+
+    async def filter_new_records(self, records):
+        if not records or not self.pool:
+            return records
+        by_addr = {}
+        for r in records:
+            by_addr.setdefault(r[1], []).append(r)
+        filtered = []
+        for addr, recs in by_addr.items():
+            existing = await self.get_existing_ohlcv_keys(addr)
+            for r in recs:
+                if r[0] not in existing:
+                    filtered.append(r)
+        return filtered
+
     async def batch_insert_ohlcv(self, records):
         if not records: return
         async with self.pool.acquire() as conn:

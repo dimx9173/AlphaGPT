@@ -6,6 +6,8 @@ from ..config import Config
 from .base import DataProvider
 
 class BirdeyeProvider(DataProvider):
+    MAX_RETRIES = 3
+
     def __init__(self):
         self.base_url = Config.BIRDEYE_BASE_URL
         self.headers = {
@@ -62,7 +64,6 @@ class BirdeyeProvider(DataProvider):
         time_from = int((datetime.now() - timedelta(days=days)).timestamp())
         snapshot_liquidity = self._as_float(liquidity)
         snapshot_fdv = self._as_float(fdv)
-        
         url = f"{self.base_url}/defi/ohlcv"
         params = {
             "address": address,
@@ -70,38 +71,54 @@ class BirdeyeProvider(DataProvider):
             "time_from": time_from,
             "time_to": time_to
         }
-
-        async with self.semaphore:
-            try:
-                async with session.get(url, params=params) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        items = data.get('data', {}).get('items', [])
-                        if not items: return []
-                        
-                        formatted = []
-                        for item in items:
-                            candle_liquidity = self._as_float(item.get('liquidity'), snapshot_liquidity)
-                            candle_fdv = self._as_float(item.get('fdv'), snapshot_fdv)
-                            formatted.append((
-                                datetime.fromtimestamp(item['unixTime']), # time
-                                address,                                  # address
-                                float(item['o']),                         # open
-                                float(item['h']),                         # high
-                                float(item['l']),                         # low
-                                float(item['c']),                         # close
-                                float(item['v']),                         # volume
-                                candle_liquidity,                         # liquidity
-                                candle_fdv,                               # fdv
-                                'birdeye'                                 # source
-                            ))
-                        return formatted
-                    elif resp.status == 429:
-                        logger.warning(f"Birdeye 429 for {address}, retrying...")
-                        await asyncio.sleep(2)
-                        return await self.get_token_history(session, address, days, liquidity=liquidity, fdv=fdv)
-                    else:
-                        return []
-            except Exception as e:
-                logger.error(f"Birdeye Fetch Error {address}: {e}")
-                return []
+        last_status = None
+        last_remaining = None
+        for attempt in range(self.MAX_RETRIES):
+            async with self.semaphore:
+                try:
+                    async with session.get(url, params=params) as resp:
+                        last_status = resp.status
+                        try:
+                            last_remaining = resp.headers.get('x-ratelimit-remaining') or resp.headers.get('X-RateLimit-Remaining') or resp.headers.get('remaining')
+                        except Exception:
+                            last_remaining = None
+                        if resp.status == 200:
+                            data = await resp.json()
+                            items = data.get('data', {}).get('items', [])
+                            if not items:
+                                return []
+                            formatted = []
+                            for item in items:
+                                candle_liquidity = self._as_float(item.get('liquidity'), snapshot_liquidity)
+                                candle_fdv = self._as_float(item.get('fdv'), snapshot_fdv)
+                                formatted.append((
+                                    datetime.fromtimestamp(item['unixTime']),
+                                    address,
+                                    float(item['o']),
+                                    float(item['h']),
+                                    float(item['l']),
+                                    float(item['c']),
+                                    float(item['v']),
+                                    candle_liquidity,
+                                    candle_fdv,
+                                    'birdeye'
+                                ))
+                            return formatted
+                        elif resp.status == 429:
+                            quota_msg = f" remaining={last_remaining}" if last_remaining is not None else ""
+                            if attempt < self.MAX_RETRIES - 1:
+                                backoff = 2 * (2 ** attempt)
+                                logger.warning(f"Birdeye 429 for {address}{quota_msg}, backoff {backoff}s attempt {attempt+1}/{self.MAX_RETRIES}")
+                            else:
+                                logger.warning(f"Birdeye 429 for {address}{quota_msg}, max retries exceeded")
+                        else:
+                            return []
+                except Exception as e:
+                    logger.error(f"Birdeye Fetch Error {address}: {e}")
+                    return []
+            if attempt < self.MAX_RETRIES - 1 and last_status == 429:
+                backoff = 2 * (2 ** attempt)
+                await asyncio.sleep(backoff)
+            elif last_status != 429:
+                break
+        return []

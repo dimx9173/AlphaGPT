@@ -5,7 +5,7 @@ import streamlit as st
 import pandas as pd
 import time
 from data_service import DashboardService
-from visualizer import plot_pnl_distribution, plot_market_scatter
+from visualizer import plot_pnl_distribution, plot_market_scatter, plot_training_curve, plot_walk_forward
 
 st.set_page_config(
     page_title="MemeAlpha Commander",
@@ -92,7 +92,32 @@ with col3:
 with col4:
     st.metric("Active Strategy", "AlphaGPT-v1", help=str(strategy_data))
 
-tab1, tab2, tab3 = st.tabs(["Portfolio", "Market Scanner", "Logs"])
+try:
+    tm = svc.get_training_metrics()
+    ps = svc.get_pipeline_status()
+except Exception:
+    tm = {"latest": None, "history": None, "source": None}
+    ps = {}
+latest = (tm or {}).get("latest") or {}
+hist = (tm or {}).get("history")
+def _fmt(v, fmt="{:.3f}"):
+    try:
+        if v is None: return "—"
+        return fmt.format(float(v))
+    except Exception:
+        return str(v)
+m1, m2, m3, m4 = st.columns(4)
+with m1:
+    st.metric("Sharpe (last)", _fmt(latest.get("sharpe"), "{:.2f}"), help=f"source: {(tm or {}).get('source')}")
+with m2:
+    st.metric("MaxDD (last)", _fmt(latest.get("max_dd"), "{:.4f}"))
+with m3:
+    st.metric("Turnover (last)", _fmt(latest.get("turnover"), "{:.4f}"))
+with m4:
+    lu = ps.get("last_updated") if isinstance(ps, dict) else None
+    st.metric("Pipeline", f"{ps.get('token_count', '—')} tokens", delta=str(lu)[:19] if lu else None, help=str({k: ps.get(k) for k in ("ohlcv_count","checkpoint_exists","metrics.jsonl","training_history.json") if isinstance(ps, dict)}))
+
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["Portfolio", "Market Scanner", "Training Curve", "Pipeline Status", "Logs"])
 
 with tab1:
     st.subheader("Active Holdings")
@@ -121,6 +146,36 @@ with tab2:
         st.warning("No market data found in DB. Is the Data Pipeline running?")
 
 with tab3:
+    st.subheader("Training Curve (Sharpe / Reward)")
+    if hist is not None:
+        st.plotly_chart(plot_training_curve(hist), use_container_width=True)
+        if isinstance(hist, dict) and hist.get("step"):
+            st.plotly_chart(plot_walk_forward(hist), use_container_width=True)
+        elif isinstance(hist, list):
+            st.caption(f"History from {(tm or {}).get('source')} — {len(hist)} points")
+            st.plotly_chart(plot_training_curve(hist), use_container_width=True)
+    else:
+        st.info("No training metrics yet. Run training to generate training_history.json / metrics.jsonl (Sharpe/MaxDD/Turnover).")
+        st.caption("Tip: cat training_history.json or cat metrics.jsonl to verify export.")
+
+with tab4:
+    st.subheader("Pipeline Status")
+    if isinstance(ps, dict):
+        cA, cB, cC = st.columns(3)
+        with cA:
+            st.metric("Tokens", str(ps.get("token_count", "—")))
+            st.metric("OHLCV candles", str(ps.get("ohlcv_count", "—")))
+        with cB:
+            st.metric("Last Updated (DB)", str(ps.get("last_updated", "—"))[:19] if ps.get("last_updated") else "—")
+            st.metric("Checkpoint", "exists" if ps.get("checkpoint_exists") else "missing")
+        with cC:
+            st.metric("metrics.jsonl", "exists" if ps.get("metrics.jsonl") else "missing")
+            st.metric("training_history.json", "exists" if ps.get("training_history.json") else "missing")
+        st.json(ps)
+    else:
+        st.warning("Pipeline status unavailable (DB not reachable). File-based metrics still shown above.")
+
+with tab5:
     st.subheader("System Logs (Tail 20)")
     logs = svc.get_recent_logs(20)
     if logs:

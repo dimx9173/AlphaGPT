@@ -1,14 +1,19 @@
+import os
+import json as _json
 import torch
 import torch.nn.functional as F
 from torch.distributions import Categorical
 from tqdm import tqdm
 import json
+from datetime import datetime, timezone
+from loguru import logger
 
 from .config import ModelConfig
 from .data_loader import CryptoDataLoader
 from .alphagpt import AlphaGPT, NewtonSchulzLowRankDecay, StableRankMonitor
 from .vm import StackVM
 from .backtest import MemeBacktest
+from .metrics import append_metrics_jsonl
 
 class AlphaEngine:
     def __init__(self, use_lord_regularization=True, lord_decay_rate=1e-3, lord_num_iterations=5, v_coef=None, e_coef=None, clip_norm=None):
@@ -58,7 +63,10 @@ class AlphaEngine:
             'step': [],
             'avg_reward': [],
             'best_score': [],
-            'stable_rank': []
+            'stable_rank': [],
+            'sharpe': [],
+            'max_dd': [],
+            'turnover': [],
         }
 
     def train(self):
@@ -138,16 +146,45 @@ class AlphaEngine:
             
             # Logging
             avg_reward = rewards.mean().item()
-            postfix_dict = {'AvgRew': f"{avg_reward:.3f}", 'BestScore': f"{self.best_score:.3f}"}
+            m = getattr(self.bt, "last_metrics", {}) or {}
+            sharpe = float(m.get("sharpe", 0.0))
+            max_dd = float(m.get("max_dd", 0.0))
+            turnover = float(m.get("turnover", 0.0))
+            postfix_dict = {'AvgRew': f"{avg_reward:.3f}", 'BestScore': f"{self.best_score:.3f}", 'Sharpe': f"{sharpe:.2f}"}
             
             if self.use_lord and step % 100 == 0:
                 stable_rank = self.rank_monitor.compute()
                 postfix_dict['Rank'] = f"{stable_rank:.2f}"
                 self.training_history['stable_rank'].append(stable_rank)
+            else:
+                if self.use_lord:
+                    last = self.training_history['stable_rank'][-1] if self.training_history['stable_rank'] else 0.0
+                    self.training_history['stable_rank'].append(last)
             
             self.training_history['step'].append(step)
             self.training_history['avg_reward'].append(avg_reward)
             self.training_history['best_score'].append(self.best_score)
+            self.training_history['sharpe'].append(sharpe)
+            self.training_history['max_dd'].append(max_dd)
+            self.training_history['turnover'].append(turnover)
+            try:
+                logger.bind(step=step, sharpe=sharpe, max_dd=max_dd, turnover=turnover, best_score=self.best_score).info(
+                    f"train step={step} avg_reward={avg_reward:.4f} sharpe={sharpe:.3f} max_dd={max_dd:.4f} turnover={turnover:.4f}"
+                )
+            except Exception:
+                pass
+            try:
+                append_metrics_jsonl("metrics.jsonl", {
+                    "kind": "train_step",
+                    "step": step,
+                    "avg_reward": avg_reward,
+                    "best_score": self.best_score,
+                    "sharpe": sharpe,
+                    "max_dd": max_dd,
+                    "turnover": turnover,
+                })
+            except Exception:
+                pass
             
             pbar.set_postfix(postfix_dict)
 
