@@ -23,3 +23,23 @@ class Config:
     CONCURRENCY = int(os.getenv("PIPELINE_CONCURRENCY", "20"))
     HISTORY_DAYS = int(os.getenv("PIPELINE_HISTORY_DAYS", "7"))
     CHECKPOINT_PATH = os.getenv("PIPELINE_CHECKPOINT_PATH", "data_pipeline/checkpoint.json")
+
+    PLACEHOLDERS = {"", "password"}
+    REQUIRED_KEYS = ["BIRDEYE_API_KEY", "DB_USER"]
+
+    @classmethod
+    def _is_placeholder(cls, value):
+        return value.strip() in cls.PLACEHOLDERS if isinstance(value, str) else True
+
+    @classmethod
+    def validate_env(cls):
+        missing = []
+        for key in cls.REQUIRED_KEYS:
+            val = os.getenv(key)
+            if val is None or cls._is_placeholder(val):
+                missing.append(key)
+        if missing:
+            raise ValueError(
+                f"Missing or placeholder env vars: {', '.join(missing)}. "
+                "Please set them in .env (cp .env.example .env)"
+            )

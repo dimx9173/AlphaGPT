@@ -33,6 +33,27 @@ def sharpe_ratio(returns, eps: float = 1e-9) -> float:
     return float(mean / std * math.sqrt(252.0))
 
 
+def sortino_ratio(returns, target: float = 0.0, eps: float = 1e-9) -> float:
+    vals = _to_list(returns)
+    if not vals:
+        return 0.0
+    n = len(vals)
+    mean = sum(vals) / n
+    downside = [float(v) for v in vals if float(v) < target]
+    if not downside:
+        return 0.0
+    dn = len(downside)
+    d_mean = sum(downside) / dn
+    var = sum((v - d_mean) ** 2 for v in downside) / max(dn - 1, 1)
+    std = math.sqrt(var) if var > 0 else 0.0
+    if std < eps:
+        var2 = sum((v - target) ** 2 for v in downside) / max(dn, 1)
+        std = math.sqrt(var2) if var2 > 0 else 0.0
+        if std < eps:
+            return 0.0
+    return float(mean / std * math.sqrt(252.0))
+
+
 def max_drawdown(pnl_series) -> float:
     vals = _to_list(pnl_series)
     if not vals:
@@ -74,7 +95,8 @@ def compute_backtest_metrics(net_pnl, turnover=None) -> dict:
     sharpe = sharpe_ratio(flat)
     mdd = max_drawdown(flat)
     to = turnover_rate(turnover) if turnover is not None else 0.0
-    return {"sharpe": float(sharpe), "max_dd": float(mdd), "turnover": float(to)}
+    sortino = sortino_ratio(flat)
+    return {"sharpe": float(sharpe), "max_dd": float(mdd), "turnover": float(to), "sortino": float(sortino)}
 
 
 def append_metrics_jsonl(path: str, record: dict) -> None:

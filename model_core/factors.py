@@ -1,7 +1,8 @@
+import os
 import torch
 import torch.nn as nn
 
-from .vocab import FEATURE_NAMES
+from .vocab import FEATURE_NAMES, ADVANCED_FEATURE_NAMES
 
 
 class RMSNormFactor(nn.Module):
@@ -155,11 +156,16 @@ class AdvancedFactorEngineer:
         return features
 
 
+USE_ADVANCED = os.getenv("USE_ADVANCED", "0") == "1"
+
+
 class FeatureEngineer:
-    INPUT_DIM = len(FEATURE_NAMES)
+    INPUT_DIM = len(ADVANCED_FEATURE_NAMES) if USE_ADVANCED else len(FEATURE_NAMES)
+    USE_ADVANCED = USE_ADVANCED
+    ADVANCED_DIM = len(ADVANCED_FEATURE_NAMES)
 
     @staticmethod
-    def compute_features(raw_dict):
+    def compute_features(raw_dict, use_advanced: bool | None = None):
         c = raw_dict['close']
         o = raw_dict['open']
         h = raw_dict['high']
@@ -181,6 +187,31 @@ class FeatureEngineer:
             norm = (t - median) / mad
             return torch.clamp(norm, -5.0, 5.0)
 
+        flag = USE_ADVANCED if use_advanced is None else use_advanced
+        if flag:
+            vol_cluster = MemeIndicators.volatility_clustering(c)
+            momentum_rev = MemeIndicators.momentum_reversal(c)
+            rel_strength = MemeIndicators.relative_strength(c, h, l)
+            hl_range = (h - l) / (c + 1e-9)
+            close_pos = (c - l) / (h - l + 1e-9)
+            vol_prev = torch.roll(v, 1, dims=1)
+            vol_trend = (v - vol_prev) / (vol_prev + 1.0)
+            features = torch.stack([
+                robust_norm(ret),
+                liq_score,
+                pressure,
+                robust_norm(fomo),
+                robust_norm(dev),
+                robust_norm(log_vol),
+                robust_norm(vol_cluster),
+                momentum_rev,
+                robust_norm(rel_strength),
+                robust_norm(hl_range),
+                close_pos,
+                robust_norm(vol_trend),
+            ], dim=1)
+            return features
+
         features = torch.stack([
             robust_norm(ret),
             liq_score,
@@ -189,5 +220,4 @@ class FeatureEngineer:
             robust_norm(dev),
             robust_norm(log_vol)
         ], dim=1)
-        
         return features
