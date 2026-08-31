@@ -1,3 +1,6 @@
+# Secure run: streamlit run dashboard/app.py --server.address 127.0.0.1 --server.port 8501
+# For production, bind to 127.0.0.1 and expose via reverse proxy (nginx/caddy) with TLS and auth; never expose directly to public internet.
+import os
 import streamlit as st
 import pandas as pd
 import time
@@ -42,10 +45,30 @@ with st.sidebar:
     if st.button("Refresh Data"):
         st.rerun()
         
+    dashboard_token = os.getenv("DASHBOARD_TOKEN")
+    if not dashboard_token:
+        st.warning("DASHBOARD_TOKEN not set — dashboard should be bound to 127.0.0.1. Set DASHBOARD_TOKEN to protect EMERGENCY STOP.")
+        confirm_stop = st.checkbox("I confirm EMERGENCY STOP")
+        token_input = None
+    else:
+        token_input = st.text_input("DASHBOARD_TOKEN", type="password")
+        confirm_stop = False
+
     if st.button("EMERGENCY STOP", type="primary"):
-        with open("STOP_SIGNAL", "w") as f:
-            f.write("STOP")
-        st.error("STOP SIGNAL SENT, Process will terminate on next cycle.")
+        if dashboard_token:
+            if token_input != dashboard_token:
+                st.error("Invalid token — EMERGENCY STOP not sent.")
+            else:
+                with open("STOP_SIGNAL", "w") as f:
+                    f.write("STOP")
+                st.error("STOP SIGNAL SENT, Process will terminate on next cycle.")
+        else:
+            if not confirm_stop:
+                st.error("Please check 'I confirm EMERGENCY STOP' to proceed.")
+            else:
+                with open("STOP_SIGNAL", "w") as f:
+                    f.write("STOP")
+                st.error("STOP SIGNAL SENT, Process will terminate on next cycle.")
 
 col1, col2, col3, col4 = st.columns(4)
 portfolio_df = svc.load_portfolio()

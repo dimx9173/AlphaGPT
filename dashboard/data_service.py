@@ -21,14 +21,9 @@ class DashboardService:
 
     def _get_wallet_address(self):
         try:
-            from solders.keypair import Keypair
-            pk_str = os.getenv("SOLANA_PRIVATE_KEY", "")
-            if "[" in pk_str:
-                kp = Keypair.from_bytes(json.loads(pk_str))
-            else:
-                kp = Keypair.from_base58_string(pk_str)
-            return str(kp.pubkey())
-        except Exception:
+            from execution.config import ExecutionConfig
+            return ExecutionConfig.get_wallet_address()
+        except (ValueError, TypeError, json.JSONDecodeError):
             return "Unknown"
 
     def get_wallet_balance(self):

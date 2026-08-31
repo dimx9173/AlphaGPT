@@ -38,6 +38,8 @@ class StrategyRunner:
             exit(1)
 
     async def initialize(self):
+        from execution.config import ExecutionConfig
+        ExecutionConfig.validate_env()
         await self.data_mgr.initialize()
         bal = await self.trader.rpc.get_balance()
         logger.info(f"Bot Initialized. Wallet Balance: {bal:.4f} SOL")
