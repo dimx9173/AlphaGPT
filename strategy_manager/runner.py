@@ -115,9 +115,13 @@ class StrategyRunner:
         logger.info(f"o.O | Monitoring {len(self.portfolio.positions)} positions...")
         
         for token_addr, pos in list(self.portfolio.positions.items()):
-            current_price = await self._fetch_live_price_sol(token_addr)
+            try:
+                current_price = await self._fetch_live_price_sol(token_addr)
+            except Exception as e:
+                logger.warning(f"Could not fetch price for {pos.symbol} ({token_addr}): {e}, skipping.")
+                continue
             if current_price <= 0:
-                logger.warning(f"Could not fetch price for {pos.symbol}, skipping.")
+                logger.warning(f"Invalid price {current_price} for {pos.symbol}, skipping.")
                 continue
 
             self.portfolio.update_price(token_addr, current_price)
@@ -282,28 +286,64 @@ class StrategyRunner:
         score = torch.sigmoid(latest_logit).item()
         return score
 
-    async def _fetch_live_price_sol(self, token_addr):
-        try:
-            # 1. 获取精度
-            decimals = await get_mint_decimals(token_addr, self.trader.rpc.client)
-            amount_1_unit = 10 ** decimals
-            
-            # 2. 询价: 1 Token -> ? SOL
-            quote = await self.trader.jup.get_quote(
-                input_mint=token_addr,
-                output_mint=self.trader.config.SOL_MINT,
-                amount_integer=amount_1_unit
-            )
-            
-            if quote:
+    async def _fetch_live_price_sol(self, token_addr, jupiter=None, timeout=None):
+        jup = jupiter if jupiter is not None else self.trader.jup
+        if jup is None:
+            raise RuntimeError("No Jupiter aggregator available for _fetch_live_price_sol")
+        decimals = await get_mint_decimals(token_addr, self.trader.rpc.client)
+        amount_1_unit = 10 ** decimals
+        quote = await jup.get_quote(
+            input_mint=token_addr,
+            output_mint=self.trader.config.SOL_MINT,
+            amount_integer=amount_1_unit
+        )
+        if quote is not None:
+            try:
                 out_lamports = int(quote['outAmount'])
-                price_sol = out_lamports / 1e9
-                return price_sol
-            
+            except (KeyError, TypeError, ValueError) as e:
+                raise ValueError(f"Invalid quote outAmount for {token_addr}: {quote}") from e
+            price_sol = out_lamports / 1e9
+            if quote.get("_fallback") == "birdeye":
+                logger.info(f"Price for {token_addr} via Birdeye fallback: {price_sol} SOL")
+            return price_sol
+        fallbacks_tried = ["jupiter"]
+        try:
+            from data_pipeline.config import Config as DPConfig
+            import aiohttp
+            api_key = getattr(DPConfig, "BIRDEYE_API_KEY", "")
+            if api_key:
+                fallbacks_tried.append("birdeye")
+                base_url = getattr(DPConfig, "BIRDEYE_BASE_URL", "https://public-api.birdeye.so")
+                t = aiohttp.ClientTimeout(total=timeout or 3)
+                url = f"{base_url}/defi/price"
+                headers = {"X-API-KEY": api_key, "accept": "application/json"}
+                params = {"address": token_addr}
+                async with aiohttp.ClientSession(timeout=t, headers=headers) as sess:
+                    async with sess.get(url, params=params) as resp:
+                        if resp.status == 200:
+                            data = await resp.json()
+                            inner = data.get("data", data) if isinstance(data, dict) else {}
+                            val = inner.get("value") if isinstance(inner, dict) else None
+                            if val is not None:
+                                price = float(val)
+                                logger.info(f"Runner Birdeye price fallback {price} SOL for {token_addr}")
+                                return price
         except Exception as e:
-            logger.warning(f"Price fetch failed for {token_addr}: {e}")
-        
-        return 0.0
+            logger.debug(f"Runner Birdeye fallback failed for {token_addr}: {e}")
+        cache = getattr(jup, "_last_quote_cache", None)
+        if isinstance(cache, dict) and cache:
+            fallbacks_tried.append("cache")
+            key = (str(token_addr), str(self.trader.config.SOL_MINT), str(amount_1_unit))
+            cached = cache.get(key)
+            if cached is not None:
+                try:
+                    out_lamports = int(cached['outAmount'])
+                    price_sol = out_lamports / 1e9
+                    logger.info(f"Runner cache fallback {price_sol} SOL for {token_addr}")
+                    return price_sol
+                except (KeyError, TypeError, ValueError):
+                    pass
+        raise RuntimeError(f"Price unavailable for {token_addr} after fallbacks: {fallbacks_tried}")
 
     async def shutdown(self):
         logger.info("O.o | Shutting down strategy runner...")

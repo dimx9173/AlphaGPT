@@ -188,11 +188,16 @@ class LoopedTransformerLayer(nn.Module):
         self.dropout = nn.Dropout(dropout)
     
     def forward(self, x, mask=None, is_causal=False):
-        # Looped processing - recurrent refinement
         for _ in range(self.num_loops):
-            # Self-attention with residual
             x_norm = self.norm1(x)
-            attn_out, _ = self.attention(x_norm, x_norm, x_norm, attn_mask=mask, is_causal=is_causal)
+            B, T, D = x_norm.shape
+            head_dim = D // self.nhead
+            q = x_norm.view(B, T, self.nhead, head_dim)
+            k = x_norm.view(B, T, self.nhead, head_dim)
+            q, k = self.qk_norm(q, k)
+            q = q.reshape(B, T, D)
+            k = k.reshape(B, T, D)
+            attn_out, _ = self.attention(q, k, x_norm, attn_mask=mask, is_causal=is_causal)
             x = x + self.dropout(attn_out)
             
             # FFN with residual

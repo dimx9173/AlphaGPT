@@ -1,4 +1,5 @@
 import torch
+import torch.nn.functional as F
 from torch.distributions import Categorical
 from tqdm import tqdm
 import json
@@ -10,7 +11,7 @@ from .vm import StackVM
 from .backtest import MemeBacktest
 
 class AlphaEngine:
-    def __init__(self, use_lord_regularization=True, lord_decay_rate=1e-3, lord_num_iterations=5):
+    def __init__(self, use_lord_regularization=True, lord_decay_rate=1e-3, lord_num_iterations=5, v_coef=None, e_coef=None, clip_norm=None):
         """
         Initialize AlphaGPT training engine.
         
@@ -23,6 +24,10 @@ class AlphaEngine:
         self.loader.load_data()
         
         self.model = AlphaGPT().to(ModelConfig.DEVICE)
+        
+        self.v_coef = v_coef if v_coef is not None else ModelConfig.V_COEF
+        self.e_coef = e_coef if e_coef is not None else ModelConfig.E_COEF
+        self.clip_norm = clip_norm if clip_norm is not None else ModelConfig.CLIP_NORM
         
         # Standard optimizer
         self.opt = torch.optim.AdamW(self.model.parameters(), lr=1e-3)
@@ -70,13 +75,17 @@ class AlphaEngine:
             
             log_probs = []
             tokens_list = []
+            values = []
+            entropies = []
             
             for _ in range(ModelConfig.MAX_FORMULA_LEN):
-                logits, _, _ = self.model(inp)
+                logits, value, _ = self.model(inp)
                 dist = Categorical(logits=logits)
                 action = dist.sample()
                 
                 log_probs.append(dist.log_prob(action))
+                entropies.append(dist.entropy())
+                values.append(value.squeeze(-1))
                 tokens_list.append(action)
                 inp = torch.cat([inp, action.unsqueeze(1)], dim=1)
             
@@ -108,15 +117,19 @@ class AlphaEngine:
             # Normalize rewards
             adv = (rewards - rewards.mean()) / (rewards.std() + 1e-5)
             
-            loss = 0
-            for t in range(len(log_probs)):
-                loss += -log_probs[t] * adv
-            
-            loss = loss.mean()
+            policy_loss = torch.stack([-lp * adv for lp in log_probs], dim=0).sum(dim=0).mean()
+
+            value_pred = torch.stack(values, dim=0).mean(dim=0)
+            value_loss = F.mse_loss(value_pred, rewards)
+
+            entropy = torch.stack(entropies, dim=0).mean()
+
+            loss = policy_loss + self.v_coef * value_loss - self.e_coef * entropy
             
             # Gradient step
             self.opt.zero_grad()
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.clip_norm)
             self.opt.step()
             
             # Apply Low-Rank Decay regularization

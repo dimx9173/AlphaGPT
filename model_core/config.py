@@ -12,3 +12,6 @@ class ModelConfig:
     MIN_LIQUIDITY = 5000.0 # 低于此流动性视为归零/无法交易
     BASE_FEE = 0.005 # 基础费率 0.5% (Swap + Gas + Jito Tip)
     INPUT_DIM = FORMULA_VOCAB.feature_count
+    V_COEF = 0.5
+    E_COEF = 0.01
+    CLIP_NORM = 1.0
