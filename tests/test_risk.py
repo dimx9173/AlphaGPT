@@ -32,7 +32,7 @@ async def test_check_safety_exception_returns_false():
 
 def test_calculate_position_size_normal():
     eng = RiskEngine()
-    assert eng.calculate_position_size(10.0) == eng.config.ENTRY_AMOUNT_SOL
+    assert eng.calculate_position_size(10.0) == min(eng.config.ENTRY_AMOUNT_SOL, eng.risk_config.max_single_exposure_sol)
 
 def test_calculate_position_size_insufficient_balance():
     eng = RiskEngine()
@@ -41,7 +41,7 @@ def test_calculate_position_size_insufficient_balance():
 
 def test_calculate_position_size_exact_threshold():
     eng = RiskEngine()
-    size = eng.config.ENTRY_AMOUNT_SOL
+    size = min(eng.config.ENTRY_AMOUNT_SOL, eng.risk_config.max_single_exposure_sol)
     assert eng.calculate_position_size(size + 0.1) == size
     assert eng.calculate_position_size(size + 0.09) == 0.0
 

@@ -1,4 +1,5 @@
 import asyncio
+import signal
 import torch
 import json
 import os
@@ -43,6 +44,29 @@ class StrategyRunner:
         await self.data_mgr.initialize()
         bal = await self.trader.rpc.get_balance()
         logger.info(f"Bot Initialized. Wallet Balance: {bal:.4f} SOL")
+        try:
+            loop = asyncio.get_running_loop()
+            for sig in (signal.SIGTERM, signal.SIGINT):
+                loop.add_signal_handler(sig, lambda s=sig: self._on_signal(s))
+        except (NotImplementedError, ValueError, RuntimeError):
+            pass
+        await self._reconcile_all()
+
+    def _on_signal(self, sig):
+        logger.warning(f"Signal {sig} received, writing STOP")
+        try:
+            with open(self.stop_signal_path, "w") as f:
+                f.write("STOP")
+        except OSError:
+            pass
+
+    async def _reconcile_all(self):
+        for token in list(self.portfolio.positions.keys()):
+            try:
+                on_chain = await self.trader.rpc.get_token_balance(token)
+                self.portfolio.reconcile(token, float(on_chain))
+            except Exception as e:
+                logger.debug(f"Reconcile failed for {token}: {e}")
 
     async def run_loop(self):
         logger.info(">_< | Strategy Runner Started (Live Mode)")

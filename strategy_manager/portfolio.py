@@ -36,9 +36,33 @@ class PortfolioManager:
     def __init__(self, state_file="portfolio_state.json"):
         self.state_file = state_file
         self.positions: Dict[str, Position] = {}
+        self._seen_sigs: set[str] = set()
         self.load_state()
 
-    def add_position(self, token, symbol, price, amount, cost_sol):
+    def has_sig(self, sig: str) -> bool:
+        return sig in self._seen_sigs
+
+    def reconcile(self, token: str, on_chain_amount: float) -> bool:
+        if token not in self.positions:
+            return False
+        if on_chain_amount <= 0:
+            del self.positions[token]
+            self.save_state()
+            logger.info(f"[=] Reconciled {token}: closed (on-chain 0)")
+            return True
+        pos = self.positions[token]
+        if pos.amount_held != on_chain_amount:
+            logger.info(f"[=] Reconciled {token}: {pos.amount_held} -> {on_chain_amount} (on-chain)")
+            pos.amount_held = on_chain_amount
+            self.save_state()
+        return True
+
+    def add_position(self, token, symbol, price, amount, cost_sol, tx_sig: str | None = None):
+        if tx_sig and tx_sig in self._seen_sigs:
+            logger.warning(f"[=] Duplicate sig {tx_sig} for {token}, skipping add")
+            return
+        if tx_sig:
+            self._seen_sigs.add(tx_sig)
         self.positions[token] = Position(
             token_address=token,
             symbol=symbol,
