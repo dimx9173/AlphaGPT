@@ -16,11 +16,17 @@ from .portfolio import PortfolioManager
 from .risk import RiskEngine
 
 class StrategyRunner:
-    def __init__(self):
+    def __init__(self, brokers: dict | None = None):
         self.data_mgr = DataManager()
         self.portfolio = PortfolioManager()
         self.risk = RiskEngine()
         self.trader = SolanaTrader()
+        # P4: optional venue brokers, default single Solana venue (legacy behavior).
+        if brokers is None:
+            from execution.brokers.solana import SolanaBroker
+
+            brokers = {"solana": SolanaBroker(trader=self.trader)}
+        self.brokers = brokers
         self.vm = StackVM()
         
         self.loader = CryptoDataLoader()
@@ -61,12 +67,35 @@ class StrategyRunner:
             pass
 
     async def _reconcile_all(self):
-        for token in list(self.portfolio.positions.keys()):
+        for key in list(self.portfolio.positions.keys()):
+            pos = self.portfolio.positions.get(key)
+            venue = (pos.venue if pos else "solana").lower()
+            token = pos.token_address if pos else key
             try:
-                on_chain = await self.trader.rpc.get_token_balance(token)
-                self.portfolio.reconcile(token, float(on_chain))
+                if venue in self.brokers:
+                    broker = self.brokers[venue]
+                    vpos = await broker.get_position(token)
+                    on_chain = vpos.size if vpos else 0.0
+                    # keep sign: SHORT sizes reconcile as-is; zero closes
+                    self.portfolio.reconcile(token, float(on_chain), venue=venue)
+                else:
+                    on_chain = await self.trader.rpc.get_token_balance(token)
+                    self.portfolio.reconcile(token, float(on_chain), venue="solana")
             except Exception as e:
-                logger.debug(f"Reconcile failed for {token}: {e}")
+                logger.debug(f"Reconcile failed for {key}: {e}")
+
+    async def refresh_deadmen(self, timeout_sec: int = 60):
+        """Refresh per-venue dead-man switches (perp venues only)."""
+        for venue, broker in self.brokers.items():
+            if venue == "solana":
+                continue
+            try:
+                ok = await broker.enable_deadman(timeout_sec)
+                logger.info(f"[=] Deadman {venue}: {'ok' if ok else 'FAILED'}")
+            except NotImplementedError:
+                pass
+            except Exception as e:
+                logger.warning(f"[=] Deadman {venue} error: {e}")
 
     async def run_loop(self):
         logger.info(">_< | Strategy Runner Started (Live Mode)")

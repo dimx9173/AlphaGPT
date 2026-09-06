@@ -31,6 +31,9 @@ class Position:
     initial_cost_sol: float # 初始投入 SOL
     highest_price: float   #以此计算回撤
     is_moonbag: bool = False # 是否已经翻倍出本，剩下的让利润奔跑
+    venue: str = "solana"  # P4: solana | hyperliquid | aster
+    side: str = "LONG"     # P4: LONG | SHORT (perp)
+    leverage: float = 1.0  # P4: perp leverage
 
 class PortfolioManager:
     def __init__(self, state_file="portfolio_state.json"):
@@ -39,41 +42,60 @@ class PortfolioManager:
         self._seen_sigs: set[str] = set()
         self.load_state()
 
-    def has_sig(self, sig: str) -> bool:
-        return sig in self._seen_sigs
+    @staticmethod
+    def venue_key(venue: str, token: str) -> str:
+        return f"{(venue or 'solana').lower()}::{token}"
 
-    def reconcile(self, token: str, on_chain_amount: float) -> bool:
-        if token not in self.positions:
-            return False
+    def has_sig(self, sig: str, venue: str = "solana") -> bool:
+        return (venue.lower(), sig) in self._seen_sigs or sig in self._seen_sigs
+
+    def _remember_sig(self, sig: str | None, venue: str) -> None:
+        if sig:
+            self._seen_sigs.add((venue.lower(), sig))
+            self._seen_sigs.add(sig)  # backward compat with plain-sig lookups
+
+    def reconcile(self, token: str, on_chain_amount: float, venue: str = "solana") -> bool:
+        # Resolve venue-aware key first, fall back to legacy plain token key.
+        key = token if token in self.positions else self.venue_key(venue, token)
+        if key not in self.positions:
+            # legacy plain-key position with matching venue (or default solana)
+            if token in self.positions:
+                key = token
+            else:
+                return False
         if on_chain_amount <= 0:
-            del self.positions[token]
+            del self.positions[key]
             self.save_state()
-            logger.info(f"[=] Reconciled {token}: closed (on-chain 0)")
+            logger.info(f"[=] Reconciled {key}: closed (on-chain 0)")
             return True
-        pos = self.positions[token]
+        pos = self.positions[key]
         if pos.amount_held != on_chain_amount:
-            logger.info(f"[=] Reconciled {token}: {pos.amount_held} -> {on_chain_amount} (on-chain)")
+            logger.info(f"[=] Reconciled {key}: {pos.amount_held} -> {on_chain_amount} (on-chain)")
             pos.amount_held = on_chain_amount
             self.save_state()
         return True
 
-    def add_position(self, token, symbol, price, amount, cost_sol, tx_sig: str | None = None):
-        if tx_sig and tx_sig in self._seen_sigs:
+    def add_position(self, token, symbol, price, amount, cost_sol, tx_sig: str | None = None,
+                     venue: str = "solana", side: str = "LONG", leverage: float = 1.0):
+        if tx_sig and self.has_sig(tx_sig, venue):
             logger.warning(f"[=] Duplicate sig {tx_sig} for {token}, skipping add")
             return
-        if tx_sig:
-            self._seen_sigs.add(tx_sig)
-        self.positions[token] = Position(
+        self._remember_sig(tx_sig, venue)
+        key = token if venue.lower() == "solana" else self.venue_key(venue, token)
+        self.positions[key] = Position(
             token_address=token,
             symbol=symbol,
             entry_price=price,
             entry_time=time.time(),
             amount_held=amount,
             initial_cost_sol=cost_sol,
-            highest_price=price
+            highest_price=price,
+            venue=venue.lower(),
+            side=side,
+            leverage=leverage,
         )
         self.save_state()
-        logger.info(f"[+] Position Added: {symbol} @ {price}")
+        logger.info(f"[+] Position Added: {symbol} @ {price} [{venue}]")
 
     def update_price(self, token, current_price):
         if token in self.positions:
@@ -205,7 +227,17 @@ class PortfolioManager:
                 with open(self.state_file, 'r') as f:
                     data = json.load(f)
                     for k, v in data.items():
-                        self.positions[k] = Position(**v)
+                        v.setdefault("venue", "solana")
+                        v.setdefault("side", "LONG")
+                        v.setdefault("leverage", 1.0)
+                        try:
+                            self.positions[k] = Position(**v)
+                        except TypeError:
+                            # drop unknown future fields defensively
+                            known = {f for f in Position.__dataclass_fields__}
+                            self.positions[k] = Position(
+                                **{kk: vv for kk, vv in v.items() if kk in known}
+                            )
             except FileNotFoundError:
                 self.positions = {}
         finally:

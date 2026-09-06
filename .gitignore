@@ -61,3 +61,21 @@ data_pipeline/checkpoint.json.tmp
 .DS_Store
 Thumbs.db
 
+
+# Cold data (P-cloud symlinks) - do not track
+data_15m_3y/
+data_15m_3y
+*.csv
+backtest_*.jsonl
+backtest_*.json
+backtest_results.jsonl
+paper_trades*.json
+train_*_best.json
+train_*.log
+corr_*.csv
+validate_15m_3y.json
+checkpoint.json
+*.log
+# Internal agent plans
+.claude/
+.sisyphus/

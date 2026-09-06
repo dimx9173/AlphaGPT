@@ -77,3 +77,119 @@ class ExecutionConfig:
     @classmethod
     def get_wallet_address(cls):
         return str(cls.get_payer_keypair().pubkey())
+
+
+class HyperliquidConfig:
+    """Hyperliquid venue config (P4 Phase 2). Testnet by default."""
+
+    MAINNET_URL = "https://api.hyperliquid.xyz"
+    TESTNET_URL = "https://api.hyperliquid-testnet.xyz"
+
+    @classmethod
+    def use_testnet(cls) -> bool:
+        return __import__("os").getenv("HYPERLIQUID_TESTNET", "true").strip().lower() in {
+            "1", "true", "yes", "y",
+        }
+
+    @classmethod
+    def base_url(cls) -> str:
+        return cls.TESTNET_URL if cls.use_testnet() else cls.MAINNET_URL
+
+    @classmethod
+    def account_address(cls) -> str:
+        return __import__("os").getenv("HYPERLIQUID_ACCOUNT_ADDRESS", "").strip()
+
+    @classmethod
+    def secret_key(cls) -> str:
+        return __import__("os").getenv("HYPERLIQUID_SECRET_KEY", "").strip()
+
+    @classmethod
+    def enabled(cls) -> bool:
+        venues = __import__("os").getenv("VENUES_ENABLED", "solana")
+        return "hyperliquid" in {v.strip().lower() for v in venues.split(",")}
+
+    @classmethod
+    def validate_env(cls):
+        if not cls.enabled():
+            return
+        missing = []
+        if not cls.account_address():
+            missing.append("HYPERLIQUID_ACCOUNT_ADDRESS")
+        if not cls.secret_key():
+            missing.append("HYPERLIQUID_SECRET_KEY")
+        if missing:
+            raise ValueError(
+                f"Missing env vars: {', '.join(missing)}. "
+                "Set them in .env (testnet keys first; see .env.example)"
+            )
+
+
+class AsterConfig:
+    """Aster venue config (P4 Phase 3). V3 EIP-712, testnet by default."""
+
+    FUTURES_MAIN = "https://fapi.asterdex.com"
+    FUTURES_TEST = "https://fapi.asterdex-testnet.com"
+    SPOT_MAIN = "https://sapi.asterdex.com"
+    SPOT_TEST = "https://sapi.asterdex-testnet.com"
+
+    @classmethod
+    def use_testnet(cls) -> bool:
+        import os
+
+        return os.getenv("ASTER_TESTNET", "true").strip().lower() in {
+            "1", "true", "yes", "y",
+        }
+
+    @classmethod
+    def futures_url(cls) -> str:
+        return cls.FUTURES_TEST if cls.use_testnet() else cls.FUTURES_MAIN
+
+    @classmethod
+    def spot_url(cls) -> str:
+        return cls.SPOT_TEST if cls.use_testnet() else cls.SPOT_MAIN
+
+    @classmethod
+    def _get(cls, key: str) -> str:
+        import os
+
+        return os.getenv(key, "").strip()
+
+    @classmethod
+    def user_address(cls) -> str:
+        return cls._get("ASTER_USER_ADDRESS")
+
+    @classmethod
+    def signer_address(cls) -> str:
+        return cls._get("ASTER_SIGNER_ADDRESS")
+
+    @classmethod
+    def signer_key(cls) -> str:
+        return cls._get("ASTER_SIGNER_PRIVATE_KEY")
+
+    @classmethod
+    def enabled(cls) -> bool:
+        import os
+
+        venues = os.getenv("VENUES_ENABLED", "solana")
+        return "aster" in {v.strip().lower() for v in venues.split(",")}
+
+    @classmethod
+    def validate_env(cls):
+        if not cls.enabled():
+            return
+        missing = [k for k, v in [
+            ("ASTER_USER_ADDRESS", cls.user_address()),
+            ("ASTER_SIGNER_ADDRESS", cls.signer_address()),
+            ("ASTER_SIGNER_PRIVATE_KEY", cls.signer_key()),
+        ] if not v]
+        if missing:
+            raise ValueError(
+                f"Missing env vars: {', '.join(missing)}. "
+                "Create an API-wallet at /en/api-wallet; see .env.example"
+            )
+
+    @classmethod
+    def make_signer(cls):
+        from .brokers.aster_sign import AsterSigner
+
+        return AsterSigner(cls.user_address(), cls.signer_address(), cls.signer_key())

@@ -122,18 +122,30 @@ tab1, tab2, tab3, tab4, tab5 = st.tabs(["Portfolio", "Market Scanner", "Training
 with tab1:
     st.subheader("Active Holdings")
     if not portfolio_df.empty:
+        # P4: ensure venue columns exist for old state files
+        for _c, _d in (("venue", "solana"), ("side", "LONG"), ("leverage", 1.0)):
+            if _c not in portfolio_df.columns:
+                portfolio_df[_c] = _d
+        venues = sorted(portfolio_df["venue"].fillna("solana").unique().tolist())
+        venue_sel = st.multiselect("Venue filter", venues, default=venues)
+        filt_df = portfolio_df[portfolio_df["venue"].isin(venue_sel)] if venue_sel else portfolio_df
         # Display Table
-        display_cols = ['symbol', 'entry_price', 'highest_price', 'amount_held', 'pnl_pct', 'is_moonbag']
-        
+        display_cols = [c for c in ['venue', 'side', 'leverage', 'symbol', 'entry_price',
+                                    'highest_price', 'amount_held', 'pnl_pct', 'is_moonbag']
+                        if c in filt_df.columns]
+
         # Format for display
-        show_df = portfolio_df[display_cols].copy()
-        show_df['pnl_pct'] = show_df['pnl_pct'].apply(lambda x: f"{x:.2%}")
-        show_df['entry_price'] = show_df['entry_price'].apply(lambda x: f"{x:.6f}")
-        
+        show_df = filt_df[display_cols].copy()
+        if 'pnl_pct' in show_df.columns:
+            show_df['pnl_pct'] = show_df['pnl_pct'].apply(lambda x: f"{x:.2%}")
+        if 'entry_price' in show_df.columns:
+            show_df['entry_price'] = show_df['entry_price'].apply(lambda x: f"{x:.6f}")
+
         st.dataframe(show_df, use_container_width=True, hide_index=True)
-        
+        st.caption(f"By venue: {filt_df.groupby('venue').size().to_dict()}" if not filt_df.empty else "")
+
         # Display Chart
-        st.plotly_chart(plot_pnl_distribution(portfolio_df), use_container_width=True)
+        st.plotly_chart(plot_pnl_distribution(filt_df), use_container_width=True)
     else:
         st.info("No active positions. The bot is scanning...")
 

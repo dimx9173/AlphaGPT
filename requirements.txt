@@ -30,6 +30,10 @@ python-dotenv>=1.0.0  # Load .env files
 loguru>=0.7.0         # Structured logging
 tqdm>=4.66.0          # Progress bars
 
+# Multi-Venue: Hyperliquid + Aster (P4)
+hyperliquid-python-sdk>=0.24.0  # Hyperliquid Info/Exchange (official)
+eth-account>=0.11.0             # EVM signing (Aster V3 + HL agent keys)
+
 # Solana Blockchain Integration
 # Note: Install solders first, then solana (as recommended by solana-py)
 solders>=0.18.0       # Solana Rust bindings (install first)

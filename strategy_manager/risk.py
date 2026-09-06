@@ -65,6 +65,9 @@ class RiskEngine:
         exposure_sol: float | None = None,
         daily_pnl: float | None = None,
         drawdown: float | None = None,
+        leverage: int | None = None,
+        notional_usdt: float | None = None,
+        funding_rate: float | None = None,
     ) -> bool:
         # 1) 熔斷（可注入指標）
         blocked, reason = self.check_circuit(daily_pnl=daily_pnl, drawdown=drawdown)
@@ -86,6 +89,17 @@ class RiskEngine:
             logger.warning(f"[x] Risk: Single exposure {exposure_sol:.4f} SOL > {self.risk_config.max_single_exposure_sol} SOL")
             return False
 
+        # 4b) perp 門檻（僅當調用方傳入 perp 參數時觸發，現貨行為不變）
+        if leverage is not None or notional_usdt is not None or funding_rate is not None:
+            ok, _ = self.check_perp(
+                token_address,
+                leverage if leverage is not None else 1,
+                notional_usdt if notional_usdt is not None else 0.0,
+                funding_rate,
+            )
+            if not ok:
+                return False
+
         # 5) 原有：流動性門檻
         if liquidity_usd < 5000:
             logger.warning(f"[x] Risk: Liquidity too low (${liquidity_usd})")
@@ -106,6 +120,34 @@ class RiskEngine:
             return False
 
         return True
+
+    def check_perp(
+        self,
+        symbol: str,
+        leverage: int,
+        notional_usdt: float,
+        funding_rate: float | None = None,
+    ) -> tuple[bool, str]:
+        """Perp gate: (allowed, reason). Empty reason means pass."""
+        if leverage > self.risk_config.perp_max_leverage:
+            logger.warning(
+                f"[x] Risk: leverage {leverage}x > max {self.risk_config.perp_max_leverage}x ({symbol})"
+            )
+            return False, "leverage"
+        if notional_usdt > self.risk_config.perp_max_notional_usdt:
+            logger.warning(
+                f"[x] Risk: notional ${notional_usdt:.0f} > max ${self.risk_config.perp_max_notional_usdt:.0f} ({symbol})"
+            )
+            return False, "notional"
+        if funding_rate is not None and abs(funding_rate) > self.risk_config.max_funding_rate:
+            logger.warning(
+                f"[x] Risk: funding {funding_rate:.4%} > max {self.risk_config.max_funding_rate:.4%} ({symbol})"
+            )
+            return False, "funding"
+        if self.is_blacklisted(symbol):
+            logger.warning(f"[x] Risk: Blacklisted {symbol}")
+            return False, "blacklist"
+        return True, ""
 
     def calculate_position_size(self, wallet_balance_sol: float) -> float:
         size = self.config.ENTRY_AMOUNT_SOL
