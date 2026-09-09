@@ -38,7 +38,13 @@ async def build_plans(broker, risk: RiskEngine | None = None,
     risk = risk or RiskEngine()
     cfg = risk.risk_config if isinstance(risk.risk_config, RiskConfig) else RiskConfig()
     want_map = latest_signals()
-    notion = float(notional or os.getenv("Y1B_NOTIONAL_USDT", "50"))
+    try:
+        notion = float(notional if notional is not None else os.getenv("Y1B_NOTIONAL_USDT", "50"))
+    except (TypeError, ValueError):
+        notion = 50.0
+    if notion <= 0:
+        return [Plan(coin, SYMBOLS[coin], want, None, 0.0, 0.0, False, "bad-notional")
+                for coin, want in want_map.items()]
     plans: list[Plan] = []
     for coin, want in want_map.items():
         sym = SYMBOLS[coin]

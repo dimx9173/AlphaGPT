@@ -16,6 +16,19 @@ def test_live_without_confirm_refused():
     assert d.get("refused") is True
 
 
+def test_bad_notional_rejected_no_orders():
+    import asyncio
+    from unittest.mock import AsyncMock
+    from strategy_manager.y1b_executor import build_plans
+    from strategy_manager.risk import RiskEngine
+    b = AsyncMock()
+    b.get_price = AsyncMock(return_value=20.0)
+    b.market_open = AsyncMock(side_effect=AssertionError("bad notional must not order"))
+    for bad in (-100.0, 0.0):
+        plans = asyncio.run(build_plans(b, RiskEngine(), notional=bad))
+        assert plans and all(p.gate_ok is False and p.size == 0.0 for p in plans)
+    b.market_open.assert_not_awaited()
+
 def test_oversize_notional_capped():
     import asyncio
     from unittest.mock import AsyncMock
