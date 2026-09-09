@@ -54,6 +54,22 @@ def test_stop_blocks_live(tmp_path, monkeypatch):
     assert res and res[0].get("blocked") is True
     b.market_open.assert_not_awaited()
 
+def test_funding_gate_blocks_high_funding():
+    import asyncio
+    b = _mock_broker(20.0)
+    b.get_funding_rate = AsyncMock(return_value=0.05)
+    plans = asyncio.run(build_plans(b, RiskEngine(), notional=50.0))
+    gated = [p for p in plans if p.want != 0]
+    assert gated and all(p.gate_ok is False for p in gated)
+
+def test_funding_mock_attr_ignored():
+    import asyncio
+    from unittest.mock import MagicMock
+    b = _mock_broker(20.0)
+    b.get_funding_rate = MagicMock(return_value=MagicMock())
+    plans = asyncio.run(build_plans(b, RiskEngine(), notional=50.0))
+    assert all(p.gate_ok is True for p in plans if p.want != 0)
+
 def test_perp_gate_rejects_oversize():
     import asyncio
     b = _mock_broker(1.0)

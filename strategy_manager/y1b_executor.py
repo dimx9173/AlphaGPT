@@ -53,13 +53,11 @@ async def build_plans(broker, risk: RiskEngine | None = None,
         side = Side.BUY if want > 0 else Side.SELL
         size = min(notion, cfg.perp_max_notional_usdt) / price
         funding = None
-        get_funding = getattr(broker, "get_funding_rate", None)
-        try:
-            from unittest.mock import AsyncMock as _AM, Mock as _MK
-            if isinstance(get_funding, (_AM, _MK)):
+        get_funding = broker.__dict__.get("get_funding_rate", None)
+        if get_funding is None:
+            get_funding = getattr(type(broker), "get_funding_rate", None)
+            if isinstance(get_funding, property):
                 get_funding = None
-        except Exception:
-            pass
         if callable(get_funding):
             try:
                 funding = await get_funding(sym)
