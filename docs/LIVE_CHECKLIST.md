@@ -182,6 +182,15 @@ python3 research/run_paper2.py
 - Fix `1b6c269`: broker session closed, loguru stays on stderr.
 - Use: `python3 research/run_y1b_once.py [--notional=50] [--live]` (--live still needs ALL live gates).
 
+## 7l. This-run results (2026-09-09, 132-suite + CLI dual-confirm + venue map)
+
+- Full suite: 132 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS ([1/4] shadow dry-run
+  + [2/4] STOP-block + [3/4] paper 478/2.9883 + [4/4] fee2x 478/2.0386).
+- CLI `run_y1b_once.py`: dual-confirm (`--live` + `--i-understand-live`), pure-JSON stdout,
+  oversize-notional cap pinned at perp max. Testnet ETC/TRX unlisted -> flat, no order.
+- Venue map: Aster testnet 17 syms (no ETC/TRX) / HL testnet 212 (ETC only) / Aster mainnet 585 (both listed).
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
