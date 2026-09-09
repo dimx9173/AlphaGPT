@@ -5,7 +5,7 @@ Default dry-run (no orders, no keys). Live ONLY with --live AND
 Y1B_LIVE_ENABLED=1 AND PAPER_MODE unset AND STOP absent AND circuit
 closed AND deadman ok AND perp gate pass.
 Usage:
-  python3 research/run_y1b_once.py [--notional=50] [--live]
+  python3 research/run_y1b_once.py [--notional=50] [--live --i-understand-live]
 """
 import asyncio
 import json
@@ -20,8 +20,14 @@ from strategy_manager.risk import RiskEngine  # noqa: E402
 from strategy_manager.y1b_executor import run_once  # noqa: E402
 
 
+LIVE_CONFIRM = "--i-understand-live"
+
 def main(argv):
     live = "--live" in argv
+    if live and LIVE_CONFIRM not in argv:
+        print(json.dumps({"refused": True,
+                           "reason": "live requires --live AND --i-understand-live"}))
+        return
     notional = None
     for a in argv:
         if a.startswith("--notional="):
