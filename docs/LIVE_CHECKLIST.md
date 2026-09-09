@@ -195,6 +195,8 @@ python3 research/run_paper2.py
 - CLI `run_y1b_once.py`: dual-confirm (`--live` + `--i-understand-live`), pure-JSON stdout,
   oversize-notional cap pinned at perp max. Testnet ETC/TRX unlisted -> flat, no order.
 - Venue map: Aster testnet 17 syms (no ETC/TRX) / HL testnet 212 (ETC only) / Aster mainnet 585 (both listed).
+- Mainnet data feed probe (2026-09-09, public read-only): ETCUSDT 8.457 / TRXUSDT 0.33900,
+  4h klines retrievable. Basket data source ready; only order placement awaits human approval.
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
 ## 7n. Live-flag fail-safe probe (2026-09-09, real testnet endpoint)
