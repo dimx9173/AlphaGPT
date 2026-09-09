@@ -54,8 +54,13 @@ def test_env_example_has_y1b_switches():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     txt = open(os.path.join(root, ".env.example")).read()
     for key in ["Y1B_LIVE_ENABLED=0", "PAPER_MODE=1", "Y1B_NOTIONAL_USDT=50", "Y1B_STATE=y1b_state.json",
-                "PERP_MAX_LEVERAGE=2"]:
+                "PERP_MAX_LEVERAGE=2", "VENUES_ENABLED=aster"]:
         assert key in txt, key
+
+
+def test_dashboard_stop_respects_env():
+    src = open("dashboard/app.py").read()
+    assert 'os.getenv("STOP_SIGNAL_PATH", "STOP_SIGNAL")' in src.replace("_os.getenv", "os.getenv")
 
 def test_gates_from_artifacts():
     mon = _load("results/backtest_E10.json")["locked_params"]["monitoring"]

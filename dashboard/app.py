@@ -59,14 +59,16 @@ with st.sidebar:
             if token_input != dashboard_token:
                 st.error("Invalid token — EMERGENCY STOP not sent.")
             else:
-                with open("STOP_SIGNAL", "w") as f:
+                import os as _os
+                with open(_os.getenv("STOP_SIGNAL_PATH", "STOP_SIGNAL"), "w") as f:
                     f.write("STOP")
                 st.error("STOP SIGNAL SENT, Process will terminate on next cycle.")
         else:
             if not confirm_stop:
                 st.error("Please check 'I confirm EMERGENCY STOP' to proceed.")
             else:
-                with open("STOP_SIGNAL", "w") as f:
+                import os as _os
+                with open(_os.getenv("STOP_SIGNAL_PATH", "STOP_SIGNAL"), "w") as f:
                     f.write("STOP")
                 st.error("STOP SIGNAL SENT, Process will terminate on next cycle.")
 
