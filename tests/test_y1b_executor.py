@@ -103,6 +103,21 @@ def test_deadman_fail_blocks_live_no_orders(tmp_path, monkeypatch):
     assert res == [{"blocked": True, "reason": "deadman FAILED"}]
     b.market_open.assert_not_awaited()
 
+def test_leverage_reject_blocks_order_no_idempotent_skip(tmp_path, monkeypatch):
+    import asyncio
+    monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
+    monkeypatch.setenv("Y1B_LIVE_ENABLED", "1")
+    monkeypatch.delenv("PAPER_MODE", raising=False)
+    b = _mock_broker(20.0)
+    b.get_position = AsyncMock(return_value=None)
+    b.enable_deadman = AsyncMock(return_value=True)
+    b.set_leverage = AsyncMock(return_value=False)
+    b.market_open = AsyncMock(side_effect=AssertionError("must not order on lev reject"))
+    from strategy_manager.y1b_executor import run_once
+    plans, res, sync = asyncio.run(run_once(broker=b, notional=50.0, dry_run=False))
+    assert any(r.get("reason") == "leverage-rejected" for r in res)
+    b.market_open.assert_not_awaited()
+
 def test_perp_gate_rejects_oversize():
     import asyncio
     b = _mock_broker(1.0)

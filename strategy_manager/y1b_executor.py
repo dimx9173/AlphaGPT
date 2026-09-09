@@ -190,9 +190,12 @@ async def run_once(broker=None, risk: RiskEngine | None = None,
                 results.append({"symbol": p.symbol, "skipped": True, "reason": "already-held"})
                 continue
         try:
-            await broker.set_leverage(p.symbol, int(LEV))
+            lev_ok = await broker.set_leverage(p.symbol, int(LEV))
         except Exception as e:
             results.append({"symbol": p.symbol, "error": f"leverage: {e}"})
+            continue
+        if lev_ok is False:
+            results.append({"symbol": p.symbol, "skipped": True, "reason": "leverage-rejected"})
             continue
         res = await broker.market_open(p.symbol, p.side, p.size)
         results.append({"symbol": p.symbol, "ok": res.ok, "oid": res.oid,
