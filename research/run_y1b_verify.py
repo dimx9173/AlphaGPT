@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """run_y1b_verify.py — Y1b wiring verification (no orders, no keys).
 
-Runs three dry checks:
+Runs four dry checks:
   1. shadow dry-run: mock broker, plans gated, market_open zero-call
   2. STOP-block: STOP file + Y1B_LIVE_ENABLED=1 + dry_run=False -> blocked
   3. paper baseline: research/run_paper2.py must print 478/2.9883/0.899
+  4. fee2x: FEE=0.0008 must print 478/2.0386 (final_x>1), baseline restored
 Usage: python3 research/run_y1b_verify.py
 """
 import os
@@ -59,10 +60,29 @@ def check_paper():
     r = subprocess.run([sys.executable, "research/run_paper2.py"], capture_output=True, text=True)
     out = r.stdout + r.stderr
     assert "trades=478" in out and "final_x=2.9883" in out, out[-500:]
-    print("[3/3] paper baseline OK (478/2.9883)")
+    print("[3/4] paper baseline OK (478/2.9883)")
+
+def check_fee2x():
+    import shutil
+    src = "research/run_paper2.py"
+    tmp = "research/_fee2x_verify_tmp.py"
+    shutil.copy(src, tmp)
+    try:
+        txt = open(tmp).read().replace("FEE = 0.0004", "FEE = 0.0008", 1)
+        assert "FEE = 0.0008" in txt
+        open(tmp, "w").write(txt)
+        r = subprocess.run([sys.executable, tmp], capture_output=True, text=True)
+        out = r.stdout + r.stderr
+        assert "trades=478" in out and "final_x=2.0386" in out, out[-500:]
+        print("[4/4] fee2x OK (478/2.0386 final_x>1)")
+    finally:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        subprocess.run([sys.executable, "research/run_paper2.py"], capture_output=True)
 
 if __name__ == "__main__":
     check_shadow()
     check_stop()
     check_paper()
+    check_fee2x()
     print("Y1B_VERIFY PASS: no orders, no keys")
