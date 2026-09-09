@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Shadow ledger: append-only daily stability rows (no orders, no keys)."""
-import csv
 import datetime
 import json
 import os
