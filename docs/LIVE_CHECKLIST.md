@@ -233,6 +233,13 @@ python3 research/run_paper2.py
 - Full suite: 137 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
+## 7s. This-run results (2026-09-09, close-only pins + 139 suite)
+
+- Test `6ee73d4`: want-zero close-only pinned in shadow (dry_run_close report,
+  zero orders) and live (venue flatten + reconcile).
+- Full suite: 139 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
