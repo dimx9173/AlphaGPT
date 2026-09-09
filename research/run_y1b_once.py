@@ -29,9 +29,16 @@ def main(argv):
                 notional = float(a.split("=", 1)[1])
             except ValueError:
                 pass
-    plans, res, sync = asyncio.run(run_once(
-        broker=AsterBroker(), risk=RiskEngine(), notional=notional,
-        dry_run=False if live else None))
+    broker = AsterBroker()
+    try:
+        plans, res, sync = asyncio.run(run_once(
+            broker=broker, risk=RiskEngine(), notional=notional,
+            dry_run=False if live else None))
+    finally:
+        try:
+            asyncio.run(broker.close())
+        except Exception:
+            pass
     print(json.dumps({"plans": [
         {"coin": p.coin, "symbol": p.symbol, "want": p.want,
          "size": round(p.size, 6), "price": p.price, "gate_ok": p.gate_ok,
