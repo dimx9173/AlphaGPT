@@ -256,6 +256,13 @@ python3 research/run_paper2.py
 - fee2x: 2.0386->2.1 (>1 PASS). Verify gates switched to tolerance assertions (§5).
 - No orders, no keys.
 
+## 7v. This-run results (2026-09-09, print-config CLI + 140 suite)
+
+- New `--print-config` on `run_y1b_once.py`: instant locked-config dump
+  (formula/legs/lev/symbols), no compute, no keys, no network.
+- Full suite: 140 passed, 0 failed. Gate report PASS.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
