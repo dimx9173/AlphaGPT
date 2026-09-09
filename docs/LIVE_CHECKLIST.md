@@ -248,6 +248,14 @@ python3 research/run_paper2.py
 - Full suite: 139 passed, 0 failed.
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
+## 7u. Data refresh re-baseline (2026-09-09, n=6598)
+
+- Cold data ETC/TRX extended to 2026-09-09 09:45 (+286 bars, public Binance resume).
+- paper: trades 478 (=), final_x 2.9883->3.0782 (+0.09 within +-0.15), sharpe 0.899->0.911,
+  mdd 0.7846->0.7782, n 6580->6598, by={ETC:186, TRX:292} unchanged.
+- fee2x: 2.0386->2.1 (>1 PASS). Verify gates switched to tolerance assertions (§5).
+- No orders, no keys.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
