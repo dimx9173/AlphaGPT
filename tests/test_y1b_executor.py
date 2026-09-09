@@ -143,6 +143,46 @@ def test_idempotent_held_skips_replay(tmp_path, monkeypatch):
     assert any(r.get("reason") in ("idempotent-held", "already-held") for r in res)
     b.market_open.assert_not_awaited()
 
+def test_want_zero_reports_dry_run_close(tmp_path, monkeypatch):
+    import asyncio
+    from execution.brokers.base import VenuePosition, Venue
+    from strategy_manager import y1b_executor as XE
+    monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
+    monkeypatch.delenv("Y1B_LIVE_ENABLED", raising=False)
+    orig = XE.latest_signals
+    XE.latest_signals = lambda: {"ETC": 0.0, "TRX": 0.0}
+    try:
+        b = _mock_broker(20.0)
+        b.get_position = AsyncMock(return_value=VenuePosition(
+            venue=Venue.ASTER, symbol="ETCUSDT", side="LONG", size=1.5))
+        plans, res, sync = asyncio.run(run_once(broker=b, notional=50.0))
+        assert all(p.want == 0.0 for p in plans)
+        assert any(a.get("dry_run_close") for a in sync)
+        b.market_open.assert_not_awaited()
+    finally:
+        XE.latest_signals = orig
+
+def test_want_zero_live_closes_venue_position(tmp_path, monkeypatch):
+    import asyncio
+    from execution.brokers.base import VenuePosition, Venue
+    from strategy_manager import y1b_executor as XE
+    monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
+    monkeypatch.setenv("Y1B_LIVE_ENABLED", "1")
+    monkeypatch.delenv("PAPER_MODE", raising=False)
+    orig = XE.latest_signals
+    XE.latest_signals = lambda: {"ETC": 0.0, "TRX": 0.0}
+    try:
+        b = _mock_broker(20.0)
+        b.enable_deadman = AsyncMock(return_value=True)
+        b.get_position = AsyncMock(return_value=VenuePosition(
+            venue=Venue.ASTER, symbol="ETCUSDT", side="LONG", size=1.5))
+        b.market_open = AsyncMock(return_value=type("R", (), {
+            "ok": True, "oid": "c1", "fill_price": 20.0, "reason": ""})())
+        plans, res, sync = asyncio.run(run_once(broker=b, notional=50.0, dry_run=False))
+        assert any(a.get("closed") for a in sync)
+    finally:
+        XE.latest_signals = orig
+
 def test_perp_gate_rejects_oversize():
     import asyncio
     b = _mock_broker(1.0)
