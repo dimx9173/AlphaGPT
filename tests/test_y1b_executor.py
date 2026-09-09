@@ -91,6 +91,21 @@ def test_gate_failed_flip_closes_only(tmp_path, monkeypatch):
     assert closes and not flips
     b.market_open.assert_awaited()
 
+def test_circuit_open_blocks_live_no_orders(tmp_path, monkeypatch):
+    import asyncio
+    monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
+    monkeypatch.setenv("Y1B_LIVE_ENABLED", "1")
+    monkeypatch.delenv("PAPER_MODE", raising=False)
+    eng = RiskEngine()
+    eng.set_daily_pnl(-0.50)
+    b = _mock_broker(20.0)
+    b.enable_deadman = AsyncMock(return_value=True)
+    b.market_open = AsyncMock(side_effect=AssertionError("circuit must block"))
+    from strategy_manager.y1b_executor import run_once
+    plans, res, sync = asyncio.run(run_once(broker=b, risk=eng, notional=50.0, dry_run=False))
+    assert res == [{"blocked": True, "reason": "circuit:daily_loss"}]
+    b.market_open.assert_not_awaited()
+
 def test_deadman_fail_blocks_live_no_orders(tmp_path, monkeypatch):
     import asyncio
     monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
