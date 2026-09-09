@@ -153,6 +153,15 @@ python3 research/run_paper2.py
 - HEAD `aee13f3` clean (9 files, 554+/5-). Full suite 125 passed, verify 3-in-1 PASS, E10 check PASS.
 - No orders, no keys. Live default-off; human testnet gates pending (§5/§8.4).
 
+## 7i. This-run results (2026-09-09, audit close + 129 suite)
+
+- Independent audit (read-only): H1 flip-bypasses-gate REAL -> fixed in `6f45438`
+  (gate-failed flips degrade to close-only, pinned by test). H2 close-exempt by
+  design (allowlisted). H3/H4 fail-open notes recorded. Drift: NONE
+  (config == E10 == golden on all asserted fields).
+- Full suite: 129 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
+- No orders, no keys. Live default-off; human testnet gates pending (§5/§8.4).
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
