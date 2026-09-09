@@ -172,6 +172,8 @@ python3 research/run_paper2.py
 - Executor `get_price` returns 0.0 on invalid symbol -> plan `flat`, no order. Safe-fail confirmed.
 - Mainnet probe (2026-09-09, public read-only): 585 symbols, **ETCUSDT + TRXUSDT both listed**.
   So Y1b basket is mainnet-tradable; testnet gap is coverage-only, not a strategy blocker.
+- Hyperliquid testnet probe (2026-09-09, public `/info` meta): 212 perps, **ETC listed, TRX missing**.
+  So HL testnet covers only the ETC leg — full-basket live-test still needs Aster mainnet micro-notional (human approval).
 
 ## 7k. This-run results (2026-09-09, single-cycle CLI)
 
