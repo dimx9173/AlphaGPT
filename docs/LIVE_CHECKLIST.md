@@ -197,6 +197,13 @@ python3 research/run_paper2.py
 - Venue map: Aster testnet 17 syms (no ETC/TRX) / HL testnet 212 (ETC only) / Aster mainnet 585 (both listed).
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
+## 7n. Live-flag fail-safe probe (2026-09-09, real testnet endpoint)
+
+- `Y1B_LIVE_ENABLED=1` + `dry_run=False` against real Aster testnet (no keys):
+  plans built (ETC/TRX -1.0), result `blocked: deadman FAILED`, zero orders.
+- Fail-safe holds on the real path, not just mocks. Keys absent -> signer
+  ValueError/deadman FAILED before any order path.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
