@@ -70,6 +70,27 @@ def test_funding_mock_attr_ignored():
     plans = asyncio.run(build_plans(b, RiskEngine(), notional=50.0))
     assert all(p.gate_ok is True for p in plans if p.want != 0)
 
+def test_gate_failed_flip_closes_only(tmp_path, monkeypatch):
+    import asyncio
+    from execution.brokers.base import VenuePosition, Venue
+    monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
+    monkeypatch.setenv("Y1B_LIVE_ENABLED", "1")
+    monkeypatch.delenv("PAPER_MODE", raising=False)
+    b = _mock_broker(20.0)
+    b.get_funding_rate = AsyncMock(return_value=0.05)  # force gate fail
+    b.enable_deadman = AsyncMock(return_value=True)
+    # held LONG vs want SHORT -> flip path, gate fails -> close-only
+    b.get_position = AsyncMock(return_value=VenuePosition(
+        venue=Venue.ASTER, symbol="ETCUSDT", side="LONG", size=1.0))
+    b.market_open = AsyncMock(return_value=type("R", (), {
+        "ok": True, "oid": "x1", "fill_price": 20.0, "reason": ""})())
+    from strategy_manager.y1b_executor import run_once
+    plans, res, sync = asyncio.run(run_once(broker=b, notional=50.0, dry_run=False))
+    closes = [a for a in sync if a.get("closed_only_gate_fail")]
+    flips = [a for a in sync if a.get("flipped")]
+    assert closes and not flips
+    b.market_open.assert_awaited()
+
 def test_perp_gate_rejects_oversize():
     import asyncio
     b = _mock_broker(1.0)

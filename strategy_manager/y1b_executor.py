@@ -101,7 +101,9 @@ async def preflight(broker, risk: RiskEngine) -> tuple[bool, str]:
 
 
 async def sync_positions(broker, plans: list[Plan], pm, live: bool):
-    """Flatten venue positions whose want==0; report flips. Dry-run only reports."""
+    """Flatten venue positions whose want==0 (close-only allowlist, gate-exempt
+    by design: risk-reducing); report flips. Gate-failed flips close-only.
+    Dry-run only reports."""
     actions = []
     for p in plans:
         try:
@@ -129,6 +131,16 @@ async def sync_positions(broker, plans: list[Plan], pm, live: bool):
             actions.append({"symbol": p.symbol, "flip_needed": True, "held": held,
                             "want": p.want, "dry_run": not live})
             if live:
+                if not p.gate_ok:
+                    # H1 fix: gate-failed flips degrade to close-only (risk-reducing),
+                    # never open fresh size against a failed perp gate.
+                    side = Side.SELL if held > 0 else Side.BUY
+                    res = await broker.market_open(p.symbol, side, abs(held))
+                    actions.append({"symbol": p.symbol, "closed_only_gate_fail": res.ok,
+                                    "oid": res.oid, "reason": p.reason or res.reason})
+                    if res.ok:
+                        pm.reconcile(p.symbol, 0.0, venue="aster")
+                    continue
                 side = Side.BUY if p.want > 0 else Side.SELL
                 res = await broker.market_open(p.symbol, side, p.size + abs(held))
                 actions.append({"symbol": p.symbol, "flipped": res.ok, "oid": res.oid,
