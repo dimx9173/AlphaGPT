@@ -204,6 +204,13 @@ python3 research/run_paper2.py
 - Fail-safe holds on the real path, not just mocks. Keys absent -> signer
   ValueError/deadman FAILED before any order path.
 
+## 7o. This-run results (2026-09-09, leverage fail-safe + 134 suite)
+
+- Fix `c58ebde`: `set_leverage` returning False now blocks the order
+  (`leverage-rejected`, zero `market_open` calls), pinned by test.
+- Full suite: 134 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
