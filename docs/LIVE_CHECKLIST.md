@@ -211,6 +211,13 @@ python3 research/run_paper2.py
 - Full suite: 134 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
+## 7p. This-run results (2026-09-09, sign-aware held fix + 135 suite)
+
+- Fix `2c4ea7d`: same-side held check now sign-aware (`size × side`);
+  SHORT-held no longer misfires as opposite-side. Pinned by idempotent test.
+- Full suite: 135 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
