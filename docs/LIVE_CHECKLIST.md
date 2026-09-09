@@ -182,6 +182,12 @@ python3 research/run_paper2.py
 - Fix `1b6c269`: broker session closed, loguru stays on stderr.
 - Use: `python3 research/run_y1b_once.py [--notional=50] [--live]` (--live still needs ALL live gates).
 
+## 7m. This-run results (2026-09-09, 133-suite + deadman-fail pin)
+
+- Full suite: 133 passed (132+1 deadman-fail), 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
+- Live fail-safe pinned: deadman FAILED -> blocked with zero `market_open` calls.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7l. This-run results (2026-09-09, 132-suite + CLI dual-confirm + venue map)
 
 - Full suite: 132 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS ([1/4] shadow dry-run
