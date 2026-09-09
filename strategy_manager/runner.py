@@ -41,8 +41,16 @@ class StrategyRunner:
                 self.formula = data if isinstance(data, list) else data.get("formula")
             logger.success(f"Loaded Strategy: {self.formula}")
         except FileNotFoundError:
-            logger.critical("Strategy file not found! Please train model first.")
-            exit(1)
+            # E10 fallback: use locked Y1b FORMULA from config (paper safe)
+            try:
+                from .config import FORMULA as _LOCKED_FORMULA
+                self.formula = list(_LOCKED_FORMULA)
+                logger.warning("best_meme_strategy.json missing, using LOCKED Y1b FORMULA from config")
+            except Exception:
+                logger.critical("Strategy file not found! Please train model first.")
+                exit(1)
+        # PAPER_MODE: when true/1, run_loop refuses live trading (offline paper only)
+        self.paper_mode = os.getenv("PAPER_MODE", "").lower() in {"1", "true", "yes"}
 
     async def initialize(self):
         from execution.config import ExecutionConfig
@@ -98,6 +106,9 @@ class StrategyRunner:
                 logger.warning(f"[=] Deadman {venue} error: {e}")
 
     async def run_loop(self):
+        if getattr(self, "paper_mode", False):
+            logger.warning("PAPER_MODE=1: offline paper only, live run_loop refused. Use research/run_paper2.py.")
+            return
         logger.info(">_< | Strategy Runner Started (Live Mode)")
         
         while True:
@@ -397,6 +408,12 @@ class StrategyRunner:
                 except (KeyError, TypeError, ValueError):
                     pass
         raise RuntimeError(f"Price unavailable for {token_addr} after fallbacks: {fallbacks_tried}")
+
+    async def run_y1b_once(self, notional: float | None = None, dry_run: bool | None = None):
+        """Y1b basket cycle (E10 lock): delegates to y1b_executor. Legacy path untouched."""
+        from .y1b_executor import run_once as _y1b_once
+        broker = self.brokers.get("aster") if isinstance(getattr(self, "brokers", None), dict) else None
+        return await _y1b_once(broker=broker, risk=self.risk, notional=notional, dry_run=dry_run)
 
     async def shutdown(self):
         logger.info("O.o | Shutting down strategy runner...")
