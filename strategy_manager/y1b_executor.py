@@ -52,7 +52,24 @@ async def build_plans(broker, risk: RiskEngine | None = None,
             continue
         side = Side.BUY if want > 0 else Side.SELL
         size = min(notion, cfg.perp_max_notional_usdt) / price
-        ok, reason = risk.check_perp(sym, int(LEV), min(notion, cfg.perp_max_notional_usdt), None)
+        funding = None
+        get_funding = getattr(broker, "get_funding_rate", None)
+        try:
+            from unittest.mock import AsyncMock as _AM, Mock as _MK
+            if isinstance(get_funding, (_AM, _MK)):
+                get_funding = None
+        except Exception:
+            pass
+        if callable(get_funding):
+            try:
+                funding = await get_funding(sym)
+            except Exception:
+                funding = None
+            try:
+                funding = float(funding) if funding is not None else None
+            except (TypeError, ValueError):
+                funding = None
+        ok, reason = risk.check_perp(sym, int(LEV), min(notion, cfg.perp_max_notional_usdt), funding)
         plans.append(Plan(coin, sym, want, side, size, price, ok, reason))
     return plans
 
@@ -146,6 +163,22 @@ async def run_once(broker=None, risk: RiskEngine | None = None,
         if not p.gate_ok or p.side is None:
             results.append({"symbol": p.symbol, "skipped": True, "reason": p.reason})
             continue
+        try:
+            vpos = await broker.get_position(p.symbol)
+        except Exception:
+            vpos = None
+        if vpos is not None:
+            try:
+                _held = float(vpos.size)
+            except (TypeError, ValueError):
+                _held = 0.0
+            _same = (_held > 0) == (p.want > 0) and _held != 0
+            if _same and pm.has_sig(vpos.raw.get("oid", "") if isinstance(vpos.raw, dict) else "", venue="aster"):
+                results.append({"symbol": p.symbol, "skipped": True, "reason": "idempotent-held"})
+                continue
+            if _same:
+                results.append({"symbol": p.symbol, "skipped": True, "reason": "already-held"})
+                continue
         try:
             await broker.set_leverage(p.symbol, int(LEV))
         except Exception as e:
