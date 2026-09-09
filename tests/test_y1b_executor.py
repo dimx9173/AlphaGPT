@@ -91,6 +91,18 @@ def test_gate_failed_flip_closes_only(tmp_path, monkeypatch):
     assert closes and not flips
     b.market_open.assert_awaited()
 
+def test_deadman_fail_blocks_live_no_orders(tmp_path, monkeypatch):
+    import asyncio
+    monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
+    monkeypatch.setenv("Y1B_LIVE_ENABLED", "1")
+    monkeypatch.delenv("PAPER_MODE", raising=False)
+    b = _mock_broker(20.0)
+    b.enable_deadman = AsyncMock(return_value=False)
+    from strategy_manager.y1b_executor import run_once
+    plans, res, sync = asyncio.run(run_once(broker=b, notional=50.0, dry_run=False))
+    assert res == [{"blocked": True, "reason": "deadman FAILED"}]
+    b.market_open.assert_not_awaited()
+
 def test_perp_gate_rejects_oversize():
     import asyncio
     b = _mock_broker(1.0)
