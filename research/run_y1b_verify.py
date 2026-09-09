@@ -33,7 +33,7 @@ def check_shadow():
         assert all(r.get("dry_run") for r in res)
         b.market_open.assert_not_awaited()
     asyncio.run(main())
-    print("[1/3] shadow dry-run OK")
+    print("[1/4] shadow dry-run OK")
 
 def check_stop():
     from pathlib import Path
@@ -54,7 +54,7 @@ def check_stop():
         assert res and res[0].get("blocked") is True
         b.market_open.assert_not_awaited()
     asyncio.run(main())
-    print("[2/3] STOP-block OK")
+    print("[2/4] STOP-block OK")
 
 def check_paper():
     r = subprocess.run([sys.executable, "research/run_paper2.py"], capture_output=True, text=True)
