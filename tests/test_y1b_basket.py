@@ -1,5 +1,5 @@
 """Y1b basket wiring test: locked params + offline signals, no orders."""
-from strategy_manager.config import FORMULA, LOCKED_ETC, LOCKED_TRX, LEV, CHALLENGER_AA_H1_CD2
+from strategy_manager.config import FORMULA, LOCKED_ETC, LOCKED_TRX, LEV, CHALLENGER_AA_H1_CD2, CHALLENGER_AA_H1, CHALLENGER_AA_H2
 from strategy_manager.y1b_basket import latest_signals
 
 def test_y1b_locked():
@@ -34,6 +34,10 @@ def test_runner_y1b_once_shadow(monkeypatch, tmp_path):
 
 def test_e13_guard_pinned():
     assert CHALLENGER_AA_H1_CD2 == dict(sth=0.10, etc_cd=17, trx_cd=11, vt=0.012, vw=12, ts=24, q=0.3)
+
+def test_challengers_pinned_shadow_only():
+    assert CHALLENGER_AA_H1 == dict(sth=0.10, etc_cd=15, trx_cd=9, vt=0.012, vw=12)
+    assert CHALLENGER_AA_H2 == dict(sth=0.12, etc_cd=15, trx_cd=9, vt=0.012, vw=12)
 
 def test_y1b_paper_mode_refusal():
     import asyncio
