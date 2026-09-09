@@ -162,6 +162,22 @@ def test_want_zero_reports_dry_run_close(tmp_path, monkeypatch):
     finally:
         XE.latest_signals = orig
 
+def test_price_feed_failure_yields_no_orders(tmp_path, monkeypatch):
+    import asyncio
+    monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
+    monkeypatch.setenv("Y1B_LIVE_ENABLED", "1")
+    monkeypatch.delenv("PAPER_MODE", raising=False)
+    b = _mock_broker(20.0)
+    b.enable_deadman = AsyncMock(return_value=True)
+    b.get_price = AsyncMock(side_effect=RuntimeError("feed down"))
+    b.get_position = AsyncMock(return_value=None)
+    b.market_open = AsyncMock(side_effect=AssertionError("no price must not order"))
+    from strategy_manager.y1b_executor import run_once
+    plans, res, sync = asyncio.run(run_once(broker=b, notional=50.0, dry_run=False))
+    assert plans and all(p.gate_ok is False and "price fail" in p.reason for p in plans)
+    assert all(r.get("skipped") for r in res)
+    b.market_open.assert_not_awaited()
+
 def test_want_zero_live_closes_venue_position(tmp_path, monkeypatch):
     import asyncio
     from execution.brokers.base import VenuePosition, Venue
