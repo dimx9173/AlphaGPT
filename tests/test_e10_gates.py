@@ -26,6 +26,11 @@ def test_paper_baseline_within_tolerance():
     assert abs(s["final_x"] - 2.9883) < 0.15
     assert abs(s["sharpe"] - 0.899) < 0.10
 
+def test_env_example_has_y1b_switches():
+    txt = open(".env.example").read()
+    for key in ["Y1B_LIVE_ENABLED=0", "PAPER_MODE=1", "Y1B_NOTIONAL_USDT=50", "Y1B_STATE=y1b_state.json"]:
+        assert key in txt, key
+
 def test_gates_from_artifacts():
     mon = _load("results/backtest_E10.json")["locked_params"]["monitoring"]
     e1 = _load("results/backtest_E1.json")["12fold"]["Y1b"]["summary"]
