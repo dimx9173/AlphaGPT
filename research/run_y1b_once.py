@@ -14,13 +14,20 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-import tests.conftest  # noqa: F401,E402  (solders stub for RiskEngine import chain)
-from execution.brokers.aster import AsterBroker  # noqa: E402
-from strategy_manager.risk import RiskEngine  # noqa: E402
-from strategy_manager.y1b_executor import run_once  # noqa: E402
-
 
 LIVE_CONFIRM = "--i-understand-live"
+
+# Heavy imports (torch chain via y1b_executor) are lazy so that --print-config
+# and --live refusal stay instant with zero third-party imports.
+
+
+def _load_heavy():
+    import tests.conftest  # noqa: F401  (solders stub for RiskEngine import chain)
+    from execution.brokers.aster import AsterBroker
+    from strategy_manager.risk import RiskEngine
+    from strategy_manager.y1b_executor import run_once
+    return AsterBroker, RiskEngine, run_once
+
 
 def main(argv):
     live = "--live" in argv
@@ -30,10 +37,12 @@ def main(argv):
         return
     if "--print-config" in argv:
         from strategy_manager.config import FORMULA, LOCKED_ETC, LOCKED_TRX, LEV
-        from strategy_manager.y1b_executor import SYMBOLS
         print(json.dumps({"formula": FORMULA, "etc": LOCKED_ETC, "trx": LOCKED_TRX,
-                          "lev": LEV, "symbols": SYMBOLS, "dry_run_default": True}))
+                          "lev": LEV,
+                          "symbols": {"ETC": "ETCUSDT", "TRX": "TRXUSDT"},
+                          "dry_run_default": True}))
         return
+    AsterBroker, RiskEngine, run_once = _load_heavy()
     notional = None
     for a in argv:
         if a.startswith("--notional="):

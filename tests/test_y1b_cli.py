@@ -59,3 +59,14 @@ def test_print_config_no_compute():
     assert d["lev"] == 2.0
     assert d["symbols"] == {"ETC": "ETCUSDT", "TRX": "TRXUSDT"}
     assert d["dry_run_default"] is True
+
+
+def test_print_config_symbols_match_executor():
+    import json
+    import subprocess
+    import sys
+    r = subprocess.run([sys.executable, "research/run_y1b_once.py", "--print-config"],
+                       capture_output=True, text=True, timeout=60)
+    d = json.loads(r.stdout)
+    from strategy_manager.y1b_executor import SYMBOLS
+    assert d["symbols"] == dict(SYMBOLS)
