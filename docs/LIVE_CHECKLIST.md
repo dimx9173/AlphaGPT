@@ -278,6 +278,13 @@ python3 research/run_paper2.py
 - Full suite: 145 passed, 0 failed. Gate report PASS.
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
+## 7y. This-run results (2026-09-09, lazy CLI + 151 suite)
+
+- Perf `816b792`: heavy torch chain lazy-loaded; CLI refusal and `--print-config`
+  instant (~0.1s vs ~3s). Inlined symbols pinned consistent by test.
+- Full suite: 151 passed, 0 failed. Gate report PASS.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
