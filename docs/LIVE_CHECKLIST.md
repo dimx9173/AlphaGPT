@@ -162,6 +162,15 @@ python3 research/run_paper2.py
 - Full suite: 129 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
 - No orders, no keys. Live default-off; human testnet gates pending (§5/§8.4).
 
+## 7j. Venue finding (2026-09-09, testnet public read-only probe)
+
+- Aster testnet `fapi` public GET reachable (no keys used, no orders).
+- Listed symbols (17): BTC/LINK/1000PEPE/SOL/DOGE/SUI/FET/ARB/XRP/ADA/ASTER/NEAR/ETH/LTC/AVAX/RENDER/1000SHIB USDT.
+- **No ETCUSDT / TRXUSDT on testnet** — Y1b basket cannot live-test there.
+- Implication: testnet live-test must use a listed proxy (e.g. SOLUSDT) for venue plumbing only,
+  or go straight to mainnet micro-notional after human approval. Strategy P&L validation stays offline (paper).
+- Executor `get_price` returns 0.0 on invalid symbol -> plan `flat`, no order. Safe-fail confirmed.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
