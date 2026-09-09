@@ -16,6 +16,18 @@ def test_live_without_confirm_refused():
     assert d.get("refused") is True
 
 
+def test_oversize_notional_capped():
+    import asyncio
+    from unittest.mock import AsyncMock
+    from strategy_manager.y1b_executor import build_plans
+    from strategy_manager.risk import RiskEngine
+    b = AsyncMock()
+    b.get_price = AsyncMock(return_value=1.0)
+    plans = asyncio.run(build_plans(b, RiskEngine(), notional=99999.0))
+    for p in plans:
+        if p.want != 0:
+            assert p.size * p.price <= 500.0 + 1e-6
+
 def test_default_is_dry_run():
     d = _run()
     assert all(x.get("dry_run") for x in d["results"])
