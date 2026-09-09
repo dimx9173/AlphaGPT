@@ -170,6 +170,8 @@ python3 research/run_paper2.py
 - Implication: testnet live-test must use a listed proxy (e.g. SOLUSDT) for venue plumbing only,
   or go straight to mainnet micro-notional after human approval. Strategy P&L validation stays offline (paper).
 - Executor `get_price` returns 0.0 on invalid symbol -> plan `flat`, no order. Safe-fail confirmed.
+- Mainnet probe (2026-09-09, public read-only): 585 symbols, **ETCUSDT + TRXUSDT both listed**.
+  So Y1b basket is mainnet-tradable; testnet gap is coverage-only, not a strategy blocker.
 
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
