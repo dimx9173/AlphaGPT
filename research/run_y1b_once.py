@@ -28,6 +28,12 @@ def main(argv):
         print(json.dumps({"refused": True,
                            "reason": "live requires --live AND --i-understand-live"}))
         return
+    if "--print-config" in argv:
+        from strategy_manager.config import FORMULA, LOCKED_ETC, LOCKED_TRX, LEV
+        from strategy_manager.y1b_executor import SYMBOLS
+        print(json.dumps({"formula": FORMULA, "etc": LOCKED_ETC, "trx": LOCKED_TRX,
+                          "lev": LEV, "symbols": SYMBOLS, "dry_run_default": True}))
+        return
     notional = None
     for a in argv:
         if a.startswith("--notional="):
