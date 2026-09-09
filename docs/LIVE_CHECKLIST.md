@@ -173,6 +173,13 @@ python3 research/run_paper2.py
 - Mainnet probe (2026-09-09, public read-only): 585 symbols, **ETCUSDT + TRXUSDT both listed**.
   So Y1b basket is mainnet-tradable; testnet gap is coverage-only, not a strategy blocker.
 
+## 7k. This-run results (2026-09-09, single-cycle CLI)
+
+- New `research/run_y1b_once.py`: standalone Y1b cycle, default dry-run, pure-JSON stdout
+  (`CLI_OK [ETC/TRX -1.0] dry_run=True` on testnet: unlisted -> price 0 -> flat, no order).
+- Fix `1b6c269`: broker session closed, loguru stays on stderr.
+- Use: `python3 research/run_y1b_once.py [--notional=50] [--live]` (--live still needs ALL live gates).
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
