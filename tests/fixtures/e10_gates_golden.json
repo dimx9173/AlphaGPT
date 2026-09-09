@@ -1,0 +1,57 @@
+{
+ "_provenance": "pinned 2026-09-09 from results artifacts; test_e10_gates falls back to results/ when present",
+ "FORMULA": [
+  3,
+  2,
+  7,
+  2,
+  7,
+  11,
+  15,
+  4,
+  4,
+  6,
+  6,
+  10
+ ],
+ "coins": {
+  "ETC": {
+   "cd": 18
+  },
+  "TRX": {
+   "cd": 6
+  }
+ },
+ "gate_adopted_id": "Y1b_main_thr1.0_w200",
+ "risk": {
+  "perp_max_leverage": 2
+ },
+ "monitoring": {
+  "twelvefold_mean_min": 0.0,
+  "twelvefold_median_min": 1.5,
+  "twelvefold_npos_min": 8,
+  "fee2x_worst_B_min": 0.0,
+  "fee2x_worst_C_min": 1.0,
+  "turnover_max": 0.16,
+  "coverage_range": [
+   0.5,
+   0.7
+  ],
+  "trailing_sharpe_window": 200,
+  "trailing_sharpe_min": 1.0
+ },
+ "paper": {
+  "trades": 478,
+  "final_x": 2.988330819068988,
+  "sharpe": 0.8987043186758948
+ },
+ "fold12": {
+  "mean": 1.81,
+  "median": 3.178,
+  "n_pos": 9
+ },
+ "turnover_full": 0.082523,
+ "shadow_coverage": 0.652,
+ "stress_worst_B": 2.58,
+ "stress_worst_C": 3.621
+}
