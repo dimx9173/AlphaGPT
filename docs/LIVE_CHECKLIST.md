@@ -226,6 +226,13 @@ python3 research/run_paper2.py
 - Full suite: 136 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
+## 7r. This-run results (2026-09-09, venue+STOP consistency + 137 suite)
+
+- Fix `60cb9c9`: `.env.example` venue default solana->aster (Y1b lock);
+  dashboard STOP path now respects `STOP_SIGNAL_PATH` (tested).
+- Full suite: 137 passed, 0 failed. `run_y1b_verify.py` 4-in-1 PASS.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
