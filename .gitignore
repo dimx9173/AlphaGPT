@@ -79,3 +79,20 @@ checkpoint.json
 # Internal agent plans
 .claude/
 .sisyphus/
+
+# Reorg folders (cold symlinks) - do not track contents
+/data/
+/results/
+/logs/
+
+# Runtime state (never commit)
+portfolio_state.json
+portfolio_state.json.bak
+portfolio_state.json.lock
+y1b_state.json
+y1b_state.json.bak
+y1b_state.json.lock
+STOP_SIGNAL
+STOP
+STOPPED
+best_meme_strategy.json
