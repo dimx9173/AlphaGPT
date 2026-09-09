@@ -285,6 +285,13 @@ python3 research/run_paper2.py
 - Full suite: 151 passed, 0 failed. Gate report PASS.
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
+## 7z. This-run results (2026-09-09, circuit-open pin + 152 suite)
+
+- Test `41b32a1`: circuit-open (`daily_loss` breach) blocks live with zero
+  `market_open` calls, pinned at executor preflight level.
+- Full suite: 152 passed, 0 failed. Gate report PASS.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
