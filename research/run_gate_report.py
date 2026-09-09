@@ -63,8 +63,9 @@ def main():
     json.dump(rep, open("results/gate_report.json", "w"), indent=1)
     print(json.dumps(rep, indent=1)[:2000])
     print("GATE_REPORT", "PASS" if rep["ok"] else "FAIL")
+    return rep
 
 
 if __name__ == "__main__":
-    main()
-    sys.exit(0)
+    rep = main()
+    sys.exit(0 if (rep or {}).get("ok") else 1)
