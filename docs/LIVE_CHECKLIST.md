@@ -263,6 +263,14 @@ python3 research/run_paper2.py
 - Full suite: 140 passed, 0 failed. Gate report PASS.
 - No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
 
+## 7w. Shadow ledger live (2026-09-09, 2-week gate tracking)
+
+- New `research/run_shadow_ledger.py`: append-only daily rows (paper stats +
+  data rows + §5 drift verdict) into gitignored `results/shadow_ledger.jsonl`.
+- First row 2026-09-09: 478/3.0782/0.911 all PASS. 14 consecutive PASS rows
+  satisfy the §8.4 shadow-stability gate; run once daily.
+- No orders, no keys.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
