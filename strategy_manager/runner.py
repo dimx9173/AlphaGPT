@@ -84,8 +84,11 @@ class StrategyRunner:
                     broker = self.brokers[venue]
                     vpos = await broker.get_position(token)
                     on_chain = vpos.size if vpos else 0.0
-                    # keep sign: SHORT sizes reconcile as-is; zero closes
-                    self.portfolio.reconcile(token, float(on_chain), venue=venue)
+                    # VenuePosition.size is unsigned; persist side from chain so
+                    # stored state never claims LONG for a SHORT holding.
+                    vside = getattr(vpos, "side", None) if vpos else None
+                    self.portfolio.reconcile(token, float(on_chain), venue=venue,
+                                             side=vside)
                 else:
                     on_chain = await self.trader.rpc.get_token_balance(token)
                     self.portfolio.reconcile(token, float(on_chain), venue="solana")

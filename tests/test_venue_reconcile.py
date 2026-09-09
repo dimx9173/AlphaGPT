@@ -53,3 +53,13 @@ def test_old_state_file_loads_with_defaults(tmp_state_file):
     pm = PortfolioManager(state_file=tmp_state_file)
     assert pm.positions["TokenA"].venue == "solana"
     assert pm.positions["TokenA"].leverage == 1.0
+
+
+def test_reconcile_persists_side_from_chain(tmp_state_file):
+    pm = PortfolioManager(state_file=tmp_state_file)
+    pm.add_position("ETCUSDT", "ETC", 20.0, 2.5, 0.0, venue="aster",
+                    side="LONG", leverage=2.0)
+    assert pm.reconcile("ETCUSDT", 2.5, venue="aster", side="SHORT") is True
+    pos = pm.positions["aster::ETCUSDT"]
+    assert pos.side == "SHORT"
+    assert pos.amount_held == 2.5

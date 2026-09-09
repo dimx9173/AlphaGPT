@@ -54,7 +54,8 @@ class PortfolioManager:
             self._seen_sigs.add((venue.lower(), sig))
             self._seen_sigs.add(sig)  # backward compat with plain-sig lookups
 
-    def reconcile(self, token: str, on_chain_amount: float, venue: str = "solana") -> bool:
+    def reconcile(self, token: str, on_chain_amount: float, venue: str = "solana",
+                  side: str | None = None) -> bool:
         # Resolve venue-aware key first, fall back to legacy plain token key.
         key = token if token in self.positions else self.venue_key(venue, token)
         if key not in self.positions:
@@ -69,9 +70,13 @@ class PortfolioManager:
             logger.info(f"[=] Reconciled {key}: closed (on-chain 0)")
             return True
         pos = self.positions[key]
+        if side is not None:
+            pos.side = side
         if pos.amount_held != on_chain_amount:
             logger.info(f"[=] Reconciled {key}: {pos.amount_held} -> {on_chain_amount} (on-chain)")
             pos.amount_held = on_chain_amount
+            self.save_state()
+        elif side is not None:
             self.save_state()
         return True
 
