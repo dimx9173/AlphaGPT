@@ -4,8 +4,8 @@
 Runs four dry checks:
   1. shadow dry-run: mock broker, plans gated, market_open zero-call
   2. STOP-block: STOP file + Y1B_LIVE_ENABLED=1 + dry_run=False -> blocked
-  3. paper baseline: research/run_paper2.py must print 478/2.9883/0.899
-  4. fee2x: FEE=0.0008 must print 478/2.0386 (final_x>1), baseline restored
+  3. paper baseline: research/run_paper2.py must print trades=478 and final_x within 2.98+-0.15
+  4. fee2x: FEE=0.0008 must print trades=478 and final_x>1, baseline restored
 Usage: python3 research/run_y1b_verify.py
 """
 import os
