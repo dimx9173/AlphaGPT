@@ -118,6 +118,31 @@ def test_leverage_reject_blocks_order_no_idempotent_skip(tmp_path, monkeypatch):
     assert any(r.get("reason") == "leverage-rejected" for r in res)
     b.market_open.assert_not_awaited()
 
+def test_idempotent_held_skips_replay(tmp_path, monkeypatch):
+    import asyncio
+    from execution.brokers.base import VenuePosition, Venue
+    from strategy_manager.portfolio import PortfolioManager
+    from strategy_manager.y1b_executor import run_once
+    monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
+    monkeypatch.setenv("Y1B_LIVE_ENABLED", "1")
+    monkeypatch.delenv("PAPER_MODE", raising=False)
+    pm = PortfolioManager(state_file=str(tmp_path / "y1b.json"))
+    pm.add_position("ETCUSDT", "ETC", 20.0, 2.5, 0.0, tx_sig="OID123",
+                    venue="aster", side="SHORT", leverage=2.0)
+    b = _mock_broker(20.0)
+    b.enable_deadman = AsyncMock(return_value=True)
+    b.set_leverage = AsyncMock(return_value=True)
+    # held SHORT 2.5 vs want SHORT (signals currently -1.0): same side + same oid
+    b.get_position = AsyncMock(return_value=VenuePosition(
+        venue=Venue.ASTER, symbol="ETCUSDT", side="SHORT", size=2.5,
+        raw={"oid": "OID123"}))
+    b.market_open = AsyncMock(side_effect=AssertionError("replay must not order"))
+    plans, res, sync = asyncio.run(run_once(broker=b, notional=50.0, dry_run=False))
+    # NOTE: _seen_sigs is process-local (not persisted); across restarts the
+    # same-side position is skipped via already-held. Same result: zero orders.
+    assert any(r.get("reason") in ("idempotent-held", "already-held") for r in res)
+    b.market_open.assert_not_awaited()
+
 def test_perp_gate_rejects_oversize():
     import asyncio
     b = _mock_broker(1.0)

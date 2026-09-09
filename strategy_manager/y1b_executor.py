@@ -179,9 +179,11 @@ async def run_once(broker=None, risk: RiskEngine | None = None,
             vpos = None
         if vpos is not None:
             try:
-                _held = float(vpos.size)
+                _size = float(vpos.size)
             except (TypeError, ValueError):
-                _held = 0.0
+                _size = 0.0
+            _vside = getattr(vpos, "side", "LONG")
+            _held = _size * (1 if _vside == "LONG" else -1)
             _same = (_held > 0) == (p.want > 0) and _held != 0
             if _same and pm.has_sig(vpos.raw.get("oid", "") if isinstance(vpos.raw, dict) else "", venue="aster"):
                 results.append({"symbol": p.symbol, "skipped": True, "reason": "idempotent-held"})
