@@ -271,6 +271,13 @@ python3 research/run_paper2.py
   satisfy the §8.4 shadow-stability gate; run once daily.
 - No orders, no keys.
 
+## 7x. This-run results (2026-09-09, reconcile side fix + 145 suite)
+
+- Fix `9fd1e3e`: `reconcile()` persists venue `side` from chain; SHORT holdings
+  no longer stored as LONG. Runner `_reconcile_all` passes chain side through.
+- Full suite: 145 passed, 0 failed. Gate report PASS.
+- No orders, no keys. Live default-off; mainnet micro-notional needs human approval.
+
 ## 7f. This-run results (2026-09-09, runner Y1b wiring)
 
 - `StrategyRunner.run_y1b_once()`: delegates to y1b_executor with aster broker + runner risk; legacy meme path untouched.
