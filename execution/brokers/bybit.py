@@ -27,6 +27,41 @@ from .cex_config import BybitConfig
 RECV_WINDOW = "5000"
 _CATEGORY = "linear"
 
+# Default symbols armed by no-arg enable_deadman (demo cancel-all needs symbol).
+_DEFAULT_DEADMAN_SYMBOLS = ("ETCUSDT", "TRXUSDT")
+
+# Known qty steps (from instruments-info); fallback snaps conservatively.
+_QTY_STEP = {"ETCUSDT": 0.1, "TRXUSDT": 1.0}
+
+
+async def _qty_step(broker, symbol: str) -> float:
+    known = _QTY_STEP.get(symbol)
+    if known:
+        return known
+    try:
+        data = await broker._public_get("/v5/market/instruments-info", {
+            "category": _CATEGORY, "symbol": symbol})
+        row = ((data or {}).get("result") or {}).get("list", [{}])[0]
+        step = float((row.get("lotSizeFilter") or {}).get("qtyStep", 1) or 1)
+        if step > 0:
+            _QTY_STEP[symbol] = step
+            return step
+    except Exception:
+        pass
+    return 1.0
+
+
+def _snap_qty(size: float, step: float) -> float:
+    import math
+    from decimal import Decimal, ROUND_DOWN
+    if step <= 0:
+        return max(size, 0.0)
+    try:
+        q = (Decimal(str(size)) // Decimal(str(step))) * Decimal(str(step))
+        return float(q)
+    except Exception:
+        return math.floor(size / step) * step
+
 # Bybit kline intervals; map common aliases, pass Bybit-native values through.
 _INTERVAL_MAP = {
     "1m": "1", "3m": "3", "5m": "5", "15m": "15", "30m": "30",
@@ -255,10 +290,13 @@ class BybitBroker(VenueBroker):
 
     async def market_open(self, symbol: str, side: Side, size: float,
                           slippage_bps: int = 500) -> OrderResult:
+        qty = _snap_qty(size, await _qty_step(self, symbol))
+        if qty <= 0:
+            return _err(symbol, side, f"qty {size} below step minimum")
         result, err = await self._signed("POST", "/v5/order/create", {
             "category": _CATEGORY, "symbol": symbol,
             "side": self._side(side), "orderType": "Market",
-            "qty": str(size), "timeInForce": "GTC",
+            "qty": str(qty), "timeInForce": "GTC",
         })
         if result is None:
             return _err(symbol, side, err or "order failed")
@@ -266,15 +304,18 @@ class BybitBroker(VenueBroker):
         price = await self.get_price(symbol)
         return OrderResult(
             status=OrderStatus.OK, venue=Venue.BYBIT, symbol=symbol,
-            side=side, oid=oid, fill_price=price, fill_size=size, raw=result,
+            side=side, oid=oid, fill_price=price, fill_size=qty, raw=result,
         )
 
     async def limit_open(self, symbol: str, side: Side, size: float,
                          price: float) -> OrderResult:
+        qty = _snap_qty(size, await _qty_step(self, symbol))
+        if qty <= 0:
+            return _err(symbol, side, f"qty {size} below step minimum")
         result, err = await self._signed("POST", "/v5/order/create", {
             "category": _CATEGORY, "symbol": symbol,
             "side": self._side(side), "orderType": "Limit",
-            "qty": str(size), "price": str(price), "timeInForce": "GTC",
+            "qty": str(qty), "price": str(price), "timeInForce": "GTC",
         })
         if result is None:
             return _err(symbol, side, err or "order failed")
@@ -311,15 +352,18 @@ class BybitBroker(VenueBroker):
     async def enable_deadman(self, timeout_sec: int = 60,
                              symbol: str = "") -> bool:
         """Cancel-all open linear orders (immediate deadman; Bybit V5 has no
-        countdown timer). True on ok, False on any failure."""
-        body: dict = {"category": _CATEGORY}
-        if symbol:
-            body["symbol"] = symbol
-        result, err = await self._signed("POST", "/v5/order/cancel-all", body)
-        if result is None:
-            logger.warning(f"[bybit] cancel-all failed: {err}")
-            return False
-        return True
+        countdown timer). True on ok, False on any failure.
+        Demo quirk: cancel-all without symbol returns params error, so the
+        no-symbol call arms the default Y1b symbols one by one."""
+        syms = [symbol] if symbol else list(_DEFAULT_DEADMAN_SYMBOLS)
+        ok_all = True
+        for _s in syms:
+            body: dict = {"category": _CATEGORY, "symbol": _s}
+            result, err = await self._signed("POST", "/v5/order/cancel-all", body)
+            if result is None:
+                logger.warning(f"[bybit] cancel-all {_s} failed: {err}")
+                ok_all = False
+        return ok_all
 
     async def close(self) -> None:
         if self._session is not None and self._owns_session:

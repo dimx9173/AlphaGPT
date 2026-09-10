@@ -55,7 +55,7 @@ def live_enabled() -> bool:
     return os.getenv("Y1B_LIVE_ENABLED", "").strip() == "1"
 
 def paper_mode() -> bool:
-    return os.getenv("PAPER_MODE", "").lower() in {"1", "true", "yes"}
+    return (os.getenv("PAPER_MODE", "") or "").lower() in {"1", "true", "yes"}
 
 @dataclass
 class Plan:
