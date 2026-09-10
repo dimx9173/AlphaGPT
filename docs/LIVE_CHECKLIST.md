@@ -379,3 +379,21 @@ cat docs/LIVE_CHECKLIST_E10_PATCH.md >> docs/LIVE_CHECKLIST.md   # 人工覆核�
 ```
 
 ***End of E10 patch. Sources: `results/backtest_E10.json` (machine truth) + `docs/STRATEGY_E10.md` (strategy truth).***
+
+## 7aa. This-run results (2026-09-10, CEX multi-venue + 166 suite)
+
+- New venues `binance` / `bybit` / `okx` (USDT-margined perp, testnet/demo default):
+  `execution/brokers/binance.py` (USDT-M futures, HMAC-SHA256, countdown per-symbol),
+  `execution/brokers/bybit.py` (V5 linear, HMAC-SHA256, cancel-all deadman),
+  `execution/brokers/okx.py` (SWAP, HMAC-SHA256 base64, `ETCUSDT->ETC-USDT-SWAP` map),
+  shared `execution/brokers/cex_config.py` (testnet/demo-first, `validate_env` only when enabled).
+- Y1b is venue-aware: `make_broker()` / `Y1B_VENUE` (`--venue=` flag), portfolio keys +
+  reconcile follow `broker.venue` (no more aster hardcode); Binance deadman pre-arms
+  `ETCUSDT/TRXUSDT`. `make_venue_broker()` factory in `execution/brokers/__init__.py`.
+- Safety unchanged: default dry-run, no keys at construction, missing keys fail closed
+  (writes ERROR / False, reads soft 0.0/None), live still needs `Y1B_LIVE_ENABLED=1` +
+  PAPER_MODE unset + STOP absent + circuit closed + deadman ok + perp gate pass.
+- Tests: new `tests/test_cex_brokers.py` (14 cases, fake sessions, no network/keys);
+  venue-set pin updated. Full suite: 166 passed, 0 failed. Gate report PASS.
+- Env: `.env.example` adds `BINANCE_*` / `BYBIT_*` / `OKX_*` + `Y1B_VENUE=aster`.
+- No orders, no keys. Live default-off; CEX mainnet needs human approval per venue.

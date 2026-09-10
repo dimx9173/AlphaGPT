@@ -1,9 +1,10 @@
 """Y1b shadow/live executor (E10 lock): signals -> perp gate -> broker.
 
 Default OFF / paper: Y1B_LIVE_ENABLED != 1 means dry-run only (no orders).
-Live requires ALL: Y1B_LIVE_ENABLED=1, PAPER_MODE unset, ASTER keys present,
+Live requires ALL: Y1B_LIVE_ENABLED=1, PAPER_MODE unset, venue keys present,
 deadman ok, STOP absent, perp gate pass. Size = Y1B_NOTIONAL_USDT / price,
-capped by PERP_MAX_NOTIONAL_USDT. Start with testnet (ASTER_TESTNET=true).
+capped by PERP_MAX_NOTIONAL_USDT. Start with testnet/demo.
+Venues: aster (default) | binance | bybit | okx via Y1B_VENUE.
 """
 from __future__ import annotations
 import os
@@ -15,6 +16,40 @@ from strategy_manager.risk import RiskEngine
 from execution.brokers.base import Side
 
 SYMBOLS = {"ETC": "ETCUSDT", "TRX": "TRXUSDT"}
+
+
+def venue_name(broker) -> str:
+    """Venue key for portfolio/reconcile, derived from broker (default aster)."""
+    try:
+        v = getattr(broker, "venue", None)
+        val = getattr(v, "value", v)
+        if isinstance(val, str) and val:
+            return val.lower()
+    except Exception:
+        pass
+    return "aster"
+
+
+def make_broker(venue: str | None = None):
+    """Factory for Y1b venues: aster (default) | binance | bybit | okx."""
+    import os as _os
+    name = (venue or _os.getenv("Y1B_VENUE", "aster")).strip().lower()
+    if name == "binance":
+        from execution.brokers.binance import BinanceBroker
+        b = BinanceBroker()
+        try:
+            b.set_deadman_symbols(list(SYMBOLS.values()))
+        except Exception:
+            pass
+        return b
+    if name == "bybit":
+        from execution.brokers.bybit import BybitBroker
+        return BybitBroker()
+    if name == "okx":
+        from execution.brokers.okx import OkxBroker
+        return OkxBroker()
+    from execution.brokers.aster import AsterBroker
+    return AsterBroker()
 
 def live_enabled() -> bool:
     return os.getenv("Y1B_LIVE_ENABLED", "").strip() == "1"
@@ -110,6 +145,7 @@ async def sync_positions(broker, plans: list[Plan], pm, live: bool):
     """Flatten venue positions whose want==0 (close-only allowlist, gate-exempt
     by design: risk-reducing); report flips. Gate-failed flips close-only.
     Dry-run only reports."""
+    _venue = venue_name(broker)
     actions = []
     for p in plans:
         try:
@@ -132,7 +168,7 @@ async def sync_positions(broker, plans: list[Plan], pm, live: bool):
             actions.append({"symbol": p.symbol, "closed": res.ok, "oid": res.oid,
                             "reason": res.reason})
             if res.ok:
-                pm.reconcile(p.symbol, 0.0, venue="aster")
+                pm.reconcile(p.symbol, 0.0, venue=_venue)
         elif p.want != 0 and held != 0 and ((held > 0) != (p.want > 0)):
             actions.append({"symbol": p.symbol, "flip_needed": True, "held": held,
                             "want": p.want, "dry_run": not live})
@@ -145,7 +181,7 @@ async def sync_positions(broker, plans: list[Plan], pm, live: bool):
                     actions.append({"symbol": p.symbol, "closed_only_gate_fail": res.ok,
                                     "oid": res.oid, "reason": p.reason or res.reason})
                     if res.ok:
-                        pm.reconcile(p.symbol, 0.0, venue="aster")
+                        pm.reconcile(p.symbol, 0.0, venue=_venue)
                     continue
                 side = Side.BUY if p.want > 0 else Side.SELL
                 res = await broker.market_open(p.symbol, side, p.size + abs(held))
@@ -160,8 +196,8 @@ async def run_once(broker=None, risk: RiskEngine | None = None,
     from strategy_manager.portfolio import PortfolioManager
     risk = risk or RiskEngine()
     if broker is None:
-        from execution.brokers.aster import AsterBroker
-        broker = AsterBroker()
+        broker = make_broker()
+    _venue = venue_name(broker)
     live = live_enabled() and not paper_mode() and (dry_run is False)
     plans = await build_plans(broker, risk, notional)
     results = []
@@ -191,7 +227,7 @@ async def run_once(broker=None, risk: RiskEngine | None = None,
             _vside = getattr(vpos, "side", "LONG")
             _held = _size * (1 if _vside == "LONG" else -1)
             _same = (_held > 0) == (p.want > 0) and _held != 0
-            if _same and pm.has_sig(vpos.raw.get("oid", "") if isinstance(vpos.raw, dict) else "", venue="aster"):
+            if _same and pm.has_sig(vpos.raw.get("oid", "") if isinstance(vpos.raw, dict) else "", venue=_venue):
                 results.append({"symbol": p.symbol, "skipped": True, "reason": "idempotent-held"})
                 continue
             if _same:
@@ -215,6 +251,6 @@ async def run_once(broker=None, risk: RiskEngine | None = None,
             except Exception:
                 amt = p.size
             pm.add_position(p.symbol, p.coin, res.fill_price or p.price, amt, 0.0,
-                            tx_sig=res.oid or None, venue="aster",
+                            tx_sig=res.oid or None, venue=_venue,
                             side="LONG" if p.want > 0 else "SHORT", leverage=float(LEV))
     return plans, results, sync

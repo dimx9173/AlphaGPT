@@ -50,7 +50,8 @@ class FakeBroker(VenueBroker):
 def test_interface_shape():
     b = FakeBroker()
     assert b.venue == Venue.HYPERLIQUID
-    assert set(v.value for v in Venue) == {"solana", "hyperliquid", "aster"}
+    assert set(v.value for v in Venue) == {"solana", "hyperliquid", "aster",
+                                                 "binance", "bybit", "okx"}
     assert set(s.value for s in Side) == {"buy", "sell"}
 
 

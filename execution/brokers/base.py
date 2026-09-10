@@ -15,6 +15,9 @@ class Venue(str, Enum):
     SOLANA = "solana"
     HYPERLIQUID = "hyperliquid"
     ASTER = "aster"
+    BINANCE = "binance"
+    BYBIT = "bybit"
+    OKX = "okx"
 
 
 class Side(str, Enum):

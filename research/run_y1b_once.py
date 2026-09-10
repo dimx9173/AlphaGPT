@@ -5,7 +5,8 @@ Default dry-run (no orders, no keys). Live ONLY with --live AND
 Y1B_LIVE_ENABLED=1 AND PAPER_MODE unset AND STOP absent AND circuit
 closed AND deadman ok AND perp gate pass.
 Usage:
-  python3 research/run_y1b_once.py [--notional=50] [--live --i-understand-live]
+  python3 research/run_y1b_once.py [--notional=50] [--venue=aster|binance|bybit|okx] [--live --i-understand-live]
+  Y1B_VENUE env also selects the broker (default aster).
 """
 import asyncio
 import json
@@ -23,10 +24,10 @@ LIVE_CONFIRM = "--i-understand-live"
 
 def _load_heavy():
     import tests.conftest  # noqa: F401  (solders stub for RiskEngine import chain)
-    from execution.brokers.aster import AsterBroker
+    from strategy_manager.y1b_executor import make_broker
     from strategy_manager.risk import RiskEngine
     from strategy_manager.y1b_executor import run_once
-    return AsterBroker, RiskEngine, run_once
+    return make_broker, RiskEngine, run_once
 
 
 def main(argv):
@@ -42,15 +43,18 @@ def main(argv):
                           "symbols": {"ETC": "ETCUSDT", "TRX": "TRXUSDT"},
                           "dry_run_default": True}))
         return
-    AsterBroker, RiskEngine, run_once = _load_heavy()
+    make_broker, RiskEngine, run_once = _load_heavy()
     notional = None
+    venue = None
     for a in argv:
         if a.startswith("--notional="):
             try:
                 notional = float(a.split("=", 1)[1])
             except ValueError:
                 pass
-    broker = AsterBroker()
+        if a.startswith("--venue="):
+            venue = a.split("=", 1)[1]
+    broker = make_broker(venue)
     try:
         plans, res, sync = asyncio.run(run_once(
             broker=broker, risk=RiskEngine(), notional=notional,
