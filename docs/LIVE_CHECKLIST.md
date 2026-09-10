@@ -380,6 +380,16 @@ cat docs/LIVE_CHECKLIST_E10_PATCH.md >> docs/LIVE_CHECKLIST.md   # 人工覆核�
 
 ***End of E10 patch. Sources: `results/backtest_E10.json` (machine truth) + `docs/STRATEGY_E10.md` (strategy truth).***
 
+## 7ab. This-run results (2026-09-10, shadow day-2 + gate PASS + 166 suite)
+
+- Shadow ledger day-2 `2026-09-10`: 478/3.0782/0.911 all PASS (rows ETC/TRX 105576).
+  2 consecutive PASS; 12 more daily PASS rows needed for the 14-day §8.4 gate.
+- Gate: `run_y1b_verify.py` 4-in-1 PASS (shadow dry-run, STOP-block, paper 478/3.0782,
+  fee2x 478/2.1); E10 PASS; drift clean; paper artifact 478/3.0782/0.911.
+  Note: `run_gate_report.py` shows FAIL only because it shells to system `python3`
+  (no pytest); rerun with brew python passes. Full suite: 166 passed, 0 failed.
+- No orders, no keys. Live default-off.
+
 ## 7aa. This-run results (2026-09-10, CEX multi-venue + 166 suite)
 
 - New venues `binance` / `bybit` / `okx` (USDT-margined perp, testnet/demo default):
