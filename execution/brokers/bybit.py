@@ -53,10 +53,11 @@ class BybitBroker(VenueBroker):
                  session: aiohttp.ClientSession | None = None,
                  base_url: str | None = None):
         # Keys optional here (tests / paper paths); resolved lazily per call.
+        # Demo-only: ignore any custom base_url, always testnet.
         self._api_key = api_key
         self._api_secret = api_secret
         self._session = session
-        self._base = base_url or BybitConfig.base_url()
+        self._base = BybitConfig.base_url()
         self._owns_session = False
 
     @property

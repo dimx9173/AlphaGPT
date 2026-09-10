@@ -59,18 +59,21 @@ class BinanceConfig:
 
 
 class BybitConfig:
-    """Bybit V5 (linear perp). Testnet default."""
+    """Bybit V5 (linear perp). Demo/testnet ONLY — mainnet disabled.
 
-    MAIN = "https://api.bybit.com"
+    Locked to https://api-testnet.bybit.com. BYBIT_TESTNET is accepted but
+    ignored (kept for .env compat); there is no mainnet path.
+    """
+
     TEST = "https://api-testnet.bybit.com"
 
     @classmethod
     def use_testnet(cls) -> bool:
-        return _is_true(os.getenv("BYBIT_TESTNET", "true"))
+        return True
 
     @classmethod
     def base_url(cls) -> str:
-        return cls.TEST if cls.use_testnet() else cls.MAIN
+        return cls.TEST
 
     @classmethod
     def api_key(cls) -> str:
