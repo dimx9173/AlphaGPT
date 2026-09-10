@@ -1,10 +1,13 @@
 """CSV-direct AlphaGPT training on TRX 4h (no DB).
 
-Mirrors AlphaEngine.train but loads feats from data_15m_3y CSVs.
+Mirrors AlphaEngine.train but loads feats from data/data_15m_3y CSVs.
 Reward = MemeBacktest fitness with baseline winning params
 (aster 2x, 0.88/0.12, cd3, sl3%, 4h annualization).
 Usage: python3 train_csv.py [steps] [batch]
 """
+import os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import csv, json, sys
 import torch
 import torch.nn.functional as F
@@ -20,7 +23,7 @@ from model_core.backtest import MemeBacktest
 def load_4h(coins=("TRX",)):
     bars_all = {}
     for coin in coins:
-        with open(f"data_15m_3y/{coin}.csv") as f:
+        with open(f"data/data_15m_3y/{coin}.csv") as f:
             rows = list(csv.DictReader(f))
         bars = []
         for i in range(0, len(rows), 16):
@@ -97,7 +100,7 @@ def main():
         hist.append({"step": step, "avg": round(avg, 3), "best": round(best_score, 3)})
         if step % 20 == 0:
             print(f"step {step} avg={avg:.3f} best={best_score:.3f} formula={best_formula}", flush=True)
-    with open("train_csv_best.json", "w") as f:
+    with open("results/train_csv_best.json", "w") as f:
         json.dump({"formula": best_formula, "score": best_score, "hist": hist}, f)
     print(f"DONE best={best_score:.3f} formula={best_formula}")
 

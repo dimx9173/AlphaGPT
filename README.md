@@ -1,6 +1,6 @@
 # AlphaGPT
 
-![](showcase.png)
+![](assets/showcase.png)
 
 *在 AlphaGPT 开源后，社区曾使用开源版本管理了 1.66 亿人民币规模资金。*
 
@@ -12,7 +12,7 @@
 
 如果您觉得 AlphaGPT 很有用，可以通过以下渠道捐助作者：
 
-![](helpme.jpg)
+![](assets/helpme.jpg)
 
 ---
 

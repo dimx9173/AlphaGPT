@@ -1,3 +1,6 @@
+import os, sys
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import tushare as ts
 import pandas as pd
 import numpy as np
