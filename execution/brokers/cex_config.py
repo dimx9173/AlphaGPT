@@ -59,13 +59,13 @@ class BinanceConfig:
 
 
 class BybitConfig:
-    """Bybit V5 (linear perp). Demo/testnet ONLY — mainnet disabled.
+    """Bybit V5 (linear perp). Demo ONLY — mainnet/testnet disabled.
 
-    Locked to https://api-testnet.bybit.com. BYBIT_TESTNET is accepted but
-    ignored (kept for .env compat); there is no mainnet path.
+    Locked to https://api-demo.bybit.com. BYBIT_TESTNET is accepted but
+    ignored (kept for .env compat); there is no other path.
     """
 
-    TEST = "https://api-testnet.bybit.com"
+    TEST = "https://api-demo.bybit.com"
 
     @classmethod
     def use_testnet(cls) -> bool:
