@@ -17,6 +17,12 @@ FORMULA_DECODE = ["FOMO", "PRESSURE", "SUB", "PRESSURE", "SUB", "ABS", "DECAY", 
 LOCKED_ETC = dict(lth=0.88, sth=0.12, cd=18, sl=None, ts=24, vt=None, vw=12, q=0.3)
 LOCKED_TRX = dict(lth=0.85, sth=0.12, cd=6, sl=0.05, ts=24, vt=None, vw=12, q=0.3)
 LOCKED_WEIGHTS = [0.5, 0.5]
+# Top5 extension (2026-09-12, gate PASS): ATOM/APT/KAS join ETC/TRX, equal 20%.
+# FULL sharpe 2.63 / fee2x worst B4.80 C2.23 / turnover 0.09 / 12fold 2.79/3.66/10 / mean_corr 0.22.
+LOCKED_ATOM = dict(lth=0.85, sth=0.15, cd=6, sl=0.05, ts=24, vt=None, vw=12, q=0.3)
+LOCKED_APT = dict(lth=0.88, sth=0.12, cd=18, sl=None, ts=24, vt=None, vw=12, q=0.3)
+LOCKED_KAS = dict(lth=0.88, sth=0.12, cd=6, sl=None, ts=24, vt=None, vw=12, q=0.3)
+LOCKED_WEIGHTS_5 = [0.2, 0.2, 0.2, 0.2, 0.2]
 LOCKED_OVERLAY_Z1 = dict(ETC=dict(lth=0.88, sth=0.12, cd=18, sl=None, ts=24, vt=0.012, vw=12),
                          TRX=dict(lth=0.85, sth=0.12, cd=6, sl=0.05, ts=24, vt=0.012, vw=12))
 LOCKED_GATE = dict(window=200, thresh=1.0, type="main", adopted_id="Y1b_main_thr1.0_w200", coverage=0.652)

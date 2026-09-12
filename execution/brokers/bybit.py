@@ -28,10 +28,10 @@ RECV_WINDOW = "5000"
 _CATEGORY = "linear"
 
 # Default symbols armed by no-arg enable_deadman (demo cancel-all needs symbol).
-_DEFAULT_DEADMAN_SYMBOLS = ("ETCUSDT", "TRXUSDT")
+_DEFAULT_DEADMAN_SYMBOLS = ("ETCUSDT", "TRXUSDT", "ATOMUSDT", "APTUSDT", "KASUSDT")
 
 # Known qty steps (from instruments-info); fallback snaps conservatively.
-_QTY_STEP = {"ETCUSDT": 0.1, "TRXUSDT": 1.0}
+_QTY_STEP = {"ETCUSDT": 0.1, "TRXUSDT": 1.0, "ATOMUSDT": 0.1, "APTUSDT": 0.01, "KASUSDT": 10.0}
 
 
 async def _qty_step(broker, symbol: str) -> float:

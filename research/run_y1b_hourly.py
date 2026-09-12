@@ -36,6 +36,7 @@ async def _cycle(notional: float):
     os.environ["Y1B_LIVE_ENABLED"] = "1"
     os.environ["PAPER_MODE"] = ""
     os.environ["Y1B_VENUE"] = "bybit"
+    os.environ["Y1B_TOP5"] = "1"
     broker = make_broker("bybit")
     out = {"venue": venue_name(broker)}
     try:

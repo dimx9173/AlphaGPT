@@ -16,6 +16,14 @@ from strategy_manager.risk import RiskEngine
 from execution.brokers.base import Side
 
 SYMBOLS = {"ETC": "ETCUSDT", "TRX": "TRXUSDT"}
+SYMBOLS_5 = {"ETC": "ETCUSDT", "TRX": "TRXUSDT", "ATOM": "ATOMUSDT", "APT": "APTUSDT", "KAS": "KASUSDT"}
+
+
+def active_symbols():
+    import os as _os
+    if _os.getenv("Y1B_TOP5", "").strip().lower() in {"1", "true", "yes"}:
+        return dict(SYMBOLS_5)
+    return dict(SYMBOLS)
 
 
 def venue_name(broker) -> str:
@@ -38,7 +46,7 @@ def make_broker(venue: str | None = None):
         from execution.brokers.binance import BinanceBroker
         b = BinanceBroker()
         try:
-            b.set_deadman_symbols(list(SYMBOLS.values()))
+            b.set_deadman_symbols(list(active_symbols().values()))
         except Exception:
             pass
         return b
@@ -78,11 +86,13 @@ async def build_plans(broker, risk: RiskEngine | None = None,
     except (TypeError, ValueError):
         notion = 50.0
     if notion <= 0:
-        return [Plan(coin, SYMBOLS[coin], want, None, 0.0, 0.0, False, "bad-notional")
+        _syms = active_symbols()
+        return [Plan(coin, _syms.get(coin, coin), want, None, 0.0, 0.0, False, "bad-notional")
                 for coin, want in want_map.items()]
     plans: list[Plan] = []
+    _syms = active_symbols()
     for coin, want in want_map.items():
-        sym = SYMBOLS[coin]
+        sym = _syms.get(coin, coin)
         try:
             price = await broker.get_price(sym)
         except Exception as e:
