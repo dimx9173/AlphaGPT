@@ -164,8 +164,9 @@ def test_want_zero_reports_dry_run_close(tmp_path, monkeypatch):
     from strategy_manager import y1b_executor as XE
     monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
     monkeypatch.delenv("Y1B_LIVE_ENABLED", raising=False)
-    orig = XE.latest_signals
-    XE.latest_signals = lambda: {"ETC": 0.0, "TRX": 0.0}
+    orig = XE.basket_signals
+    XE.basket_signals = lambda *a, **k: {"signals": {"ETC": [0.0], "TRX": [0.0]},
+                                         "sg_last": {}, "weights": {}}
     try:
         b = _mock_broker(20.0)
         b.get_position = AsyncMock(return_value=VenuePosition(
@@ -175,7 +176,7 @@ def test_want_zero_reports_dry_run_close(tmp_path, monkeypatch):
         assert any(a.get("dry_run_close") for a in sync)
         b.market_open.assert_not_awaited()
     finally:
-        XE.latest_signals = orig
+        XE.basket_signals = orig
 
 def test_price_feed_failure_yields_no_orders(tmp_path, monkeypatch):
     import asyncio
@@ -200,8 +201,9 @@ def test_want_zero_live_closes_venue_position(tmp_path, monkeypatch):
     monkeypatch.setenv("Y1B_STATE", str(tmp_path / "y1b.json"))
     monkeypatch.setenv("Y1B_LIVE_ENABLED", "1")
     monkeypatch.delenv("PAPER_MODE", raising=False)
-    orig = XE.latest_signals
-    XE.latest_signals = lambda: {"ETC": 0.0, "TRX": 0.0}
+    orig = XE.basket_signals
+    XE.basket_signals = lambda *a, **k: {"signals": {"ETC": [0.0], "TRX": [0.0]},
+                                         "sg_last": {}, "weights": {}}
     try:
         b = _mock_broker(20.0)
         b.enable_deadman = AsyncMock(return_value=True)
@@ -212,7 +214,7 @@ def test_want_zero_live_closes_venue_position(tmp_path, monkeypatch):
         plans, res, sync = asyncio.run(run_once(broker=b, notional=50.0, dry_run=False))
         assert any(a.get("closed") for a in sync)
     finally:
-        XE.latest_signals = orig
+        XE.basket_signals = orig
 
 def test_perp_gate_rejects_oversize():
     import asyncio
