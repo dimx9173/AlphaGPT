@@ -407,3 +407,17 @@ cat docs/LIVE_CHECKLIST_E10_PATCH.md >> docs/LIVE_CHECKLIST.md   # 人工覆核�
   venue-set pin updated. Full suite: 166 passed, 0 failed. Gate report PASS.
 - Env: `.env.example` adds `BINANCE_*` / `BYBIT_*` / `OKX_*` + `Y1B_VENUE=aster`.
 - No orders, no keys. Live default-off; CEX mainnet needs human approval per venue.
+
+## P0P2 PRP 驗收 (2026-09-13, 11 步全齊, 206 passed)
+
+- P0-1 執行對齊 PASS: decision_only + Y1B_DECISION_ALIGN + signal_age + exec_align.json (turnover 0.0896, slip -0.053/bp)。自做 `aa94edd`。
+- P0-2 換倉門檻 PASS(待定): hyst/min-hold/cost 全預設 OFF + frontier 15 格無 knee (訊號已稀疏) + 5 tests。`49aca60` + 修 `ae0bb66`。
+- P0-3 凍結 OOS: CONDITIONAL FAIL (高原 PASS, permutation ETC p0.06/TRX p0.16 未過)。P1/P2 結論待定。`ec5ffc8`。
+- P1-1 逆 vol: KEEP equal (invvol_cap 數字勝但待定)。`bb71d37`。pytest 194。
+- P1-2 剎車: 三門全過 (maxDD -52.6%, sharpe 1.98->2.66) 待定。slow 標記。`3ba1b0d`。
+- P1-3 q-sweep: KEEP q0.3 (非孤立峰)。`1a97408`。
+- P2-1 白名單: 有效/失效無重疊 (待定)。`3895295`。
+- P2-2 粗掃: 孤島 + WRC p0.82 FAIL (待定, 磁碟檔為 4 組冒煙版, 全量 288 在工人環境)。`e57a6d1`。
+- P2-3 漏斗: PEPE REJECT_L1, ATOM PASS_ALL_PENDING (待定)。新 commit。
+- P2-4 晉級+微結構: 標準制定, demo 預期 FAIL 缺口 4 項; micro PASS。`0803360`。
+- 全量: 206 passed, 1 slow deselected。Demo Top5 照跑 (ETC/APT/KAS SHORT)。
