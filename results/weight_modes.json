@@ -1,0 +1,405 @@
+{
+ "config": {
+  "engine": "mirror run_qsweep leg_net + quantile q0.3 long-only + cooldown + stops + roll1; weights dynamic trailing 60x4h realized-vol reciprocal, clip 0.10-0.35; invvol_cap rescales lev to vol_target",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "vol_window": 60,
+  "clip": [
+   0.1,
+   0.35
+  ],
+  "vol_target": 0.35,
+  "lev_clamp": [
+   0.25,
+   2.0
+  ],
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "fee2x": 0.0008,
+  "fee_grid": [
+   {
+    "fee": 0.0004,
+    "fund": 0.0005
+   },
+   {
+    "fee": 0.0008,
+    "fund": 0.0005
+   },
+   {
+    "fee": 0.0004,
+    "fund": 0.001
+   },
+   {
+    "fee": 0.0008,
+    "fund": 0.001
+   }
+  ],
+  "grid_bars": 6135,
+  "h2_len": 493,
+  "note": "E10 FORMULA untouched; live default equal; offline read-only"
+ },
+ "modes": {
+  "equal": {
+   "FULL": {
+    "sharpe": 1.977,
+    "ann": 1.6947,
+    "mdd": 0.8114,
+    "cum": 4.7474,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   "H2": {
+    "sharpe": 2.357,
+    "ann": 1.4659,
+    "mdd": 0.3289,
+    "cum": 0.33,
+    "n": 493,
+    "turnover": 0.082759
+   },
+   "dd": {
+    "dd_start": 1572,
+    "dd_end": 2314,
+    "dd_depth": 0.8114,
+    "by_coin": {
+     "ETC": -0.0665,
+     "TRX": -0.1089,
+     "ATOM": -0.2237,
+     "APT": -0.4766,
+     "KAS": 0.0894
+    }
+   },
+   "turnover_inc_vs_equal": 0.0,
+   "fee_grid": [
+    {
+     "fee": 0.0004,
+     "fund": 0.0005,
+     "FULL_sharpe": 1.977,
+     "H2_sharpe": 2.357,
+     "FULL_turnover": 0.088215
+    },
+    {
+     "fee": 0.0008,
+     "fund": 0.0005,
+     "FULL_sharpe": 1.797,
+     "H2_sharpe": 2.124,
+     "FULL_turnover": 0.088215
+    },
+    {
+     "fee": 0.0004,
+     "fund": 0.001,
+     "FULL_sharpe": 3.652,
+     "H2_sharpe": 4.821,
+     "FULL_turnover": 0.088215
+    },
+    {
+     "fee": 0.0008,
+     "fund": 0.001,
+     "FULL_sharpe": 3.471,
+     "H2_sharpe": 4.589,
+     "FULL_turnover": 0.088215
+    }
+   ],
+   "fold12": {
+    "sharpes": [
+     0.632,
+     1.643,
+     1.871,
+     0.632,
+     -0.46,
+     3.03,
+     1.256,
+     1.625,
+     5.58,
+     3.571,
+     2.785,
+     2.203
+    ],
+    "mean": 2.031,
+    "median": 1.871,
+    "n_pos": 11
+   },
+   "w_final": {
+    "ETC": 0.2,
+    "TRX": 0.2,
+    "ATOM": 0.2,
+    "APT": 0.2,
+    "KAS": 0.2
+   },
+   "lev_final": 1.0,
+   "w_mean": {
+    "ETC": 0.2,
+    "TRX": 0.2,
+    "ATOM": 0.2,
+    "APT": 0.2,
+    "KAS": 0.2
+   },
+   "lev_mean": 1.0
+  },
+  "invvol": {
+   "FULL": {
+    "sharpe": 2.03,
+    "ann": 1.5419,
+    "mdd": 0.8047,
+    "cum": 4.3195,
+    "n": 6135,
+    "turnover": 0.090086
+   },
+   "H2": {
+    "sharpe": 2.813,
+    "ann": 1.4768,
+    "mdd": 0.2766,
+    "cum": 0.3325,
+    "n": 493,
+    "turnover": 0.084225
+   },
+   "dd": {
+    "dd_start": 1572,
+    "dd_end": 2314,
+    "dd_depth": 0.8047,
+    "by_coin": {
+     "ETC": -0.0654,
+     "TRX": -0.2227,
+     "ATOM": -0.208,
+     "APT": -0.3321,
+     "KAS": 0.0458
+    }
+   },
+   "turnover_inc_vs_equal": 0.001871,
+   "fee_grid": [
+    {
+     "fee": 0.0004,
+     "fund": 0.0005,
+     "FULL_sharpe": 2.03,
+     "H2_sharpe": 2.813,
+     "FULL_turnover": 0.090086
+    },
+    {
+     "fee": 0.0008,
+     "fund": 0.0005,
+     "FULL_sharpe": 1.822,
+     "H2_sharpe": 2.532,
+     "FULL_turnover": 0.090086
+    },
+    {
+     "fee": 0.0004,
+     "fund": 0.001,
+     "FULL_sharpe": 3.936,
+     "H2_sharpe": 5.756,
+     "FULL_turnover": 0.090086
+    },
+    {
+     "fee": 0.0008,
+     "fund": 0.001,
+     "FULL_sharpe": 3.727,
+     "H2_sharpe": 5.476,
+     "FULL_turnover": 0.090086
+    }
+   ],
+   "fold12": {
+    "sharpes": [
+     0.588,
+     2.07,
+     1.832,
+     0.899,
+     -0.614,
+     3.088,
+     1.379,
+     1.413,
+     6.068,
+     3.68,
+     2.642,
+     2.667
+    ],
+    "mean": 2.143,
+    "median": 2.07,
+    "n_pos": 11
+   },
+   "w_final": {
+    "ETC": 0.1801,
+    "TRX": 0.35,
+    "ATOM": 0.1844,
+    "APT": 0.1328,
+    "KAS": 0.1528
+   },
+   "lev_final": 1.0,
+   "w_mean": {
+    "ETC": 0.1877,
+    "TRX": 0.3293,
+    "ATOM": 0.1821,
+    "APT": 0.1488,
+    "KAS": 0.1521
+   },
+   "lev_mean": 1.0
+  },
+  "invvol_cap": {
+   "FULL": {
+    "sharpe": 2.051,
+    "ann": 1.1346,
+    "mdd": 0.4729,
+    "cum": 3.1785,
+    "n": 6135,
+    "turnover": 0.070031
+   },
+   "H2": {
+    "sharpe": 3.343,
+    "ann": 1.9969,
+    "mdd": 0.3548,
+    "cum": 0.4495,
+    "n": 493,
+    "turnover": 0.102761
+   },
+   "dd": {
+    "dd_start": 1572,
+    "dd_end": 2314,
+    "dd_depth": 0.4729,
+    "by_coin": {
+     "ETC": -0.0179,
+     "TRX": -0.1474,
+     "ATOM": -0.1046,
+     "APT": -0.2467,
+     "KAS": 0.055
+    }
+   },
+   "turnover_inc_vs_equal": -0.018184,
+   "fee_grid": [
+    {
+     "fee": 0.0004,
+     "fund": 0.0005,
+     "FULL_sharpe": 2.051,
+     "H2_sharpe": 3.343,
+     "FULL_turnover": 0.070031
+    },
+    {
+     "fee": 0.0008,
+     "fund": 0.0005,
+     "FULL_sharpe": 1.829,
+     "H2_sharpe": 3.042,
+     "FULL_turnover": 0.070031
+    },
+    {
+     "fee": 0.0004,
+     "fund": 0.001,
+     "FULL_sharpe": 4.14,
+     "H2_sharpe": 6.478,
+     "FULL_turnover": 0.070031
+    },
+    {
+     "fee": 0.0008,
+     "fund": 0.001,
+     "FULL_sharpe": 3.918,
+     "H2_sharpe": 6.179,
+     "FULL_turnover": 0.070031
+    }
+   ],
+   "fold12": {
+    "sharpes": [
+     0.511,
+     2.178,
+     2.73,
+     0.351,
+     -0.598,
+     3.467,
+     1.387,
+     1.08,
+     5.759,
+     3.01,
+     1.834,
+     3.244
+    ],
+    "mean": 2.079,
+    "median": 2.178,
+    "n_pos": 11
+   },
+   "w_final": {
+    "ETC": 0.1801,
+    "TRX": 0.35,
+    "ATOM": 0.1844,
+    "APT": 0.1328,
+    "KAS": 0.1528
+   },
+   "lev_final": 0.9349,
+   "w_mean": {
+    "ETC": 0.1877,
+    "TRX": 0.3293,
+    "ATOM": 0.1821,
+    "APT": 0.1488,
+    "KAS": 0.1521
+   },
+   "lev_mean": 0.7803
+  }
+ },
+ "compare": {
+  "B_beats_A": false,
+  "C_beats_A": true,
+  "rule": "sharpe+ AND maxDD-20%+ vs A"
+ },
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "KEEP_equal",
+ "decision_note": "P0-3 permutation FAIL (per-coin p>=0.05) => P1-1 verdict PENDING; contrast only, default stays equal regardless of B/C outcome."
+}

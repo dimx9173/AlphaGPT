@@ -108,6 +108,145 @@ def _active_basket():
         return BASKET_5, WEIGHTS_5
     return BASKET, WEIGHTS
 
+# === P1-1 inverse-vol weighting (E06/E07, default OFF/equal) ===
+# Y1B_WEIGHT_MODE=equal|invvol|invvol_cap (default equal).
+# invvol: trailing 60x4h realized-vol reciprocal, per-coin clip 10~35%.
+# invvol_cap: invvol weights + portfolio vol target (Y1B_VOL_TARGET, default
+# 0.35 ann.) rescaling total leverage. P0-3 permutation FAIL => verdict
+# PENDING: research contrast only, live default stays equal.
+WEIGHT_MODES = ("equal", "invvol", "invvol_cap")
+Y1B_VOL_WINDOW = 60
+Y1B_W_MIN, Y1B_W_MAX = 0.10, 0.35
+Y1B_VOL_TARGET_DEFAULT = 0.35
+Y1B_LEV_SCALE_MIN, Y1B_LEV_SCALE_MAX = 0.25, 2.0
+
+
+def weight_mode():
+    import os as _os
+    m = (_os.getenv("Y1B_WEIGHT_MODE", "equal") or "equal").strip().lower()
+    return m if m in WEIGHT_MODES else "equal"
+
+
+def vol_target():
+    import os as _os
+    try:
+        return float(_os.getenv("Y1B_VOL_TARGET", str(Y1B_VOL_TARGET_DEFAULT)))
+    except (TypeError, ValueError):
+        return Y1B_VOL_TARGET_DEFAULT
+
+
+def realized_vol(closes, window=Y1B_VOL_WINDOW):
+    """Trailing annualized realized vol of simple returns (4h grid)."""
+    import math as _m
+    r = [(closes[i + 1] - closes[i]) / closes[i] for i in range(len(closes) - 1)
+         if closes[i]]
+    r = r[-window:] if len(r) >= window else r
+    if len(r) < 2:
+        return 0.0
+    m = sum(r) / len(r)
+    var = sum((x - m) ** 2 for x in r) / (len(r) - 1)
+    return _m.sqrt(max(var, 0.0)) * _m.sqrt(2190.0)
+
+
+def invvol_weights(vols: dict, lo=Y1B_W_MIN, hi=Y1B_W_MAX):
+    """Inverse-vol weights with exact box-simplex projection (cap clip).
+
+    Target raw = inv-vol normalized; project onto {sum=1, lo<=w<=hi} via
+    water-filling: iteratively pin weights hitting bounds, rescale the rest.
+    Falls back to uniform if infeasible (e.g. 2-coin basket vs 35% cap).
+    """
+    coins = list(vols)
+    n = len(coins)
+    if n == 0:
+        return {}
+    if not (n * lo <= 1.0 <= n * hi):
+        return {c: 1.0 / n for c in coins}
+    floored = {c: max(float(vols[c]), 1e-9) for c in coins}
+    if all(v <= 1e-9 for v in vols.values()):
+        return {c: 1.0 / n for c in coins}
+    inv = {c: 1.0 / floored[c] for c in coins}
+    tot = sum(inv.values())
+    raw = {c: inv[c] / tot for c in coins}
+    pinned = {}
+    free = list(coins)
+    remain = 1.0
+    for _ in range(n + 1):
+        if not free:
+            break
+        scale = remain / sum(raw[c] for c in free)
+        trial = {c: raw[c] * scale for c in free}
+        over = [c for c in free if trial[c] > hi]
+        under = [c for c in free if trial[c] < lo]
+        if not over and not under:
+            for c in free:
+                pinned[c] = trial[c]
+            free = []
+            break
+        # pin the most-violated bound first for determinism
+        if over and (not under or max(trial[c] - hi for c in over) >= max(lo - trial[c] for c in under)):
+            c = max(over, key=lambda x: trial[x])
+            pinned[c] = hi
+            remain -= hi
+            free.remove(c)
+        else:
+            c = min(under, key=lambda x: trial[x])
+            pinned[c] = lo
+            remain -= lo
+            free.remove(c)
+    else:
+        return {c: 1.0 / n for c in coins}
+    if free:
+        for c in free:
+            pinned[c] = raw[c] * (remain / sum(raw[x] for x in free))
+    s = sum(pinned.values())
+    return {c: pinned[c] / s for c in coins}
+
+
+def weights_for_bars(bars_map: dict, mode: str | None = None,
+                     window=Y1B_VOL_WINDOW, target: float | None = None):
+    """Static live weights from trailing-window vols. Returns (weights, meta).
+
+    Default equal path returns the locked static weights untouched.
+    """
+    import math as _m
+    coins = list(bars_map)
+    n = len(coins)
+    mode = (mode or weight_mode()).strip().lower()
+    if mode not in WEIGHT_MODES:
+        mode = "equal"
+    if mode == "equal" or n == 0:
+        return {c: 1.0 / n for c in coins}, {"mode": "equal", "lev_scale": 1.0}
+    closes = {c: [b[3] for b in bars_map[c][-window - 1:]] for c in coins}
+    vols = {c: realized_vol(closes[c], window) for c in coins}
+    w = invvol_weights(vols)
+    meta = {"mode": mode, "vols": vols, "lev_scale": 1.0,
+            "vol_target": target if target is not None else vol_target()}
+    if mode == "invvol_cap":
+        rets = {}
+        for c in coins:
+            cc = closes[c]
+            rets[c] = [(cc[i + 1] - cc[i]) / cc[i] for i in range(len(cc) - 1)
+                       if cc[i]]
+        m = min(len(rets[c]) for c in coins)
+        if m >= 20:
+            mat = [[rets[c][-m + k] for k in range(m)] for c in coins]
+            means = [sum(row) / m for row in mat]
+            pv = 0.0
+            for i in range(n):
+                for j in range(n):
+                    cov = sum((mat[i][k] - means[i]) * (mat[j][k] - means[j])
+                              for k in range(m)) / (m - 1)
+                    pv += w[coins[i]] * w[coins[j]] * cov
+            port_vol = _m.sqrt(max(pv, 0.0)) * _m.sqrt(2190.0)
+            tgt = meta["vol_target"]
+            scale = tgt / port_vol if port_vol > 1e-9 else 1.0
+            scale = min(max(scale, Y1B_LEV_SCALE_MIN), Y1B_LEV_SCALE_MAX)
+            meta["lev_scale"] = round(scale, 4)
+            meta["port_vol"] = round(port_vol, 4)
+        else:
+            meta["lev_scale"] = 1.0
+    return w, meta
+
 def basket_signals(bars_map: dict | None = None, top5: bool | None = None):
     import os as _os
     use5 = top5 if top5 is not None else (_os.getenv("Y1B_TOP5", "").strip().lower() in {"1", "true", "yes"})
@@ -121,7 +260,16 @@ def basket_signals(bars_map: dict | None = None, top5: bool | None = None):
     # signal_age: hours since the last closed 4h bar (bars are 4h-aggregated).
     _now = _dt.datetime.now(_dt.timezone.utc)
     _age_h = round((_now.hour % 4) + _now.minute / 60.0 + _now.second / 3600.0, 2)
-    return {"n": n, "signals": sigs, "weights": dict(weights),
+    _mode = weight_mode()
+    _wout, _wmeta = dict(weights), {"mode": "equal", "lev_scale": 1.0}
+    if _mode != "equal":
+        try:
+            _wout, _wmeta = weights_for_bars(
+                {c: bars_map[c][:n] for c in basket}, mode=_mode)
+        except Exception:
+            _wout, _wmeta = dict(weights), {"mode": _mode, "fallback": "equal"}
+    return {"n": n, "signals": sigs, "weights": _wout,
+            "weight_mode": _mode, "weight_meta": _wmeta,
             "formula": list(FORMULA), "lev": LEV, "fee": FEE, "fund": FUND,
             "signal_age_h": _age_h, "asof_utc": _now.isoformat()}
 
