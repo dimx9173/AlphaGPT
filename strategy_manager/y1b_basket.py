@@ -100,7 +100,11 @@ def leg_position(bars, spec: dict):
     out = []
     for v in pos:
         out.append(1.0 if v > 0.5 else (-1.0 if v < -0.5 else 0.0))
-    return out
+    try:
+        _sg_last = float(sg[0][-1])
+    except Exception:
+        _sg_last = 0.5
+    return out, _sg_last
 
 def _active_basket():
     import os as _os
@@ -254,8 +258,11 @@ def basket_signals(bars_map: dict | None = None, top5: bool | None = None):
     bars_map = bars_map or {c: load_bars_4h(c) for c in basket}
     n = min(len(b) for b in bars_map.values())
     sigs = {}
+    sg_last = {}
     for c, spec in basket.items():
-        sigs[c] = leg_position(bars_map[c][:n], spec)
+        _pos, _sg = leg_position(bars_map[c][:n], spec)
+        sigs[c] = _pos
+        sg_last[c] = _sg
     import datetime as _dt
     # signal_age: hours since the last closed 4h bar (bars are 4h-aggregated).
     _now = _dt.datetime.now(_dt.timezone.utc)
@@ -268,7 +275,7 @@ def basket_signals(bars_map: dict | None = None, top5: bool | None = None):
                 {c: bars_map[c][:n] for c in basket}, mode=_mode)
         except Exception:
             _wout, _wmeta = dict(weights), {"mode": _mode, "fallback": "equal"}
-    return {"n": n, "signals": sigs, "weights": _wout,
+    return {"n": n, "signals": sigs, "sg_last": sg_last, "weights": _wout,
             "weight_mode": _mode, "weight_meta": _wmeta,
             "formula": list(FORMULA), "lev": LEV, "fee": FEE, "fund": FUND,
             "signal_age_h": _age_h, "asof_utc": _now.isoformat()}
@@ -439,7 +446,7 @@ def brake_open_scale(coin: str) -> float:
             spec = basket.get(coin)
             if spec is not None:
                 b = load_bars_4h(coin)[-240:]
-                sig = leg_position(b, spec)
+                sig, _ = leg_position(b, spec)
                 cl = [x[3] for x in b]
                 r = [(cl[i + 1] - cl[i]) / cl[i] if cl[i] else 0.0
                      for i in range(len(cl) - 1)] + [0.0]

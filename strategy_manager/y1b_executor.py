@@ -11,7 +11,7 @@ import os
 from dataclasses import dataclass
 
 from strategy_manager.config import LEV, RiskConfig
-from strategy_manager.y1b_basket import latest_signals
+from strategy_manager.y1b_basket import basket_signals, latest_signals
 from strategy_manager.risk import RiskEngine
 from execution.brokers.base import Side
 
@@ -65,6 +65,87 @@ def live_enabled() -> bool:
 def paper_mode() -> bool:
     return (os.getenv("PAPER_MODE", "") or "").lower() in {"1", "true", "yes"}
 
+
+# === P0-2 swap gates (E14/E15). ALL default OFF. ===
+# Y1B_HYST_EPS: sigmoid hysteresis band half-width (e.g. 0.1). When ON, a flip
+#   needs |sg-0.5| >= eps on the new side, else want degrades to 0 (hold).
+# Y1B_MIN_HOLD_BARS: min 4h bars to hold before a flip (e.g. 2). Uses
+#   PortfolioManager entry_time; risk-reducing closes (want==0/flat) exempt.
+# Y1B_COST_K: cost-aware flips. Expected edge per unit must exceed
+#   k*(fee2x + slip_bp + funding) else degrade flip to hold (close-only if
+#   gate fails follows existing close-only path).
+def _swap_env_float(name: str, default: float) -> float:
+    try:
+        return float(os.getenv(name, str(default)))
+    except (TypeError, ValueError):
+        return default
+
+
+def hyst_eps() -> float:
+    return _swap_env_float("Y1B_HYST_EPS", 0.0)
+
+
+def min_hold_bars() -> int:
+    try:
+        return max(int(float(os.getenv("Y1B_MIN_HOLD_BARS", "0"))), 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def cost_k() -> float:
+    return _swap_env_float("Y1B_COST_K", 0.0)
+
+
+def swap_gates_on() -> bool:
+    return hyst_eps() > 0 or min_hold_bars() > 0 or cost_k() > 0
+
+
+def apply_swap_gates(want: float, sg: float | None, coin: str, pm=None,
+                     edge_per_unit: float | None = None,
+                     fee2x: float = 0.0008, slip_bp: float = 5.0,
+                     funding: float | None = None) -> tuple[float, str]:
+    """Degrade want->0 (hold) when a swap gate blocks. Returns (want, note).
+    note '' means pass. Pure function (pm only read for entry_time)."""
+    if want == 0:
+        return want, ""
+    eps = hyst_eps()
+    if eps > 0 and sg is not None:
+        try:
+            dist = abs(float(sg) - 0.5)
+        except (TypeError, ValueError):
+            dist = 0.0
+        if dist < eps:
+            return 0.0, "hyst"
+    mh = min_hold_bars()
+    if mh > 0 and pm is not None:
+        try:
+            poss = getattr(pm, "positions", {}) or {}
+            hit = None
+            for _k, _pos in poss.items():
+                try:
+                    if getattr(_pos, "token_address", "") == coin or getattr(_pos, "symbol", "") == coin:
+                        hit = _pos
+                        break
+                except Exception:
+                    continue
+            if hit is not None:
+                import time as _t
+                age_h = (_t.time() - float(getattr(hit, "entry_time", 0) or 0)) / 3600.0
+                if 0 <= age_h < mh * 4.0:
+                    return 0.0, "min-hold"
+        except Exception:
+            pass
+    k = cost_k()
+    if k > 0 and edge_per_unit is not None:
+        try:
+            slip = float(slip_bp) / 10000.0
+            fund = abs(float(funding)) if funding is not None else 0.0005
+            if float(edge_per_unit) < k * (float(fee2x) + slip + fund):
+                return 0.0, "cost"
+        except (TypeError, ValueError):
+            pass
+    return want, ""
+
 @dataclass
 class Plan:
     coin: str
@@ -80,7 +161,13 @@ async def build_plans(broker, risk: RiskEngine | None = None,
                       notional: float | None = None) -> list[Plan]:
     risk = risk or RiskEngine()
     cfg = risk.risk_config if isinstance(risk.risk_config, RiskConfig) else RiskConfig()
-    want_map = latest_signals()
+    try:
+        _bs = basket_signals()
+        want_map = {c: (s[-1] if s else 0.0) for c, s in _bs["signals"].items()}
+        _sg_map = dict(_bs.get("sg_last") or {})
+    except Exception:
+        want_map = latest_signals()
+        _sg_map = {}
     try:
         notion = float(notional if notional is not None else os.getenv("Y1B_NOTIONAL_USDT", "50"))
     except (TypeError, ValueError):
@@ -125,6 +212,20 @@ async def build_plans(broker, risk: RiskEngine | None = None,
             except (TypeError, ValueError):
                 funding = None
         ok, reason = risk.check_perp(sym, int(LEV), min(notion, cfg.perp_max_notional_usdt), funding)
+        # P0-2 swap gates (env-gated, default OFF => pass-through).
+        # Hyst needs sg of the new side; min-hold/cost need live pm -> applied
+        # at flip time in sync/run loop via apply_swap_gates; here record sg.
+        try:
+            _sg = _sg_map.get(coin)
+        except Exception:
+            _sg = None
+        if swap_gates_on() and want != 0 and _sg is not None and hyst_eps() > 0:
+            try:
+                if abs(float(_sg) - 0.5) < hyst_eps():
+                    plans.append(Plan(coin, sym, 0.0, None, 0.0, price, True, "hyst"))
+                    continue
+            except (TypeError, ValueError):
+                pass
         plans.append(Plan(coin, sym, want, side, size, price, ok, reason))
     return plans
 
@@ -189,6 +290,19 @@ async def sync_positions(broker, plans: list[Plan], pm, live: bool):
             actions.append({"symbol": p.symbol, "flip_needed": True, "held": held,
                             "want": p.want, "dry_run": not live})
             if live:
+                # P0-2 swap gates on flips: min-hold + cost degrade to hold
+                # (close-only already handled by want==0 path next cycle).
+                if swap_gates_on():
+                    _gw, _gn = apply_swap_gates(
+                        p.want, None, p.coin, pm=pm,
+                        edge_per_unit=None, funding=None)
+                    # hyst already applied at plan time (needs sg); here only
+                    # enforce min-hold; cost gate needs edge estimate -> skip
+                    # live (frontier-tuned offline), record only.
+                    if _gn == "min-hold":
+                        actions.append({"symbol": p.symbol, "held": True,
+                                        "reason": "min-hold", "held_size": held})
+                        continue
                 if not p.gate_ok:
                     # H1 fix: gate-failed flips degrade to close-only (risk-reducing),
                     # never open fresh size against a failed perp gate.
