@@ -1,0 +1,55 @@
+{
+ "lock": {
+  "doc": "docs/STRATEGY_E10.md",
+  "doc_title": "STRATEGY_E10 10-route consolidation",
+  "lock_date": "2026-09-07",
+  "e10_n_bars_4h": 6580,
+  "e10_segments": {
+   "H1": [
+    5584,
+    6077
+   ],
+   "H2": [
+    6077,
+    6570
+   ],
+   "B": [
+    6380,
+    6580
+   ],
+   "C": [
+    6080,
+    6580
+   ],
+   "FULL": [
+    0,
+    6580
+   ]
+  },
+  "locked_pair": "ETC 0.88/0.12/cd18/None/ts24 + TRX 0.85/0.12/cd6/0.05/ts24, q0.3 long-only, 50/50",
+  "config_mirror": "strategy_manager/config.py LOCKED_ETC/LOCKED_TRX"
+ },
+ "bars": {
+  "source_15m": "data/data_15m_3y/{COIN}.csv",
+  "agg": "16x15m -> 4h",
+  "t0_utc": "2023-09-05T17:15:00Z",
+  "bar_hours": 4,
+  "current_4h_bars": 6598,
+  "last_bar_start_utc": "2026-09-09T05:15:00Z"
+ },
+ "cut": {
+  "cut_index": 6580,
+  "meaning": "in-sample=[0:6580), frozen-OOS=[6580:N)",
+  "cut_bar_start_utc": "2026-09-06T09:15:00Z",
+  "lock_date_2026_09_07T00Z_bar_index": 6583,
+  "lock_date_bar_start_utc": "2026-09-06T21:15:00Z",
+  "note": "adopted cut=6580 (=E10 n, conservative: OOS starts ~1.5d before doc date, zero leakage possible)"
+ },
+ "rules": [
+  "R1 selection/param search MUST use only bars [0:6580).",
+  "R2 bars [6580:N) are frozen OOS: no selection, no refit, no threshold tuning on OOS.",
+  "R3 locked-point OOS diagnostic allowed only as read-only report, never as selection input.",
+  "R4 any new bar appended at N extends frozen OOS; cut_index never moves without new lock doc.",
+  "R5 this task is read-only: no orders, no broker calls."
+ ]
+}
