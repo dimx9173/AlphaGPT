@@ -20,7 +20,8 @@ load_dotenv(".env")
 
 import tests.conftest  # noqa: F401,E402  (solders stub)
 from strategy_manager.y1b_executor import (  # noqa: E402
-    make_broker, venue_name, run_once, stop_requested)
+    make_broker, venue_name, run_once, stop_requested, decision_aligned)
+from strategy_manager.y1b_basket import basket_signals as _basket_signals  # noqa: E402
 from strategy_manager.risk import RiskEngine  # noqa: E402
 
 LOG = "results/y1b_hourly.jsonl"
@@ -38,10 +39,17 @@ async def _cycle(notional: float):
     os.environ["Y1B_VENUE"] = "bybit"
     os.environ["Y1B_TOP5"] = "1"
     broker = make_broker("bybit")
-    out = {"venue": venue_name(broker)}
+    import datetime as _dt
+    _hh = _dt.datetime.now(_dt.timezone.utc).hour
+    _aligned = decision_aligned(_hh)
+    out = {"venue": venue_name(broker), "hour_utc": _hh,
+           "decision_aligned": _aligned}
     try:
+        _sig = _basket_signals()
+        out["signal_age_h"] = _sig.get("signal_age_h")
         plans, res, sync = await run_once(
-            broker=broker, risk=RiskEngine(), notional=notional, dry_run=False)
+            broker=broker, risk=RiskEngine(), notional=notional, dry_run=False,
+            hour=_hh)
         out["plans"] = [{"coin": p.coin, "symbol": p.symbol, "want": p.want,
                          "size": round(p.size, 6), "price": p.price,
                          "gate_ok": p.gate_ok, "reason": p.reason} for p in plans]

@@ -200,15 +200,28 @@ async def sync_positions(broker, plans: list[Plan], pm, live: bool):
     return actions
 
 
+def decision_aligned(hour: int | None = None) -> bool:
+    """4h decision gate: only UTC hour%4==0 may open/flip. Default OFF."""
+    import datetime as _dt
+    if (__import__("os").getenv("Y1B_DECISION_ALIGN", "") or "").lower() not in {"1", "true", "yes"}:
+        return True
+    h = hour if hour is not None else _dt.datetime.now(_dt.timezone.utc).hour
+    return (h % 4) == 0
+
+
 async def run_once(broker=None, risk: RiskEngine | None = None,
-                   notional: float | None = None, dry_run: bool | None = None):
-    """One Y1b cycle. Returns (plans, results, sync). dry_run default True unless live fully enabled."""
+                   notional: float | None = None, dry_run: bool | None = None,
+                   decision_only: bool = False, hour: int | None = None):
+    """One Y1b cycle. Returns (plans, results, sync). dry_run default True unless live fully enabled.
+    decision_only=True (or non-aligned hour with Y1B_DECISION_ALIGN=1): risk-only,
+    sync closes allowed, no fresh opens (market_open zero-call)."""
     from strategy_manager.portfolio import PortfolioManager
     risk = risk or RiskEngine()
     if broker is None:
         broker = make_broker()
     _venue = venue_name(broker)
     live = live_enabled() and not paper_mode() and (dry_run is False)
+    _risk_only = bool(decision_only) or not decision_aligned(hour)
     plans = await build_plans(broker, risk, notional)
     results = []
     pm = PortfolioManager(state_file=os.getenv("Y1B_STATE", "y1b_state.json"))
@@ -221,6 +234,17 @@ async def run_once(broker=None, risk: RiskEngine | None = None,
         if not live:
             results.append({"symbol": p.symbol, "dry_run": True, "want": p.want,
                             "size": round(p.size, 6), "price": p.price, "gate_ok": p.gate_ok})
+            continue
+        if _risk_only:
+            # Risk-only cycle: report, never open fresh size.
+            try:
+                _v = await broker.get_position(p.symbol)
+                _h = (_v.size if _v else 0.0)
+            except Exception:
+                _h = 0.0
+            results.append({"symbol": p.symbol, "skipped": True,
+                            "reason": "risk-only",
+                            "want": p.want, "held": _h})
             continue
         if not p.gate_ok or p.side is None:
             results.append({"symbol": p.symbol, "skipped": True, "reason": p.reason})

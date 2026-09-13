@@ -117,8 +117,13 @@ def basket_signals(bars_map: dict | None = None, top5: bool | None = None):
     sigs = {}
     for c, spec in basket.items():
         sigs[c] = leg_position(bars_map[c][:n], spec)
+    import datetime as _dt
+    # signal_age: hours since the last closed 4h bar (bars are 4h-aggregated).
+    _now = _dt.datetime.now(_dt.timezone.utc)
+    _age_h = round((_now.hour % 4) + _now.minute / 60.0 + _now.second / 3600.0, 2)
     return {"n": n, "signals": sigs, "weights": dict(weights),
-            "formula": list(FORMULA), "lev": LEV, "fee": FEE, "fund": FUND}
+            "formula": list(FORMULA), "lev": LEV, "fee": FEE, "fund": FUND,
+            "signal_age_h": _age_h, "asof_utc": _now.isoformat()}
 
 def latest_signals(bars_map: dict | None = None, top5: bool | None = None):
     r = basket_signals(bars_map, top5=top5)
