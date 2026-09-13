@@ -103,6 +103,12 @@ async def build_plans(broker, risk: RiskEngine | None = None,
             continue
         side = Side.BUY if want > 0 else Side.SELL
         size = min(notion, cfg.perp_max_notional_usdt) / price
+        # P1-2 drawdown brake (env-gated, default OFF => scale 1.0).
+        try:
+            from strategy_manager.y1b_basket import brake_open_scale
+            size = size * brake_open_scale(coin)
+        except Exception:
+            pass
         funding = None
         get_funding = broker.__dict__.get("get_funding_rate", None)
         if get_funding is None:

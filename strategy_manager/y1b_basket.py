@@ -276,3 +276,179 @@ def basket_signals(bars_map: dict | None = None, top5: bool | None = None):
 def latest_signals(bars_map: dict | None = None, top5: bool | None = None):
     r = basket_signals(bars_map, top5=top5)
     return {c: (s[-1] if s else 0.0) for c, s in r["signals"].items()}
+# --- P1-2 drawdown three-layer brake (E10/E11). Research params; ALL default OFF.
+# P0-3 = FAIL (permutation p>=0.05) => P1-2 conclusion PENDING; live chain
+# unchanged unless env flags are explicitly turned ON. E10 FORMULA untouched.
+# NOTE: Y1B_VOL_TARGET is shared with P1-1 invvol_cap (default 0.35 there);
+# P1-2 brake reads its own Y1B_TS_VOL_TARGET (default 0.7) so the two steps
+# never fight over one knob.
+DD_BRAKE_DEFAULTS = {
+    "vol_target": 0.7,   # B1: per-coin trailing-60-bar ann vol target
+    "vol_min": 0.25,     # B1: per-coin scale floor
+    "port_cap": 1.0,     # B2: portfolio trailing-60-bar ann vol cap
+    "ts_n": 24,          # B3a: holding >= N bars with no profit -> halve
+    "trail_dd": 0.2,     # B3b: portfolio trailing peak-dd > trigger -> halve
+    "half": 0.5,
+}
+DD_BRAKE_WINDOW = 60
+DD_BRAKE_BPY = 2190.0
+
+
+def _brake_env_on(name: str) -> bool:
+    import os as _os
+    return (_os.getenv(name, "") or "").strip().lower() in {"1", "true", "yes"}
+
+
+def _brake_env_float(name: str, default: float) -> float:
+    import os as _os
+    try:
+        return float(_os.getenv(name, str(default)))
+    except (TypeError, ValueError):
+        return default
+
+
+def brake_b1_on() -> bool:
+    """B1 single-coin slow vol targeting (60x4h). Env Y1B_VOL_TS, default OFF."""
+    return _brake_env_on("Y1B_VOL_TS")
+
+
+def brake_b2_on() -> bool:
+    """B2 portfolio vol cap (proportional downscale). Env Y1B_PORT_CAP, default OFF."""
+    return _brake_env_on("Y1B_PORT_CAP")
+
+
+def brake_b3_on() -> bool:
+    """B3 time-stop / portfolio trailing. Env Y1B_TIMESTOP, default OFF."""
+    return _brake_env_on("Y1B_TIMESTOP")
+
+
+def brakes_all_off() -> bool:
+    return not (brake_b1_on() or brake_b2_on() or brake_b3_on())
+
+
+def trailing_vol(rets: list, window: int = DD_BRAKE_WINDOW,
+                 bpy: float = DD_BRAKE_BPY) -> list:
+    """Trailing sample-stdev annualized (causal window ending at t)."""
+    import statistics as _st
+    out = []
+    for t in range(len(rets)):
+        w = [float(x) for x in rets[max(0, t - window + 1):t + 1]]
+        if len(w) < 2:
+            out.append(0.0)
+            continue
+        sd = _st.stdev(w)
+        out.append(sd * (bpy ** 0.5) if sd > 0 else 0.0)
+    return out
+
+
+def vol_target_scale(vol: float, target: float = 0.7, smin: float = 0.25) -> float:
+    """B1 scale: min(1, target/vol), floored at smin. vol<=0 -> 1.0 (no info)."""
+    try:
+        v = float(vol)
+    except (TypeError, ValueError):
+        return 1.0
+    if v <= 1e-12:
+        return 1.0
+    return max(float(smin), min(1.0, float(target) / v))
+
+
+def port_cap_scale(port_vol: float, cap: float = 1.0) -> float:
+    """B2 scale: min(1, cap/port_vol). port_vol<=0 -> 1.0."""
+    try:
+        v = float(port_vol)
+    except (TypeError, ValueError):
+        return 1.0
+    if v <= 1e-12:
+        return 1.0
+    return min(1.0, float(cap) / v)
+
+
+def timestop_scales(pos: list, rets: list, n: int = 24,
+                    factor: float = 0.5) -> list:
+    """B3a: per-bar scale; holding the same nonzero side >= n bars with
+    cumulative excursion <= 0 -> factor (default half), else 1.0."""
+    out = []
+    cur = 0.0
+    hold = 0
+    exc = 0.0
+    for t in range(len(pos)):
+        v = float(pos[t]) if t < len(pos) else 0.0
+        w = 1.0 if v > 0.5 else (-1.0 if v < -0.5 else 0.0)
+        r = float(rets[t]) if t < len(rets) else 0.0
+        if w != cur:
+            cur, hold, exc = w, 0, 0.0
+        if cur != 0.0:
+            hold += 1
+            exc += cur * r
+            out.append(float(factor) if (hold >= int(n) and exc <= 0) else 1.0)
+        else:
+            out.append(1.0)
+    return out
+
+
+def trailing_dd_scales(port_net: list, trigger: float = 0.2,
+                       factor: float = 0.5) -> list:
+    """B3b: per-bar scale; trailing peak-minus-cum drawdown > trigger -> factor."""
+    out = []
+    cs = 0.0
+    peak = None
+    for x in port_net:
+        cs += float(x)
+        peak = cs if peak is None else max(peak, cs)
+        out.append(float(factor) if (peak - cs) > float(trigger) else 1.0)
+    return out
+
+
+def brake_open_scale(coin: str) -> float:
+    """P1-2 live open-size scale (env-gated, default 1.0 = OFF).
+
+    B1 (Y1B_VOL_TS): trailing-60-bar coin vol vs Y1B_TS_VOL_TARGET (def 0.7),
+      floor Y1B_VOL_MIN (def 0.25). B2 (Y1B_PORT_CAP): Y1B_PORT_VOL reading
+      vs Y1B_PORT_VOL_CAP (def 1.0) — offline research feeds port vol via env.
+      B3 (Y1B_TIMESTOP): time-stop on the coin's own signal history +
+      Y1B_PORT_DD reading vs Y1B_TRAIL_DD (def 0.2) halves. Any flag OFF skips
+      that layer. All OFF -> 1.0 (formula/positions untouched).
+    """
+    import os as _os
+    if brakes_all_off():
+        return 1.0
+    sc = 1.0
+    if brake_b1_on():
+        try:
+            b = load_bars_4h(coin)[-240:]
+            cl = [x[3] for x in b]
+            r = [(cl[i + 1] - cl[i]) / cl[i] if cl[i] else 0.0
+                 for i in range(len(cl) - 1)] + [0.0]
+            v = trailing_vol(r)[-1] if r else 0.0
+            sc *= vol_target_scale(
+                v, _brake_env_float("Y1B_TS_VOL_TARGET", DD_BRAKE_DEFAULTS["vol_target"]),
+                _brake_env_float("Y1B_VOL_MIN", DD_BRAKE_DEFAULTS["vol_min"]))
+        except Exception:
+            pass
+    if brake_b2_on():
+        try:
+            pv = float(_os.getenv("Y1B_PORT_VOL", "") or 0.0)
+            if pv > 0:
+                sc *= port_cap_scale(
+                    pv, _brake_env_float("Y1B_PORT_VOL_CAP", DD_BRAKE_DEFAULTS["port_cap"]))
+        except (TypeError, ValueError):
+            pass
+    if brake_b3_on():
+        try:
+            basket = BASKET_5 if coin in BASKET_5 else BASKET
+            spec = basket.get(coin)
+            if spec is not None:
+                b = load_bars_4h(coin)[-240:]
+                sig = leg_position(b, spec)
+                cl = [x[3] for x in b]
+                r = [(cl[i + 1] - cl[i]) / cl[i] if cl[i] else 0.0
+                     for i in range(len(cl) - 1)] + [0.0]
+                tsn = int(_brake_env_float("Y1B_TS_N", float(DD_BRAKE_DEFAULTS["ts_n"])))
+                sc *= float(timestop_scales(sig, r, tsn)[-1]) if sig else 1.0
+            pdd = float(_os.getenv("Y1B_PORT_DD", "") or 0.0)
+            trg = _brake_env_float("Y1B_TRAIL_DD", DD_BRAKE_DEFAULTS["trail_dd"])
+            if pdd > trg:
+                sc *= DD_BRAKE_DEFAULTS["half"]
+        except Exception:
+            pass
+    return max(0.0, min(1.0, float(sc)))
