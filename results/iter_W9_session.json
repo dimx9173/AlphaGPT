@@ -1,0 +1,431 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 15m native cd/ts/vw x16; legs on FULL series, sessions segment outputs only",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "sessions": {
+   "asia": [
+    0,
+    8
+   ],
+   "eu": [
+    8,
+    16
+   ],
+   "us": [
+    16,
+    24
+   ]
+  },
+  "session_def": "bar UTC hour: asia [0,8), eu [8,16), us [16,24)",
+  "trades_def": "entries of nonzero-pos blocks on FULL pos series; session trades = entries in session; arm trades = sum of leg session trades",
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "bpy": 35040.0,
+  "scale": 16,
+  "note": "session split only, read-only; live untouched (stays FULL-calendar equal-weight)"
+ },
+ "per_coin": {
+  "ETC": {
+   "FULL": {
+    "sharpe": 15.639,
+    "ann": 19.6947,
+    "mdd": 0.685,
+    "cum": 19.6947,
+    "final_x": 20.6947,
+    "n": 35040,
+    "turnover": 0.003425,
+    "trades": 59
+   },
+   "asia": {
+    "sharpe": 21.604,
+    "ann": 20.3886,
+    "mdd": 0.2048,
+    "cum": 6.7962,
+    "final_x": 7.7962,
+    "n": 11680,
+    "turnover": 0.003253,
+    "trades": 20
+   },
+   "eu": {
+    "sharpe": 18.518,
+    "ann": 19.1177,
+    "mdd": 0.3614,
+    "cum": 6.3726,
+    "final_x": 7.3726,
+    "n": 11680,
+    "turnover": 0.003938,
+    "trades": 21
+   },
+   "us": {
+    "sharpe": 11.696,
+    "ann": 19.5779,
+    "mdd": 0.6326,
+    "cum": 6.526,
+    "final_x": 7.526,
+    "n": 11680,
+    "turnover": 0.003082,
+    "trades": 18
+   }
+  },
+  "TRX": {
+   "FULL": {
+    "sharpe": 50.347,
+    "ann": 17.4868,
+    "mdd": 0.1484,
+    "cum": 17.4868,
+    "final_x": 18.4868,
+    "n": 35040,
+    "turnover": 0.009703,
+    "trades": 166
+   },
+   "asia": {
+    "sharpe": 56.204,
+    "ann": 18.3603,
+    "mdd": 0.0681,
+    "cum": 6.1201,
+    "final_x": 7.1201,
+    "n": 11680,
+    "turnover": 0.009161,
+    "trades": 53
+   },
+   "eu": {
+    "sharpe": 44.896,
+    "ann": 17.3373,
+    "mdd": 0.086,
+    "cum": 5.7791,
+    "final_x": 6.7791,
+    "n": 11680,
+    "turnover": 0.009418,
+    "trades": 53
+   },
+   "us": {
+    "sharpe": 51.474,
+    "ann": 16.7628,
+    "mdd": 0.0565,
+    "cum": 5.5876,
+    "final_x": 6.5876,
+    "n": 11680,
+    "turnover": 0.010531,
+    "trades": 60
+   }
+  },
+  "ATOM": {
+   "FULL": {
+    "sharpe": 16.967,
+    "ann": 20.6124,
+    "mdd": 0.4679,
+    "cum": 20.6124,
+    "final_x": 21.6124,
+    "n": 35040,
+    "turnover": 0.01113,
+    "trades": 193
+   },
+   "asia": {
+    "sharpe": 18.765,
+    "ann": 18.7754,
+    "mdd": 0.2377,
+    "cum": 6.2585,
+    "final_x": 7.2585,
+    "n": 11680,
+    "turnover": 0.010017,
+    "trades": 57
+   },
+   "eu": {
+    "sharpe": 18.893,
+    "ann": 20.4144,
+    "mdd": 0.2619,
+    "cum": 6.8048,
+    "final_x": 7.8048,
+    "n": 11680,
+    "turnover": 0.013185,
+    "trades": 77
+   },
+   "us": {
+    "sharpe": 15.069,
+    "ann": 22.6474,
+    "mdd": 0.3529,
+    "cum": 7.5491,
+    "final_x": 8.5491,
+    "n": 11680,
+    "turnover": 0.010188,
+    "trades": 59
+   }
+  },
+  "APT": {
+   "FULL": {
+    "sharpe": 15.241,
+    "ann": 21.3801,
+    "mdd": 0.5092,
+    "cum": 21.3801,
+    "final_x": 22.3801,
+    "n": 35040,
+    "turnover": 0.003425,
+    "trades": 60
+   },
+   "asia": {
+    "sharpe": 16.677,
+    "ann": 19.6752,
+    "mdd": 0.2392,
+    "cum": 6.5584,
+    "final_x": 7.5584,
+    "n": 11680,
+    "turnover": 0.003596,
+    "trades": 21
+   },
+   "eu": {
+    "sharpe": 18.161,
+    "ann": 23.5847,
+    "mdd": 0.2955,
+    "cum": 7.8616,
+    "final_x": 8.8616,
+    "n": 11680,
+    "turnover": 0.00351,
+    "trades": 19
+   },
+   "us": {
+    "sharpe": 12.423,
+    "ann": 20.8803,
+    "mdd": 0.455,
+    "cum": 6.9601,
+    "final_x": 7.9601,
+    "n": 11680,
+    "turnover": 0.003168,
+    "trades": 20
+   }
+  },
+  "KAS": {
+   "FULL": {
+    "sharpe": 15.149,
+    "ann": 18.8424,
+    "mdd": 0.4551,
+    "cum": 18.8424,
+    "final_x": 19.8424,
+    "n": 35040,
+    "turnover": 0.009646,
+    "trades": 169
+   },
+   "asia": {
+    "sharpe": 17.24,
+    "ann": 19.3333,
+    "mdd": 0.2993,
+    "cum": 6.4444,
+    "final_x": 7.4444,
+    "n": 11680,
+    "turnover": 0.009932,
+    "trades": 58
+   },
+   "eu": {
+    "sharpe": 12.947,
+    "ann": 16.8422,
+    "mdd": 0.4681,
+    "cum": 5.6141,
+    "final_x": 6.6141,
+    "n": 11680,
+    "turnover": 0.009503,
+    "trades": 56
+   },
+   "us": {
+    "sharpe": 15.648,
+    "ann": 20.3519,
+    "mdd": 0.4009,
+    "cum": 6.784,
+    "final_x": 7.784,
+    "n": 11680,
+    "turnover": 0.009503,
+    "trades": 55
+   }
+  }
+ },
+ "arms": {
+  "asia": {
+   "FULL_calendar": {
+    "sharpe": 18.926,
+    "ann": 6.4355,
+    "mdd": 0.0719,
+    "cum": 6.4355,
+    "final_x": 7.4355,
+    "n": 35040,
+    "turnover": 0.002397,
+    "trades": 209
+   },
+   "subset": {
+    "sharpe": 33.12,
+    "ann": 19.3066,
+    "mdd": 0.0719,
+    "cum": 6.4355,
+    "final_x": 7.4355,
+    "n": 11680,
+    "turnover": 0.007192,
+    "trades": 209
+   }
+  },
+  "eu": {
+   "FULL_calendar": {
+    "sharpe": 16.842,
+    "ann": 6.4864,
+    "mdd": 0.0694,
+    "cum": 6.4864,
+    "final_x": 7.4864,
+    "n": 35040,
+    "turnover": 0.002637,
+    "trades": 226
+   },
+   "subset": {
+    "sharpe": 29.409,
+    "ann": 19.4593,
+    "mdd": 0.0694,
+    "cum": 6.4864,
+    "final_x": 7.4864,
+    "n": 11680,
+    "turnover": 0.007911,
+    "trades": 226
+   }
+  },
+  "us": {
+   "FULL_calendar": {
+    "sharpe": 12.058,
+    "ann": 6.6814,
+    "mdd": 0.2881,
+    "cum": 6.6814,
+    "final_x": 7.6814,
+    "n": 35040,
+    "turnover": 0.002432,
+    "trades": 212
+   },
+   "subset": {
+    "sharpe": 20.972,
+    "ann": 20.0441,
+    "mdd": 0.2881,
+    "cum": 6.6814,
+    "final_x": 7.6814,
+    "n": 11680,
+    "turnover": 0.007295,
+    "trades": 212
+   }
+  },
+  "basket_FULL": {
+   "sharpe": 26.111,
+   "ann": 19.6033,
+   "mdd": 0.2901,
+   "cum": 19.6033,
+   "final_x": 20.6033,
+   "n": 35040,
+   "turnover": 0.007466,
+   "trades": 647
+  }
+ },
+ "compare": {
+  "best_session_by_coin": {
+   "ETC": "asia",
+   "TRX": "asia",
+   "ATOM": "eu",
+   "APT": "eu",
+   "KAS": "asia"
+  },
+  "arm_subset_sharpe": {
+   "asia": 33.12,
+   "eu": 29.409,
+   "us": 20.972
+  },
+  "arm_calendar_sharpe": {
+   "asia": 18.926,
+   "eu": 16.842,
+   "us": 12.058
+  },
+  "arm_subset_cum": {
+   "asia": 6.4355,
+   "eu": 6.4864,
+   "us": 6.6814
+  },
+  "arm_trades": {
+   "asia": 209,
+   "eu": 226,
+   "us": 212
+  }
+ },
+ "session_counts": {
+  "asia": 11680,
+  "eu": 11680,
+  "us": 11680
+ },
+ "verdict": "PENDING",
+ "decision": "KEEP_FULL_NO_SESSION_FILTER",
+ "decision_note": "待定，不做session过滤。session仅为对照，不采用，不live。15m原生格子。",
+ "partial": false
+}
