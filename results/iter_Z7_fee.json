@@ -1,0 +1,379 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal Top5; 15m native cd/ts/vw x16; positions precomputed once, fee cells arithmetic",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "venue": "aster",
+  "lev": 2.0,
+  "lev_locked": 2.0,
+  "fee_grid": [
+   0.0002,
+   0.0004,
+   0.0008,
+   0.0016
+  ],
+  "fund": 0.0005,
+  "fail_sharpe": 0.05,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "bpy": 35040.0,
+  "scale": 16,
+  "smoke": false,
+  "note": "fee sweep only, read-only; live FEE/FUND/LEV untouched"
+ },
+ "status": "done",
+ "curve": {
+  "rows": [
+   {
+    "fee": 0.0002,
+    "sharpe": 26.25,
+    "ann": 19.7079,
+    "mdd": 0.29,
+    "cum": 19.7079,
+    "final_x": 20.7079,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0004,
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0008,
+    "sharpe": 25.832,
+    "ann": 19.394,
+    "mdd": 0.2904,
+    "cum": 19.394,
+    "final_x": 20.394,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0016,
+    "sharpe": 25.268,
+    "ann": 18.9755,
+    "mdd": 0.2911,
+    "cum": 18.9755,
+    "final_x": 19.9755,
+    "n": 35040,
+    "turnover": 0.007466
+   }
+  ],
+  "monotone_down": true,
+  "turnover_flat": true
+ },
+ "breakeven": {
+  "bisection_rows": [
+   {
+    "fee": 0.0016,
+    "sharpe": 25.268,
+    "ann": 18.9755,
+    "mdd": 0.2911,
+    "cum": 18.9755,
+    "final_x": 19.9755,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0264,
+    "sharpe": 7.133,
+    "ann": 6.0001,
+    "mdd": 0.3452,
+    "cum": 6.0001,
+    "final_x": 7.0001,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0388,
+    "sharpe": -0.52,
+    "ann": -0.4876,
+    "mdd": 1.4476,
+    "cum": -0.4876,
+    "final_x": 0.5124,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.032600000000000004,
+    "sharpe": 3.112,
+    "ann": 2.7563,
+    "mdd": 0.3824,
+    "cum": 2.7563,
+    "final_x": 3.7563,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0357,
+    "sharpe": 1.246,
+    "ann": 1.1343,
+    "mdd": 0.5105,
+    "cum": 1.1343,
+    "final_x": 2.1343,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.037250000000000005,
+    "sharpe": 0.35,
+    "ann": 0.3234,
+    "mdd": 0.8599,
+    "cum": 0.3234,
+    "final_x": 1.3234,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.038025,
+    "sharpe": -0.088,
+    "ann": -0.0821,
+    "mdd": 1.1509,
+    "cum": -0.0821,
+    "final_x": 0.9179,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.037637500000000004,
+    "sharpe": 0.13,
+    "ann": 0.1206,
+    "mdd": 1.0047,
+    "cum": 0.1206,
+    "final_x": 1.1206,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.037831250000000004,
+    "sharpe": 0.021,
+    "ann": 0.0193,
+    "mdd": 1.0773,
+    "cum": 0.0193,
+    "final_x": 1.0193,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.037734375,
+    "sharpe": 0.075,
+    "ann": 0.0699,
+    "mdd": 1.041,
+    "cum": 0.0699,
+    "final_x": 1.0699,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0377828125,
+    "sharpe": 0.048,
+    "ann": 0.0446,
+    "mdd": 1.0592,
+    "cum": 0.0446,
+    "final_x": 1.0446,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.03775859375,
+    "sharpe": 0.062,
+    "ann": 0.0573,
+    "mdd": 1.0501,
+    "cum": 0.0573,
+    "final_x": 1.0573,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.037770703125,
+    "sharpe": 0.055,
+    "ann": 0.0509,
+    "mdd": 1.0546,
+    "cum": 0.0509,
+    "final_x": 1.0509,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0377767578125,
+    "sharpe": 0.051,
+    "ann": 0.0478,
+    "mdd": 1.0569,
+    "cum": 0.0478,
+    "final_x": 1.0478,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.037779785156249995,
+    "sharpe": 0.05,
+    "ann": 0.0462,
+    "mdd": 1.058,
+    "cum": 0.0462,
+    "final_x": 1.0462,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.037778271484375,
+    "sharpe": 0.051,
+    "ann": 0.047,
+    "mdd": 1.0575,
+    "cum": 0.047,
+    "final_x": 1.047,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.0377790283203125,
+    "sharpe": 0.05,
+    "ann": 0.0466,
+    "mdd": 1.0578,
+    "cum": 0.0466,
+    "final_x": 1.0466,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.03777864990234375,
+    "sharpe": 0.05,
+    "ann": 0.0468,
+    "mdd": 1.0576,
+    "cum": 0.0468,
+    "final_x": 1.0468,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.03777846069335938,
+    "sharpe": 0.051,
+    "ann": 0.0469,
+    "mdd": 1.0575,
+    "cum": 0.0469,
+    "final_x": 1.0469,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.03777855529785157,
+    "sharpe": 0.05,
+    "ann": 0.0468,
+    "mdd": 1.0576,
+    "cum": 0.0468,
+    "final_x": 1.0468,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   {
+    "fee": 0.037778507995605476,
+    "sharpe": 0.05,
+    "ann": 0.0469,
+    "mdd": 1.0576,
+    "cum": 0.0469,
+    "final_x": 1.0469,
+    "n": 35040,
+    "turnover": 0.007466
+   }
+  ],
+  "bracket_lo": 0.03777846069335938,
+  "bracket_hi": 0.037778507995605476,
+  "threshold": 0.05,
+  "breakeven_fee": 0.037778,
+  "breakeven_check": {
+   "sharpe": 0.05,
+   "ann": 0.0469,
+   "mdd": 1.0576,
+   "cum": 0.0469,
+   "final_x": 1.0469,
+   "n": 35040,
+   "turnover": 0.007466
+  },
+  "margin_from_grid_hi": 0.036178
+ },
+ "verdict": "PENDING",
+ "verdict_note": "PENDING (待定): P0-3 permutation FAILED, no adoption, no live change; fee sweep is diagnostic only."
+}
