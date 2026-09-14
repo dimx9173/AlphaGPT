@@ -1,0 +1,433 @@
+{
+ "iter": "X5",
+ "scope": "remaining 19 coins (funnel L0/L1 only, no L2 adoption)",
+ "conclusion": "PENDING (待定, P0-3 FAIL); no coins added",
+ "universe": [
+  "ADA",
+  "ARB",
+  "AVAX",
+  "BCH",
+  "BNB",
+  "BTC",
+  "DOGE",
+  "DOT",
+  "ETH",
+  "HBAR",
+  "LINK",
+  "LTC",
+  "NEAR",
+  "SHIB",
+  "SOL",
+  "SUI",
+  "UNI",
+  "XLM",
+  "XRP"
+ ],
+ "focus6": {
+  "BTC": {
+   "coin": "BTC",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 17.774,
+   "sharpe": 1.22,
+   "fee2x": 0.991,
+   "best_template": [
+    0.88,
+    0.12,
+    6,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  "ETH": {
+   "coin": "ETH",
+   "L0_pass": true,
+   "L1_pass": true,
+   "final_x": 77.886,
+   "sharpe": 1.362,
+   "fee2x": 1.164,
+   "best_template": [
+    0.85,
+    0.12,
+    6,
+    0.05
+   ],
+   "verdict": "PASS_ALL_PENDING"
+  },
+  "SOL": {
+   "coin": "SOL",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 0.853,
+   "sharpe": -0.038,
+   "fee2x": -0.209,
+   "best_template": [
+    0.85,
+    0.12,
+    6,
+    0.05
+   ],
+   "verdict": "REJECT_L1"
+  },
+  "BNB": {
+   "coin": "BNB",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 14.446,
+   "sharpe": 1.08,
+   "fee2x": 0.907,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  "LINK": {
+   "coin": "LINK",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 8.66,
+   "sharpe": 0.498,
+   "fee2x": 0.377,
+   "best_template": [
+    0.88,
+    0.12,
+    6,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  "LTC": {
+   "coin": "LTC",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 43.201,
+   "sharpe": 1.071,
+   "fee2x": 0.953,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  }
+ },
+ "addable_pending": [
+  "DOT",
+  "ETH"
+ ],
+ "watch": [
+  "ARB",
+  "BNB",
+  "BTC",
+  "LTC",
+  "SUI"
+ ],
+ "reject": [
+  "ADA",
+  "AVAX",
+  "BCH",
+  "DOGE",
+  "HBAR",
+  "LINK",
+  "NEAR",
+  "SHIB",
+  "SOL",
+  "UNI",
+  "XLM",
+  "XRP"
+ ],
+ "rows": [
+  {
+   "coin": "ADA",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 6.874,
+   "sharpe": 0.413,
+   "fee2x": 0.324,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "ARB",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 97.16,
+   "sharpe": 0.968,
+   "fee2x": 0.879,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "AVAX",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 25.789,
+   "sharpe": 0.743,
+   "fee2x": 0.647,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "BCH",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 15.426,
+   "sharpe": 0.677,
+   "fee2x": 0.541,
+   "best_template": [
+    0.88,
+    0.12,
+    6,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "BNB",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 14.446,
+   "sharpe": 1.08,
+   "fee2x": 0.907,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "BTC",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 17.774,
+   "sharpe": 1.22,
+   "fee2x": 0.991,
+   "best_template": [
+    0.88,
+    0.12,
+    6,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "DOGE",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 11.839,
+   "sharpe": 0.544,
+   "fee2x": 0.384,
+   "best_template": [
+    0.85,
+    0.12,
+    6,
+    0.05
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "DOT",
+   "L0_pass": true,
+   "L1_pass": true,
+   "final_x": 280.693,
+   "sharpe": 1.428,
+   "fee2x": 1.326,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "PASS_ALL_PENDING"
+  },
+  {
+   "coin": "ETH",
+   "L0_pass": true,
+   "L1_pass": true,
+   "final_x": 77.886,
+   "sharpe": 1.362,
+   "fee2x": 1.164,
+   "best_template": [
+    0.85,
+    0.12,
+    6,
+    0.05
+   ],
+   "verdict": "PASS_ALL_PENDING"
+  },
+  {
+   "coin": "HBAR",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 11.351,
+   "sharpe": 0.503,
+   "fee2x": 0.418,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "LINK",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 8.66,
+   "sharpe": 0.498,
+   "fee2x": 0.377,
+   "best_template": [
+    0.88,
+    0.12,
+    6,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "LTC",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 43.201,
+   "sharpe": 1.071,
+   "fee2x": 0.953,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "NEAR",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 8.055,
+   "sharpe": 0.407,
+   "fee2x": 0.262,
+   "best_template": [
+    0.85,
+    0.12,
+    6,
+    0.05
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "SHIB",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 28.63,
+   "sharpe": 0.676,
+   "fee2x": 0.567,
+   "best_template": [
+    0.88,
+    0.12,
+    6,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "SOL",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 0.853,
+   "sharpe": -0.038,
+   "fee2x": -0.209,
+   "best_template": [
+    0.85,
+    0.12,
+    6,
+    0.05
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "SUI",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 97.91,
+   "sharpe": 0.907,
+   "fee2x": 0.825,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "UNI",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 9.754,
+   "sharpe": 0.456,
+   "fee2x": 0.315,
+   "best_template": [
+    0.85,
+    0.12,
+    6,
+    0.05
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "XLM",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 28.635,
+   "sharpe": 0.814,
+   "fee2x": 0.713,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  },
+  {
+   "coin": "XRP",
+   "L0_pass": true,
+   "L1_pass": false,
+   "final_x": 9.037,
+   "sharpe": 0.571,
+   "fee2x": 0.462,
+   "best_template": [
+    0.88,
+    0.12,
+    12,
+    null
+   ],
+   "verdict": "REJECT_L1"
+  }
+ ],
+ "note": "L1 gate: final_x>1 & sharpe>0 & fee2x_B>0 & fee2x_C>1. SOL fails outright (final_x<1, neg sharpe). BTC/BNB/LTC/ARB/SUI near-miss on fee2x_C>1. DOT/ETH pass L1 (diagnostic; basket gate L2 not evaluated for adoption).",
+ "engine": "scripts/new_coin_pipeline.py E10 FORMULA, aster 2x, fund 0.0005, base+fee2x",
+ "offline": true
+}
