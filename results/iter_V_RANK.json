@@ -1,0 +1,85 @@
+{
+ "meta": {
+  "iter": "V10",
+  "scope": "Top5 15m-native V1,V3-V9 (V2 absent, re-running as v2b)",
+  "n_done": 8,
+  "n_absent": 1,
+  "note": "read-only aggregation; all PENDING (P0-3 FAIL), no demo change"
+ },
+ "baseline": {
+  "FULL_sharpe": 26.111,
+  "FULL_mdd": 0.2901,
+  "source": "V1/V3-V9 base FULL (Top5 15m-native, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "V1",
+   "topic": "ATR-stop",
+   "status": "done",
+   "detail": "best=None (all lose to base)",
+   "demo": "no"
+  },
+  {
+   "round": "V3",
+   "topic": "RSI filter",
+   "status": "done",
+   "detail": "gated 22.3 vs base 26.1, long leg dead",
+   "demo": "no"
+  },
+  {
+   "round": "V4",
+   "topic": "ADX filter",
+   "status": "done",
+   "detail": "thr up sharpe down to 4.9, coverage 0.1%",
+   "demo": "no"
+  },
+  {
+   "round": "V5",
+   "topic": "Bollinger filter",
+   "status": "done",
+   "detail": "no gain, NO_CHANGE",
+   "demo": "no"
+  },
+  {
+   "round": "V6",
+   "topic": "MACD filter",
+   "status": "done",
+   "detail": "18.7 vs 26.1, long -7%",
+   "demo": "no"
+  },
+  {
+   "round": "V7",
+   "topic": "Stoch filter",
+   "status": "done",
+   "detail": "no gain, NO_ADOPTION",
+   "demo": "no"
+  },
+  {
+   "round": "V8",
+   "topic": "OBV filter",
+   "status": "done",
+   "detail": "23.4 vs 26.1, pass rate 36-50%",
+   "demo": "no"
+  },
+  {
+   "round": "V9",
+   "topic": "VWAP filter",
+   "status": "done",
+   "detail": "22.9 vs 26.1, -6% trades",
+   "demo": "no"
+  },
+  {
+   "round": "V2",
+   "topic": "Donchian filter",
+   "status": "absent",
+   "detail": "worker died zero-output, re-spawned as v2b",
+   "demo": "no"
+  }
+ ],
+ "ranking": "All 8 filters NO_ADOPTION/NO_CHANGE: every add-on filter reduces sharpe. Base (no filter) wins. V2 absent.",
+ "verdict": "ALL_PENDING_P03_FAIL",
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": []
+ }
+}
