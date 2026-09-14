@@ -1,0 +1,412 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-mask + cooldown + stops + vol_scale(vt None->1.0) + roll1; 15m native, cd/ts/vw x16",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "minhold_grid": [
+   0,
+   2,
+   4
+  ],
+  "minhold_unit": "4h-bar, engine x16 internally",
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 35040.0,
+  "scale": 16,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "h2_start": 17520,
+  "smoke": false,
+  "note": "turnover audit only: entries/flips/hold-bars + turnover-vs-trades scatter + min-hold effect. E10 FORMULA untouched; live chain untouched; offline read-only."
+ },
+ "partial": false,
+ "verdict": "PENDING",
+ "decision": "PENDING",
+ "base_FULL": {
+  "sharpe": 26.111,
+  "ann": 19.6033,
+  "mdd": 0.2901,
+  "cum": 19.6033,
+  "n": 35040,
+  "turnover": 0.007466,
+  "trades": 654
+ },
+ "base_H2": {
+  "sharpe": 33.824,
+  "ann": 18.1165,
+  "mdd": 0.0896,
+  "cum": 9.0582,
+  "n": 17520,
+  "turnover": 0.00734
+ },
+ "base_H2_sharpe": 33.824,
+ "base_per_coin": {
+  "ETC": {
+   "FULL": {
+    "sharpe": 15.639,
+    "ann": 19.6947,
+    "mdd": 0.685,
+    "cum": 19.6947,
+    "n": 35040,
+    "turnover": 0.003425
+   },
+   "H2": {
+    "sharpe": 22.165,
+    "ann": 19.0416,
+    "mdd": 0.1557,
+    "cum": 9.5208,
+    "n": 17520,
+    "turnover": 0.003368
+   },
+   "entries": 59,
+   "flips": 1,
+   "exits": 59,
+   "trades": 60,
+   "holds": {
+    "count": 60,
+    "mean": 303.22,
+    "median": 298.0,
+    "p90": 334.0,
+    "max": 363,
+    "min": 289,
+    "buckets": {
+     "1": 0,
+     "2_4": 0,
+     "5_8": 0,
+     "9_16": 0,
+     "17_32": 0,
+     "33_64": 0,
+     "65p": 60
+    }
+   }
+  },
+  "TRX": {
+   "FULL": {
+    "sharpe": 50.347,
+    "ann": 17.4868,
+    "mdd": 0.1484,
+    "cum": 17.4868,
+    "n": 35040,
+    "turnover": 0.009703
+   },
+   "H2": {
+    "sharpe": 56.063,
+    "ann": 17.2326,
+    "mdd": 0.1484,
+    "cum": 8.6163,
+    "n": 17520,
+    "turnover": 0.009646
+   },
+   "entries": 166,
+   "flips": 4,
+   "exits": 166,
+   "trades": 170,
+   "holds": {
+    "count": 170,
+    "mean": 110.63,
+    "median": 104.0,
+    "p90": 137.0,
+    "max": 188,
+    "min": 97,
+    "buckets": {
+     "1": 0,
+     "2_4": 0,
+     "5_8": 0,
+     "9_16": 0,
+     "17_32": 0,
+     "33_64": 0,
+     "65p": 170
+    }
+   }
+  },
+  "ATOM": {
+   "FULL": {
+    "sharpe": 16.967,
+    "ann": 20.6124,
+    "mdd": 0.4679,
+    "cum": 20.6124,
+    "n": 35040,
+    "turnover": 0.01113
+   },
+   "H2": {
+    "sharpe": 20.82,
+    "ann": 19.68,
+    "mdd": 0.1823,
+    "cum": 9.84,
+    "n": 17520,
+    "turnover": 0.010788
+   },
+   "entries": 193,
+   "flips": 2,
+   "exits": 193,
+   "trades": 195,
+   "holds": {
+    "count": 195,
+    "mean": 97.38,
+    "median": 104.0,
+    "p90": 134.0,
+    "max": 186,
+    "min": 3,
+    "buckets": {
+     "1": 0,
+     "2_4": 1,
+     "5_8": 0,
+     "9_16": 7,
+     "17_32": 12,
+     "33_64": 15,
+     "65p": 160
+    }
+   }
+  },
+  "APT": {
+   "FULL": {
+    "sharpe": 15.241,
+    "ann": 21.3801,
+    "mdd": 0.5092,
+    "cum": 21.3801,
+    "n": 35040,
+    "turnover": 0.003425
+   },
+   "H2": {
+    "sharpe": 15.25,
+    "ann": 17.0595,
+    "mdd": 0.2229,
+    "cum": 8.5297,
+    "n": 17520,
+    "turnover": 0.003368
+   },
+   "entries": 60,
+   "flips": 0,
+   "exits": 59,
+   "trades": 60,
+   "holds": {
+    "count": 60,
+    "mean": 299.2,
+    "median": 298.0,
+    "p90": 320.0,
+    "max": 344,
+    "min": 187,
+    "buckets": {
+     "1": 0,
+     "2_4": 0,
+     "5_8": 0,
+     "9_16": 0,
+     "17_32": 0,
+     "33_64": 0,
+     "65p": 60
+    }
+   }
+  },
+  "KAS": {
+   "FULL": {
+    "sharpe": 15.149,
+    "ann": 18.8424,
+    "mdd": 0.4551,
+    "cum": 18.8424,
+    "n": 35040,
+    "turnover": 0.009646
+   },
+   "H2": {
+    "sharpe": 15.832,
+    "ann": 17.5688,
+    "mdd": 0.2429,
+    "cum": 8.7844,
+    "n": 17520,
+    "turnover": 0.009532
+   },
+   "entries": 169,
+   "flips": 0,
+   "exits": 168,
+   "trades": 169,
+   "holds": {
+    "count": 169,
+    "mean": 109.96,
+    "median": 105.0,
+    "p90": 131.0,
+    "max": 225,
+    "min": 49,
+    "buckets": {
+     "1": 0,
+     "2_4": 0,
+     "5_8": 0,
+     "9_16": 0,
+     "17_32": 0,
+     "33_64": 1,
+     "65p": 168
+    }
+   }
+  }
+ },
+ "scatter": [
+  {
+   "coin": "ETC",
+   "turnover": 0.003425,
+   "entries": 59,
+   "flips": 1,
+   "trades": 60
+  },
+  {
+   "coin": "TRX",
+   "turnover": 0.009703,
+   "entries": 166,
+   "flips": 4,
+   "trades": 170
+  },
+  {
+   "coin": "ATOM",
+   "turnover": 0.01113,
+   "entries": 193,
+   "flips": 2,
+   "trades": 195
+  },
+  {
+   "coin": "APT",
+   "turnover": 0.003425,
+   "entries": 60,
+   "flips": 0,
+   "trades": 60
+  },
+  {
+   "coin": "KAS",
+   "turnover": 0.009646,
+   "entries": 169,
+   "flips": 0,
+   "trades": 169
+  }
+ ],
+ "minhold_rows": [
+  {
+   "min_hold": 0,
+   "FULL": {
+    "sharpe": 29.035,
+    "ann": 25.8117,
+    "mdd": 0.2703,
+    "cum": 25.8117,
+    "n": 35040,
+    "turnover": 0.125719,
+    "trades": 11013
+   },
+   "H2_sharpe": 33.89,
+   "H2_trades": 5246,
+   "d_sharpe_vs_base": 2.924,
+   "d_turnover_vs_base": 0.118253,
+   "turnover_cut_vs_base": -15.8389
+  },
+  {
+   "min_hold": 2,
+   "FULL": {
+    "sharpe": 25.141,
+    "ann": 20.3899,
+    "mdd": 0.343,
+    "cum": 20.3899,
+    "n": 35040,
+    "turnover": 0.025434,
+    "trades": 2228
+   },
+   "H2_sharpe": 32.142,
+   "H2_trades": 1100,
+   "d_sharpe_vs_base": -0.97,
+   "d_turnover_vs_base": 0.017968,
+   "turnover_cut_vs_base": -2.4066
+  },
+  {
+   "min_hold": 4,
+   "FULL": {
+    "sharpe": 27.272,
+    "ann": 18.5539,
+    "mdd": 0.144,
+    "cum": 18.5539,
+    "n": 35040,
+    "turnover": 0.014315,
+    "trades": 1254
+   },
+   "H2_sharpe": 30.113,
+   "H2_trades": 624,
+   "d_sharpe_vs_base": 1.161,
+   "d_turnover_vs_base": 0.006849,
+   "turnover_cut_vs_base": -0.9174
+  }
+ ],
+ "minhold_note": "min-hold 0 vs base: turnover x16.84, sharpe +2.924; diagnostic only, no adoption.",
+ "conclusion": "PENDING (P0-3 FAIL): W5 15m turnover audit diagnostic only; entries/flips/hold-bars + scatter + min-hold effects are shelf value, no adoption, no live change, live untouched."
+}
