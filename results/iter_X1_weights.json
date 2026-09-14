@@ -1,0 +1,438 @@
+{
+ "config": {
+  "engine": "mirror run_qsweep leg_pnl + quantile q0.3 long-only + cooldown + stops + roll1; static weights",
+  "formula": "E10 LOCKED (see strategy_manager.config.FORMULA)",
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "fee2x": 0.0008,
+  "box": [
+   0.05,
+   0.4
+  ],
+  "objective": "max FULL sharpe s.t. turnover<0.16 AND fold12 median>=1.5",
+  "smoke": false,
+  "grid_bars": 6135,
+  "h2_len": 493,
+  "vols_fullsample_ann": {
+   "ETC": 0.7949,
+   "TRX": 0.4519,
+   "ATOM": 0.7858,
+   "APT": 0.9477,
+   "KAS": 0.9891
+  },
+  "invvol_cap_static": {
+   "port_vol": 0.7706,
+   "vol_target": 0.35,
+   "lev_scale": 0.4542
+  },
+  "note": "E10 FORMULA untouched; live chain untouched; offline read-only; P0-3 FAIL => conclusion PENDING (待定), not demo evidence"
+ },
+ "rows": {
+  "equal": {
+   "weights": {
+    "ETC": 0.2,
+    "TRX": 0.2,
+    "ATOM": 0.2,
+    "APT": 0.2,
+    "KAS": 0.2
+   },
+   "FULL": {
+    "sharpe": 1.977,
+    "ann": 1.6947,
+    "mdd": 0.8114,
+    "cum": 4.7474,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   "H2": {
+    "sharpe": 2.357,
+    "ann": 1.4659,
+    "mdd": 0.3289,
+    "cum": 0.33,
+    "n": 493,
+    "turnover": 0.082759
+   },
+   "FULL_fee2x": {
+    "sharpe": 1.797,
+    "ann": 1.5401,
+    "mdd": 0.8672,
+    "cum": 4.3144,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   "fold12": {
+    "sharpes": [
+     0.632,
+     1.643,
+     1.871,
+     0.632,
+     -0.46,
+     3.03,
+     1.256,
+     1.625,
+     5.58,
+     3.571,
+     2.785,
+     2.203
+    ],
+    "mean": 2.031,
+    "median": 1.871,
+    "n_pos": 11
+   },
+   "eligible": true,
+   "method": "locked-default",
+   "lev_scale": 1.0
+  },
+  "kas10": {
+   "weights": {
+    "ETC": 0.225,
+    "TRX": 0.225,
+    "ATOM": 0.225,
+    "APT": 0.225,
+    "KAS": 0.1
+   },
+   "FULL": {
+    "sharpe": 1.883,
+    "ann": 1.5686,
+    "mdd": 0.9666,
+    "cum": 4.3942,
+    "n": 6135,
+    "turnover": 0.087262
+   },
+   "H2": {
+    "sharpe": 2.235,
+    "ann": 1.3976,
+    "mdd": 0.3302,
+    "cum": 0.3146,
+    "n": 493,
+    "turnover": 0.080933
+   },
+   "FULL_fee2x": {
+    "sharpe": 1.699,
+    "ann": 1.4157,
+    "mdd": 1.0214,
+    "cum": 3.9659,
+    "n": 6135,
+    "turnover": 0.087262
+   },
+   "fold12": {
+    "sharpes": [
+     0.412,
+     1.336,
+     2.748,
+     0.07,
+     -0.692,
+     2.928,
+     1.195,
+     1.501,
+     6.158,
+     3.314,
+     2.758,
+     2.057
+    ],
+    "mean": 1.982,
+    "median": 2.057,
+    "n_pos": 11
+   },
+   "eligible": true,
+   "method": "fixed-KAS-0.10",
+   "lev_scale": 1.0
+  },
+  "invvol": {
+   "weights": {
+    "ETC": 0.1847,
+    "TRX": 0.325,
+    "ATOM": 0.1869,
+    "APT": 0.155,
+    "KAS": 0.1485
+   },
+   "FULL": {
+    "sharpe": 2.038,
+    "ann": 1.5705,
+    "mdd": 0.8302,
+    "cum": 4.3996,
+    "n": 6135,
+    "turnover": 0.090254
+   },
+   "H2": {
+    "sharpe": 2.601,
+    "ann": 1.4129,
+    "mdd": 0.2854,
+    "cum": 0.3181,
+    "n": 493,
+    "turnover": 0.08384
+   },
+   "FULL_fee2x": {
+    "sharpe": 1.833,
+    "ann": 1.4124,
+    "mdd": 0.8863,
+    "cum": 3.9566,
+    "n": 6135,
+    "turnover": 0.090254
+   },
+   "fold12": {
+    "sharpes": [
+     0.688,
+     1.993,
+     1.991,
+     0.609,
+     -0.358,
+     2.934,
+     1.472,
+     1.334,
+     6.113,
+     3.708,
+     2.857,
+     2.447
+    ],
+    "mean": 2.149,
+    "median": 1.993,
+    "n_pos": 11
+   },
+   "eligible": true,
+   "method": "static-fullsample-realized-vol-clip0.10-0.35",
+   "lev_scale": 1.0
+  },
+  "invvol_cap": {
+   "weights": {
+    "ETC": 0.1847,
+    "TRX": 0.325,
+    "ATOM": 0.1869,
+    "APT": 0.155,
+    "KAS": 0.1485
+   },
+   "FULL": {
+    "sharpe": 2.038,
+    "ann": 0.7133,
+    "mdd": 0.3771,
+    "cum": 1.9983,
+    "n": 6135,
+    "turnover": 0.040993
+   },
+   "H2": {
+    "sharpe": 2.601,
+    "ann": 0.6417,
+    "mdd": 0.1296,
+    "cum": 0.1445,
+    "n": 493,
+    "turnover": 0.03808
+   },
+   "FULL_fee2x": {
+    "sharpe": 1.833,
+    "ann": 0.6415,
+    "mdd": 0.4026,
+    "cum": 1.7971,
+    "n": 6135,
+    "turnover": 0.040993
+   },
+   "fold12": {
+    "sharpes": [
+     0.688,
+     1.993,
+     1.991,
+     0.609,
+     -0.358,
+     2.934,
+     1.472,
+     1.334,
+     6.113,
+     3.708,
+     2.857,
+     2.447
+    ],
+    "mean": 2.149,
+    "median": 1.993,
+    "n_pos": 11
+   },
+   "eligible": true,
+   "method": "static-invvol-x-lev-scale",
+   "lev_scale": 0.4542
+  },
+  "meanvar": {
+   "weights": {
+    "ETC": 0.1775,
+    "TRX": 0.4,
+    "ATOM": 0.1193,
+    "APT": 0.05,
+    "KAS": 0.2533
+   },
+   "FULL": {
+    "sharpe": 2.183,
+    "ann": 1.6544,
+    "mdd": 0.6941,
+    "cum": 4.6345,
+    "n": 6135,
+    "turnover": 0.09266
+   },
+   "H2": {
+    "sharpe": 2.991,
+    "ann": 1.4685,
+    "mdd": 0.2555,
+    "cum": 0.3306,
+    "n": 493,
+    "turnover": 0.086781
+   },
+   "FULL_fee2x": {
+    "sharpe": 1.969,
+    "ann": 1.492,
+    "mdd": 0.7094,
+    "cum": 4.1797,
+    "n": 6135,
+    "turnover": 0.09266
+   },
+   "fold12": {
+    "sharpes": [
+     0.978,
+     2.761,
+     0.43,
+     1.863,
+     0.174,
+     2.891,
+     1.717,
+     1.138,
+     5.53,
+     4.311,
+     2.906,
+     2.936
+    ],
+    "mean": 2.303,
+    "median": 2.761,
+    "n_pos": 12
+   },
+   "eligible": true,
+   "method": "SLSQP-maxSharpe",
+   "lev_scale": 1.0
+  },
+  "riskpar": {
+   "weights": {
+    "ETC": 0.1839,
+    "TRX": 0.364,
+    "ATOM": 0.1658,
+    "APT": 0.1442,
+    "KAS": 0.1421
+   },
+   "FULL": {
+    "sharpe": 2.057,
+    "ann": 1.5388,
+    "mdd": 0.8262,
+    "cum": 4.3108,
+    "n": 6135,
+    "turnover": 0.090345
+   },
+   "H2": {
+    "sharpe": 2.653,
+    "ann": 1.3819,
+    "mdd": 0.2745,
+    "cum": 0.3111,
+    "n": 493,
+    "turnover": 0.083777
+   },
+   "FULL_fee2x": {
+    "sharpe": 1.845,
+    "ann": 1.3805,
+    "mdd": 0.8823,
+    "cum": 3.8674,
+    "n": 6135,
+    "turnover": 0.090345
+   },
+   "fold12": {
+    "sharpes": [
+     0.664,
+     2.118,
+     1.883,
+     0.601,
+     -0.235,
+     2.949,
+     1.508,
+     1.235,
+     6.215,
+     3.852,
+     2.876,
+     2.506
+    ],
+    "mean": 2.181,
+    "median": 2.118,
+    "n_pos": 11
+   },
+   "eligible": true,
+   "method": "cyclical-sqrt",
+   "lev_scale": 1.0
+  }
+ },
+ "selection": {
+  "eligible": [
+   "equal",
+   "invvol",
+   "invvol_cap",
+   "kas10",
+   "meanvar",
+   "riskpar"
+  ],
+  "best": "meanvar",
+  "best_FULL_sharpe": 2.183
+ },
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "KEEP_equal",
+ "decision_note": "待定(P0-3 FAIL),不切預設。權重對照僅供研究, live 維持 equal 20%。"
+}
