@@ -1,0 +1,324 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-mask + cooldown + stops + vol_scale(vt None->1.0) + roll1; 15m native, cd/ts/vw x16",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "tp_grid": [
+   null,
+   0.05,
+   0.1,
+   0.2
+  ],
+  "trail_grid": [
+   null,
+   0.03,
+   0.05
+  ],
+  "uniform_cells": 12,
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 35040.0,
+  "scale": 16,
+  "grid_bars": 35040,
+  "h2_start": 17520,
+  "smoke": false,
+  "trail_spec": "post-stop give-back exit on binary positions pre-vol_scale: armed once peak excursion > 0, flat when peak - excursion >= drop; no separate activation",
+  "note": "tp 4 x trail 3 = 12 uniform cells. E10 FORMULA untouched; live chain untouched; offline read-only."
+ },
+ "base_FULL": {
+  "sharpe": 26.111,
+  "ann": 19.6033,
+  "mdd": 0.2901,
+  "cum": 19.6033,
+  "final_x": 20.6033,
+  "n": 35040,
+  "turnover": 0.007466
+ },
+ "base_H2_sharpe": 33.824,
+ "uniform_rows": [
+  {
+   "tp": null,
+   "trail": null,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "H2_sharpe": 33.824,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0
+  },
+  {
+   "tp": null,
+   "trail": 0.03,
+   "FULL": {
+    "sharpe": 26.1,
+    "ann": 19.3334,
+    "mdd": 0.1946,
+    "cum": 19.3334,
+    "final_x": 20.3334,
+    "n": 35040,
+    "turnover": 0.014372
+   },
+   "H2_sharpe": 33.537,
+   "d_sharpe_vs_base": -0.011,
+   "d_mdd_vs_base": -0.0955
+  },
+  {
+   "tp": null,
+   "trail": 0.05,
+   "FULL": {
+    "sharpe": 26.357,
+    "ann": 19.5851,
+    "mdd": 0.2574,
+    "cum": 19.5851,
+    "final_x": 20.5851,
+    "n": 35040,
+    "turnover": 0.009966
+   },
+   "H2_sharpe": 33.9,
+   "d_sharpe_vs_base": 0.246,
+   "d_mdd_vs_base": -0.0327
+  },
+  {
+   "tp": 0.05,
+   "trail": null,
+   "FULL": {
+    "sharpe": 30.265,
+    "ann": 19.4321,
+    "mdd": 0.1829,
+    "cum": 19.4321,
+    "final_x": 20.4321,
+    "n": 35040,
+    "turnover": 0.009326
+   },
+   "H2_sharpe": 34.049,
+   "d_sharpe_vs_base": 4.154,
+   "d_mdd_vs_base": -0.1072
+  },
+  {
+   "tp": 0.05,
+   "trail": 0.03,
+   "FULL": {
+    "sharpe": 30.041,
+    "ann": 19.0776,
+    "mdd": 0.1699,
+    "cum": 19.0776,
+    "final_x": 20.0776,
+    "n": 35040,
+    "turnover": 0.015548
+   },
+   "H2_sharpe": 33.741,
+   "d_sharpe_vs_base": 3.93,
+   "d_mdd_vs_base": -0.1202
+  },
+  {
+   "tp": 0.05,
+   "trail": 0.05,
+   "FULL": {
+    "sharpe": 30.334,
+    "ann": 19.3782,
+    "mdd": 0.1829,
+    "cum": 19.3782,
+    "final_x": 20.3782,
+    "n": 35040,
+    "turnover": 0.011473
+   },
+   "H2_sharpe": 34.09,
+   "d_sharpe_vs_base": 4.223,
+   "d_mdd_vs_base": -0.1072
+  },
+  {
+   "tp": 0.1,
+   "trail": null,
+   "FULL": {
+    "sharpe": 28.6,
+    "ann": 19.6058,
+    "mdd": 0.1679,
+    "cum": 19.6058,
+    "final_x": 20.6058,
+    "n": 35040,
+    "turnover": 0.007854
+   },
+   "H2_sharpe": 33.884,
+   "d_sharpe_vs_base": 2.489,
+   "d_mdd_vs_base": -0.1222
+  },
+  {
+   "tp": 0.1,
+   "trail": 0.03,
+   "FULL": {
+    "sharpe": 28.348,
+    "ann": 19.2401,
+    "mdd": 0.1624,
+    "cum": 19.2401,
+    "final_x": 20.2401,
+    "n": 35040,
+    "turnover": 0.014566
+   },
+   "H2_sharpe": 33.613,
+   "d_sharpe_vs_base": 2.237,
+   "d_mdd_vs_base": -0.1277
+  },
+  {
+   "tp": 0.1,
+   "trail": 0.05,
+   "FULL": {
+    "sharpe": 28.673,
+    "ann": 19.5421,
+    "mdd": 0.1882,
+    "cum": 19.5421,
+    "final_x": 20.5421,
+    "n": 35040,
+    "turnover": 0.010194
+   },
+   "H2_sharpe": 33.964,
+   "d_sharpe_vs_base": 2.562,
+   "d_mdd_vs_base": -0.1019
+  },
+  {
+   "tp": 0.2,
+   "trail": null,
+   "FULL": {
+    "sharpe": 26.956,
+    "ann": 19.7557,
+    "mdd": 0.1679,
+    "cum": 19.7557,
+    "final_x": 20.7557,
+    "n": 35040,
+    "turnover": 0.007523
+   },
+   "H2_sharpe": 33.824,
+   "d_sharpe_vs_base": 0.845,
+   "d_mdd_vs_base": -0.1222
+  },
+  {
+   "tp": 0.2,
+   "trail": 0.03,
+   "FULL": {
+    "sharpe": 26.682,
+    "ann": 19.3849,
+    "mdd": 0.1624,
+    "cum": 19.3849,
+    "final_x": 20.3849,
+    "n": 35040,
+    "turnover": 0.014361
+   },
+   "H2_sharpe": 33.537,
+   "d_sharpe_vs_base": 0.571,
+   "d_mdd_vs_base": -0.1277
+  },
+  {
+   "tp": 0.2,
+   "trail": 0.05,
+   "FULL": {
+    "sharpe": 26.996,
+    "ann": 19.6845,
+    "mdd": 0.1882,
+    "cum": 19.6845,
+    "final_x": 20.6845,
+    "n": 35040,
+    "turnover": 0.009943
+   },
+   "H2_sharpe": 33.9,
+   "d_sharpe_vs_base": 0.885,
+   "d_mdd_vs_base": -0.1019
+  }
+ ],
+ "best_no_drop_dd_min": {
+  "tp": 0.1,
+  "trail": 0.03,
+  "FULL": {
+   "sharpe": 28.348,
+   "ann": 19.2401,
+   "mdd": 0.1624,
+   "cum": 19.2401,
+   "final_x": 20.2401,
+   "n": 35040,
+   "turnover": 0.014566
+  },
+  "H2_sharpe": 33.613,
+  "d_sharpe_vs_base": 2.237,
+  "d_mdd_vs_base": -0.1277
+ },
+ "best_note": "min FULL mdd among uniform cells with sharpe>=base: tp=0.1 trail=0.03",
+ "verdict": "PENDING",
+ "conclusion": "PENDING (P0-3 FAIL): Z1 15m take-profit sweep diagnostic only; no-drop dd-min selection is shelf value, no adoption, no live change, live untouched."
+}
