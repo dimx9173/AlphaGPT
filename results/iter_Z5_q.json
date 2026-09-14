@@ -1,0 +1,421 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": "sweep"
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": "sweep"
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": "sweep"
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": "sweep"
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": "sweep"
+   }
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "fee2x": 0.0008,
+  "qs": [
+   0.1,
+   0.2,
+   0.3,
+   0.4,
+   0.5
+  ],
+  "grid": "15m",
+  "grid_bars": 35040,
+  "h2_start": 17520,
+  "h2_len": 17520,
+  "bpy": 35040.0,
+  "scale": 16,
+  "smoke": false,
+  "knee": "max perpendicular distance from chord on (q, FULL fee2x sharpe)",
+  "attribution": "per-leg long_net/short_net split (fee+funding allocated by side turnover/position); entries count 0->side flips",
+  "note": "E10 FORMULA untouched; live chain untouched; offline read-only; PENDING (P0-3 FAIL), not demo evidence"
+ },
+ "rows": [
+  {
+   "q": 0.1,
+   "FULL": {
+    "sharpe": 25.189,
+    "ann": 19.781,
+    "mdd": 0.2901,
+    "cum": 19.781,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "H2": {
+    "sharpe": 31.013,
+    "ann": 17.8581,
+    "mdd": 0.175,
+    "cum": 8.9291,
+    "n": 17520,
+    "turnover": 0.007295
+   },
+   "FULL_fee2x": {
+    "sharpe": 24.922,
+    "ann": 19.5718,
+    "mdd": 0.2904,
+    "cum": 19.5718,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "H2_fee2x": {
+    "sharpe": 30.656,
+    "ann": 17.6537,
+    "mdd": 0.1768,
+    "cum": 8.8268,
+    "n": 17520,
+    "turnover": 0.007295
+   },
+   "attribution_full": {
+    "long_entries": 0,
+    "short_entries": 654,
+    "long_pnl": 0.0,
+    "short_pnl": 19.781,
+    "long_share": 0.0,
+    "short_share": 1.0
+   },
+   "attribution_h2": {
+    "long_entries": 0,
+    "short_entries": 654,
+    "long_pnl": 0.0,
+    "short_pnl": 8.9291,
+    "long_share": 0.0,
+    "short_share": 1.0
+   }
+  },
+  {
+   "q": 0.2,
+   "FULL": {
+    "sharpe": 25.107,
+    "ann": 19.6788,
+    "mdd": 0.2901,
+    "cum": 19.6788,
+    "n": 35040,
+    "turnover": 0.007489
+   },
+   "H2": {
+    "sharpe": 30.82,
+    "ann": 17.7013,
+    "mdd": 0.175,
+    "cum": 8.8506,
+    "n": 17520,
+    "turnover": 0.00734
+   },
+   "FULL_fee2x": {
+    "sharpe": 24.84,
+    "ann": 19.4689,
+    "mdd": 0.2904,
+    "cum": 19.4689,
+    "n": 35040,
+    "turnover": 0.007489
+   },
+   "H2_fee2x": {
+    "sharpe": 30.462,
+    "ann": 17.4955,
+    "mdd": 0.1768,
+    "cum": 8.7478,
+    "n": 17520,
+    "turnover": 0.00734
+   },
+   "attribution_full": {
+    "long_entries": 2,
+    "short_entries": 652,
+    "long_pnl": -0.0607,
+    "short_pnl": 19.7395,
+    "long_share": -0.0031,
+    "short_share": 1.0031
+   },
+   "attribution_h2": {
+    "long_entries": 2,
+    "short_entries": 652,
+    "long_pnl": -0.0474,
+    "short_pnl": 8.8981,
+    "long_share": -0.0054,
+    "short_share": 1.0054
+   }
+  },
+  {
+   "q": 0.3,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "H2": {
+    "sharpe": 33.824,
+    "ann": 18.1165,
+    "mdd": 0.0896,
+    "cum": 9.0582,
+    "n": 17520,
+    "turnover": 0.00734
+   },
+   "FULL_fee2x": {
+    "sharpe": 25.832,
+    "ann": 19.394,
+    "mdd": 0.2904,
+    "cum": 19.394,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "H2_fee2x": {
+    "sharpe": 33.437,
+    "ann": 17.9107,
+    "mdd": 0.0896,
+    "cum": 8.9554,
+    "n": 17520,
+    "turnover": 0.00734
+   },
+   "attribution_full": {
+    "long_entries": 9,
+    "short_entries": 638,
+    "long_pnl": -0.198,
+    "short_pnl": 19.8013,
+    "long_share": -0.0101,
+    "short_share": 1.0101
+   },
+   "attribution_h2": {
+    "long_entries": 9,
+    "short_entries": 638,
+    "long_pnl": -0.0624,
+    "short_pnl": 9.1206,
+    "long_share": -0.0069,
+    "short_share": 1.0069
+   }
+  },
+  {
+   "q": 0.4,
+   "FULL": {
+    "sharpe": 26.311,
+    "ann": 19.4003,
+    "mdd": 0.2881,
+    "cum": 19.4003,
+    "n": 35040,
+    "turnover": 0.0075
+   },
+   "H2": {
+    "sharpe": 34.501,
+    "ann": 18.2648,
+    "mdd": 0.1102,
+    "cum": 9.1324,
+    "n": 17520,
+    "turnover": 0.007363
+   },
+   "FULL_fee2x": {
+    "sharpe": 26.024,
+    "ann": 19.1901,
+    "mdd": 0.2881,
+    "cum": 19.1901,
+    "n": 35040,
+    "turnover": 0.0075
+   },
+   "H2_fee2x": {
+    "sharpe": 34.108,
+    "ann": 18.0584,
+    "mdd": 0.1105,
+    "cum": 9.0292,
+    "n": 17520,
+    "turnover": 0.007363
+   },
+   "attribution_full": {
+    "long_entries": 15,
+    "short_entries": 627,
+    "long_pnl": -0.4696,
+    "short_pnl": 19.8699,
+    "long_share": -0.0242,
+    "short_share": 1.0242
+   },
+   "attribution_h2": {
+    "long_entries": 15,
+    "short_entries": 627,
+    "long_pnl": -0.1735,
+    "short_pnl": 9.3059,
+    "long_share": -0.019,
+    "short_share": 1.019
+   }
+  },
+  {
+   "q": 0.5,
+   "FULL": {
+    "sharpe": 25.705,
+    "ann": 19.1091,
+    "mdd": 0.2881,
+    "cum": 19.1091,
+    "n": 35040,
+    "turnover": 0.007557
+   },
+   "H2": {
+    "sharpe": 34.102,
+    "ann": 18.3781,
+    "mdd": 0.1102,
+    "cum": 9.189,
+    "n": 17520,
+    "turnover": 0.007386
+   },
+   "FULL_fee2x": {
+    "sharpe": 25.419,
+    "ann": 18.8972,
+    "mdd": 0.2881,
+    "cum": 18.8972,
+    "n": 35040,
+    "turnover": 0.007557
+   },
+   "H2_fee2x": {
+    "sharpe": 33.714,
+    "ann": 18.171,
+    "mdd": 0.1105,
+    "cum": 9.0855,
+    "n": 17520,
+    "turnover": 0.007386
+   },
+   "attribution_full": {
+    "long_entries": 23,
+    "short_entries": 618,
+    "long_pnl": -0.6258,
+    "short_pnl": 19.7349,
+    "long_share": -0.0328,
+    "short_share": 1.0328
+   },
+   "attribution_h2": {
+    "long_entries": 23,
+    "short_entries": 618,
+    "long_pnl": -0.1652,
+    "short_pnl": 9.3543,
+    "long_share": -0.018,
+    "short_share": 1.018
+   }
+  }
+ ],
+ "fee2x_curve": [
+  {
+   "q": 0.1,
+   "FULL_fee2x_sharpe": 24.922
+  },
+  {
+   "q": 0.2,
+   "FULL_fee2x_sharpe": 24.84
+  },
+  {
+   "q": 0.3,
+   "FULL_fee2x_sharpe": 25.832
+  },
+  {
+   "q": 0.4,
+   "FULL_fee2x_sharpe": 26.024
+  },
+  {
+   "q": 0.5,
+   "FULL_fee2x_sharpe": 25.419
+  }
+ ],
+ "base_curve": [
+  {
+   "q": 0.1,
+   "FULL_sharpe": 25.189
+  },
+  {
+   "q": 0.2,
+   "FULL_sharpe": 25.107
+  },
+  {
+   "q": 0.3,
+   "FULL_sharpe": 26.111
+  },
+  {
+   "q": 0.4,
+   "FULL_sharpe": 26.311
+  },
+  {
+   "q": 0.5,
+   "FULL_sharpe": 25.705
+  }
+ ],
+ "knee": {
+  "q": 0.4,
+  "idx": 3,
+  "curve": [
+   24.922,
+   24.84,
+   25.832,
+   26.024,
+   25.419
+  ]
+ },
+ "q03_check": {
+  "FULL_fee2x": 25.832,
+  "FULL": 26.111,
+  "mean_others_fee2x": 25.301,
+  "gap_pct": 2.1,
+  "isolated_peak": false
+ },
+ "verdict": "PENDING",
+ "verdict_detail": "PENDING_P03_FAIL",
+ "decision": "KEEP_q0.3",
+ "decision_note": "待定(P0-3 FAIL): no adoption, live untouched; knee q=0.4 diagnostic only (q0.3 not isolated (gap +2.1%)); fee2x curve [24.922, 24.84, 25.832, 26.024, 25.419]",
+ "conclusion": "PENDING: Z5 15m quantile sweep Top5 [0.1, 0.2, 0.3, 0.4, 0.5]; knee q=0.4; no live change"
+}
