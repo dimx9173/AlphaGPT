@@ -1,0 +1,428 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "delta": 0.02,
+  "params": [
+   "lth",
+   "sth"
+  ],
+  "flat_tol": 0.15,
+  "flat_rule": "max|d FULL sharpe| <= 0.15 => flat(穩健), else sensitive(敏感); robustness only, no adoption",
+  "smoke": false,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "bpy": 35040.0,
+  "scale": 16,
+  "note": "E10 FORMULA untouched; live chain untouched; offline read-only; PENDING (待定), not demo evidence"
+ },
+ "base_FULL": {
+  "sharpe": 26.111,
+  "ann": 19.6033,
+  "mdd": 0.2901,
+  "cum": 19.6033,
+  "final_x": 20.6033,
+  "n": 35040,
+  "turnover": 0.007466
+ },
+ "rows": [
+  {
+   "coin": "TRX",
+   "param": "sth",
+   "delta": 0.02,
+   "new_value": 0.14,
+   "FULL": {
+    "sharpe": 25.784,
+    "ann": 19.6949,
+    "mdd": 0.3033,
+    "cum": 19.6949,
+    "final_x": 20.6949,
+    "n": 35040,
+    "turnover": 0.007443
+   },
+   "d_sharpe": -0.327
+  },
+  {
+   "coin": "APT",
+   "param": "sth",
+   "delta": -0.02,
+   "new_value": 0.1,
+   "FULL": {
+    "sharpe": 25.824,
+    "ann": 19.6285,
+    "mdd": 0.2901,
+    "cum": 19.6285,
+    "final_x": 20.6285,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": -0.287
+  },
+  {
+   "coin": "ATOM",
+   "param": "sth",
+   "delta": -0.02,
+   "new_value": 0.13,
+   "FULL": {
+    "sharpe": 25.886,
+    "ann": 19.4356,
+    "mdd": 0.2901,
+    "cum": 19.4356,
+    "final_x": 20.4356,
+    "n": 35040,
+    "turnover": 0.007534
+   },
+   "d_sharpe": -0.225
+  },
+  {
+   "coin": "KAS",
+   "param": "sth",
+   "delta": 0.02,
+   "new_value": 0.14,
+   "FULL": {
+    "sharpe": 25.919,
+    "ann": 19.6182,
+    "mdd": 0.2901,
+    "cum": 19.6182,
+    "final_x": 20.6182,
+    "n": 35040,
+    "turnover": 0.007443
+   },
+   "d_sharpe": -0.192
+  },
+  {
+   "coin": "ETC",
+   "param": "sth",
+   "delta": -0.02,
+   "new_value": 0.1,
+   "FULL": {
+    "sharpe": 25.986,
+    "ann": 19.818,
+    "mdd": 0.2901,
+    "cum": 19.818,
+    "final_x": 20.818,
+    "n": 35040,
+    "turnover": 0.007477
+   },
+   "d_sharpe": -0.125
+  },
+  {
+   "coin": "KAS",
+   "param": "sth",
+   "delta": -0.02,
+   "new_value": 0.1,
+   "FULL": {
+    "sharpe": 26.021,
+    "ann": 19.4005,
+    "mdd": 0.2901,
+    "cum": 19.4005,
+    "final_x": 20.4005,
+    "n": 35040,
+    "turnover": 0.007489
+   },
+   "d_sharpe": -0.09
+  },
+  {
+   "coin": "APT",
+   "param": "sth",
+   "delta": 0.02,
+   "new_value": 0.14,
+   "FULL": {
+    "sharpe": 26.162,
+    "ann": 19.6359,
+    "mdd": 0.2901,
+    "cum": 19.6359,
+    "final_x": 20.6359,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.051
+  },
+  {
+   "coin": "TRX",
+   "param": "sth",
+   "delta": -0.02,
+   "new_value": 0.1,
+   "FULL": {
+    "sharpe": 26.075,
+    "ann": 19.5791,
+    "mdd": 0.2894,
+    "cum": 19.5791,
+    "final_x": 20.5791,
+    "n": 35040,
+    "turnover": 0.007489
+   },
+   "d_sharpe": -0.036
+  },
+  {
+   "coin": "ETC",
+   "param": "sth",
+   "delta": 0.02,
+   "new_value": 0.14,
+   "FULL": {
+    "sharpe": 26.102,
+    "ann": 19.6047,
+    "mdd": 0.2901,
+    "cum": 19.6047,
+    "final_x": 20.6047,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": -0.009
+  },
+  {
+   "coin": "ATOM",
+   "param": "sth",
+   "delta": 0.02,
+   "new_value": 0.17,
+   "FULL": {
+    "sharpe": 26.115,
+    "ann": 19.6188,
+    "mdd": 0.2901,
+    "cum": 19.6188,
+    "final_x": 20.6188,
+    "n": 35040,
+    "turnover": 0.007477
+   },
+   "d_sharpe": 0.004
+  },
+  {
+   "coin": "ETC",
+   "param": "lth",
+   "delta": 0.02,
+   "new_value": 0.9,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "ETC",
+   "param": "lth",
+   "delta": -0.02,
+   "new_value": 0.86,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "TRX",
+   "param": "lth",
+   "delta": 0.02,
+   "new_value": 0.87,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "TRX",
+   "param": "lth",
+   "delta": -0.02,
+   "new_value": 0.83,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "ATOM",
+   "param": "lth",
+   "delta": 0.02,
+   "new_value": 0.87,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "ATOM",
+   "param": "lth",
+   "delta": -0.02,
+   "new_value": 0.83,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "APT",
+   "param": "lth",
+   "delta": 0.02,
+   "new_value": 0.9,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "APT",
+   "param": "lth",
+   "delta": -0.02,
+   "new_value": 0.86,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "KAS",
+   "param": "lth",
+   "delta": 0.02,
+   "new_value": 0.9,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  },
+  {
+   "coin": "KAS",
+   "param": "lth",
+   "delta": -0.02,
+   "new_value": 0.86,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466
+   },
+   "d_sharpe": 0.0
+  }
+ ],
+ "flat_check": {
+  "flat_verdict": "sensitive(敏感)",
+  "flat": false,
+  "max_abs_d_sharpe": 0.327,
+  "lth_max_abs_d": 0.0,
+  "sth_max_abs_d": 0.327,
+  "tol": 0.15,
+  "n_runs": 20
+ },
+ "verdict": "PENDING",
+ "decision": "KEEP_LOCKED",
+ "conclusion": "待定: Y3 per-coin lth/sth +/-0.02 sensitive(敏感), max|d sharpe|=0.3270 (tol 0.15); no optimum pursuit, no adoption"
+}
