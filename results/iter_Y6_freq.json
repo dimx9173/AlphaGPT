@@ -1,0 +1,377 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0); static equal 0.2 Top5; 15m native cd/ts/vw x16",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "fee2x": 0.0008,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "h2_start": 17520,
+  "bpy": 35040.0,
+  "scale": 16,
+  "thin_every": 4,
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "smoke": false,
+  "note": "decision-cadence contrast only, read-only; Y1B_DECISION_ALIGN shelved, executor default stays unset"
+ },
+ "arms": {
+  "native_15m": {
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6036,
+    "mdd": 0.2901,
+    "cum": 19.6036,
+    "n": 35040,
+    "turnover": 0.007454
+   },
+   "H2": {
+    "sharpe": 33.824,
+    "ann": 18.1165,
+    "mdd": 0.0896,
+    "cum": 9.0582,
+    "n": 17520,
+    "turnover": 0.00734
+   },
+   "flips": 7,
+   "entries": 647,
+   "per_coin": {
+    "ETC": {
+     "FULL": {
+      "sharpe": 15.639,
+      "ann": 19.6947,
+      "mdd": 0.685,
+      "cum": 19.6947,
+      "n": 35040,
+      "turnover": 0.003425
+     },
+     "H2": {
+      "sharpe": 22.165,
+      "ann": 19.0416,
+      "mdd": 0.1557,
+      "cum": 9.5208,
+      "n": 17520,
+      "turnover": 0.003368
+     },
+     "flips": 1,
+     "entries": 59
+    },
+    "TRX": {
+     "FULL": {
+      "sharpe": 50.347,
+      "ann": 17.4868,
+      "mdd": 0.1484,
+      "cum": 17.4868,
+      "n": 35040,
+      "turnover": 0.009703
+     },
+     "H2": {
+      "sharpe": 56.063,
+      "ann": 17.2325,
+      "mdd": 0.1484,
+      "cum": 8.6163,
+      "n": 17520,
+      "turnover": 0.009646
+     },
+     "flips": 4,
+     "entries": 166
+    },
+    "ATOM": {
+     "FULL": {
+      "sharpe": 16.967,
+      "ann": 20.6124,
+      "mdd": 0.4679,
+      "cum": 20.6124,
+      "n": 35040,
+      "turnover": 0.01113
+     },
+     "H2": {
+      "sharpe": 20.82,
+      "ann": 19.68,
+      "mdd": 0.1823,
+      "cum": 9.84,
+      "n": 17520,
+      "turnover": 0.010788
+     },
+     "flips": 2,
+     "entries": 193
+    },
+    "APT": {
+     "FULL": {
+      "sharpe": 15.242,
+      "ann": 21.3809,
+      "mdd": 0.5092,
+      "cum": 21.3809,
+      "n": 35040,
+      "turnover": 0.003396
+     },
+     "H2": {
+      "sharpe": 15.25,
+      "ann": 17.0595,
+      "mdd": 0.2229,
+      "cum": 8.5297,
+      "n": 17520,
+      "turnover": 0.003368
+     },
+     "flips": 0,
+     "entries": 60
+    },
+    "KAS": {
+     "FULL": {
+      "sharpe": 15.149,
+      "ann": 18.8432,
+      "mdd": 0.4551,
+      "cum": 18.8432,
+      "n": 35040,
+      "turnover": 0.009618
+     },
+     "H2": {
+      "sharpe": 15.832,
+      "ann": 17.5688,
+      "mdd": 0.2429,
+      "cum": 8.7844,
+      "n": 17520,
+      "turnover": 0.009532
+     },
+     "flips": 0,
+     "entries": 169
+    }
+   }
+  },
+  "thinned_1h": {
+   "FULL": {
+    "sharpe": 25.978,
+    "ann": 19.5748,
+    "mdd": 0.3137,
+    "cum": 19.5748,
+    "n": 35040,
+    "turnover": 0.00718
+   },
+   "H2": {
+    "sharpe": 33.763,
+    "ann": 18.1137,
+    "mdd": 0.0896,
+    "cum": 9.0569,
+    "n": 17520,
+    "turnover": 0.007112
+   },
+   "flips": 7,
+   "entries": 623,
+   "per_coin": {
+    "ETC": {
+     "FULL": {
+      "sharpe": 15.621,
+      "ann": 19.7098,
+      "mdd": 0.685,
+      "cum": 19.7098,
+      "n": 35040,
+      "turnover": 0.003425
+     },
+     "H2": {
+      "sharpe": 22.174,
+      "ann": 19.0921,
+      "mdd": 0.1557,
+      "cum": 9.546,
+      "n": 17520,
+      "turnover": 0.003368
+     },
+     "flips": 1,
+     "entries": 59
+    },
+    "TRX": {
+     "FULL": {
+      "sharpe": 50.276,
+      "ann": 17.4758,
+      "mdd": 0.1306,
+      "cum": 17.4758,
+      "n": 35040,
+      "turnover": 0.009703
+     },
+     "H2": {
+      "sharpe": 56.043,
+      "ann": 17.2099,
+      "mdd": 0.1306,
+      "cum": 8.6049,
+      "n": 17520,
+      "turnover": 0.009646
+     },
+     "flips": 4,
+     "entries": 166
+    },
+    "ATOM": {
+     "FULL": {
+      "sharpe": 16.86,
+      "ann": 20.5624,
+      "mdd": 0.5524,
+      "cum": 20.5624,
+      "n": 35040,
+      "turnover": 0.00976
+     },
+     "H2": {
+      "sharpe": 20.92,
+      "ann": 19.8311,
+      "mdd": 0.1694,
+      "cum": 9.9156,
+      "n": 17520,
+      "turnover": 0.009646
+     },
+     "flips": 2,
+     "entries": 169
+    },
+    "APT": {
+     "FULL": {
+      "sharpe": 15.18,
+      "ann": 21.2839,
+      "mdd": 0.5092,
+      "cum": 21.2839,
+      "n": 35040,
+      "turnover": 0.003396
+     },
+     "H2": {
+      "sharpe": 15.192,
+      "ann": 16.9655,
+      "mdd": 0.2229,
+      "cum": 8.4828,
+      "n": 17520,
+      "turnover": 0.003368
+     },
+     "flips": 0,
+     "entries": 60
+    },
+    "KAS": {
+     "FULL": {
+      "sharpe": 15.164,
+      "ann": 18.842,
+      "mdd": 0.4729,
+      "cum": 18.842,
+      "n": 35040,
+      "turnover": 0.009618
+     },
+     "H2": {
+      "sharpe": 15.795,
+      "ann": 17.4701,
+      "mdd": 0.2495,
+      "cum": 8.7351,
+      "n": 17520,
+      "turnover": 0.009532
+     },
+     "flips": 0,
+     "entries": 169
+    }
+   }
+  }
+ },
+ "fee2x": {
+  "native_15m": {
+   "FULL_sharpe": 25.832,
+   "H2_sharpe": 33.437,
+   "FULL_cum": 19.3947,
+   "gap_FULL_sharpe": -0.279
+  },
+  "thinned_1h": {
+   "FULL_sharpe": 25.708,
+   "H2_sharpe": 33.386,
+   "FULL_cum": 19.3735,
+   "gap_FULL_sharpe": -0.27
+  }
+ },
+ "compare": {
+  "d_sharpe_FULL": 0.133,
+  "d_sharpe_H2": 0.061,
+  "d_cum_FULL": 0.0288,
+  "d_turnover_FULL": 0.000274,
+  "turnover_ratio_native_over_thinned": 1.0382,
+  "d_flips": 0,
+  "d_entries": 24,
+  "fee2x_gap_native": -0.279,
+  "fee2x_gap_thinned": -0.27
+ },
+ "recommendation": {
+  "Y1B_DECISION_ALIGN": "1",
+  "reason": "native churn not paid (d=+0.133, ratio=1.04)",
+  "status": "shelved (executor default stays unset)"
+ },
+ "verdict": "PENDING",
+ "decision": "PENDING",
+ "conclusion": "Y6 15m replay native vs 1h-thinned dFULL=+0.133 ratio=1.04 ALIGN=1 (native churn not paid (d=+0.133, ratio=1.04)). PENDING; no live change."
+}
