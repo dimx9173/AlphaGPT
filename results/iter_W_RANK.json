@@ -1,0 +1,400 @@
+{
+ "meta": {
+  "iter": "W10",
+  "scope": "Top5 15m-native (ETC/TRX/ATOM/APT/KAS)",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "baseline": {
+  "FULL_sharpe": 26.111,
+  "FULL_mdd": 0.2901,
+  "source": "W1-W9 base FULL (Top5 15m-native, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "W1",
+   "file": "results/iter_W1_trail.json",
+   "topic": "trailing-stop sweep",
+   "status": "done",
+   "sharpe_gain": 0.246,
+   "sharpe_gain_note": "FULL-vs-base no-drop dd-min trail=0.05",
+   "dd_cut_pct": 11.27,
+   "robustness": 6.0,
+   "detail": "4 uniform + 20 percoin; best-no-drop trail=0.05 sharpe 26.357(+0.246) mdd 0.2574 turnover 0.009966; PENDING shelf",
+   "conclusion_zh": "W1 trail=0.05 paper +0.246/-11.3pct but turnover +33pct, shelf only, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "W2",
+   "file": "results/iter_W2_wt.json",
+   "topic": "weight fine sweep",
+   "status": "done",
+   "sharpe_gain": 0.636,
+   "sharpe_gain_note": "FULL-vs-base etc_0.10 beats-equal-on-both",
+   "dd_cut_pct": 15.55,
+   "robustness": 8.0,
+   "detail": "ETC {0.1..0.3} + KAS cap {0.1,0.2} + 12fold; best etc_0.10 sharpe +0.636 mdd -0.0451(-15.6pct) median 30.557; KEEP_equal; PENDING",
+   "conclusion_zh": "W2 etc_0.10 paper +0.636/-15.6pct but concentration shift, keep equal, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "W3",
+   "file": "results/iter_W3_vt.json",
+   "topic": "vol-target sweep",
+   "status": "done",
+   "sharpe_gain": 11.721,
+   "sharpe_gain_note": "FULL-vs-base best cell vt0.003",
+   "dd_cut_pct": 64.81,
+   "robustness": 5.0,
+   "detail": "vt None/0.003/0.006/0.012/0.024; best vt0.003 sharpe 37.832(+11.721) mdd 0.1021(-64.8pct) turnover 0.010196; KEEP_VT_NONE; PENDING",
+   "conclusion_zh": "W3 vt0.003 paper +11.72/-64.8pct but vt regime change + turnover +37pct, default unchanged, shelved, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "W4",
+   "file": "results/iter_W4_regime.json",
+   "topic": "regime split",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "attribution-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 7.0,
+   "detail": "bull/bear BTC-MA960 per-coin sharpe + FULL each regime + funding-pos/neg split; bull FULL 36.428 bear 21.744; descriptive only; NO_ADOPTION; PENDING",
+   "conclusion_zh": "W4 bull beats bear everywhere but split is descriptive only, no adoption, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "W5",
+   "file": "results/iter_W5_turn.json",
+   "topic": "turnover audit",
+   "status": "done",
+   "sharpe_gain": 2.924,
+   "sharpe_gain_note": "FULL-vs-base best cell mh0 (paper, turnover 16x)",
+   "dd_cut_pct": 6.83,
+   "robustness": 6.0,
+   "detail": "per-coin entries/flips/holds + scatter + min-hold {0,2,4}; mh0 sharpe +2.924 turnover 0.1257(16x) mh4 +1.161 mdd-50.4pct turnover 0.0143; audit only; PENDING",
+   "conclusion_zh": "W5 mh0/mh4 paper gains cost 2-16x turnover; audit only, no adoption, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "W6",
+   "file": "results/iter_W6_dd.json",
+   "topic": "drawdown anatomy",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "anatomy-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 7.0,
+   "detail": "top-3 dd windows per coin + portfolio net depth 0.2901 (ETC -0.1365 APT -0.1018); contribution + vol/corr; diagnostic; PENDING",
+   "conclusion_zh": "W6 worst window depth 0.2901 led by ETC/APT, diagnostic only, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "W7",
+   "file": "results/iter_W7_delay.json",
+   "topic": "entry-timing delay",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "FULL-vs-base flat (delay cells all <=base)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6.0,
+   "detail": "delay {0,1,2,3} sharpe 26.111/25.958/26.016/26.011 all <=base, turnover flat; NO_CHANGE; PENDING",
+   "conclusion_zh": "W7 delay flat-to-down (best -0.095 ex-base), no change, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "W8",
+   "file": "results/iter_W8_exit.json",
+   "topic": "exit timing",
+   "status": "done",
+   "sharpe_gain": 0.02,
+   "sharpe_gain_note": "FULL-vs-base oracle K=1 vs hold-to-flip",
+   "dd_cut_pct": -0.03,
+   "robustness": 5.0,
+   "detail": "oracle early-exit K {0,1,2}: K=1 sharpe +0.02 mdd flat K=2 -0.664; oracle lookahead not tradable; KEEP_HOLD_TO_FLIP; PENDING",
+   "conclusion_zh": "W8 oracle K=1 only +0.02 and not tradable, hold-to-flip stays, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "W9",
+   "file": "results/iter_W9_session.json",
+   "topic": "session split",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "split-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 6.0,
+   "detail": "Asia/EU/US per-coin sharpe/trades + session-only arms (asia subset 33.12 eu 29.409 us 20.972); KEEP_FULL_NO_SESSION_FILTER; PENDING",
+   "conclusion_zh": "W9 asia leads but session filter not adopted, keep FULL calendar, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "W3",
+   "rank": 1,
+   "value": 11.721
+  },
+  {
+   "round": "W5",
+   "rank": 2,
+   "value": 2.924
+  },
+  {
+   "round": "W2",
+   "rank": 3,
+   "value": 0.636
+  },
+  {
+   "round": "W1",
+   "rank": 4,
+   "value": 0.246
+  },
+  {
+   "round": "W8",
+   "rank": 5,
+   "value": 0.02
+  },
+  {
+   "round": "W4",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "W6",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "W7",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "W9",
+   "rank": 6,
+   "value": 0.0
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "W3",
+   "rank": 1,
+   "value": 64.81
+  },
+  {
+   "round": "W2",
+   "rank": 2,
+   "value": 15.55
+  },
+  {
+   "round": "W1",
+   "rank": 3,
+   "value": 11.27
+  },
+  {
+   "round": "W5",
+   "rank": 4,
+   "value": 6.83
+  },
+  {
+   "round": "W4",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "W6",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "W7",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "W9",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "W8",
+   "rank": 9,
+   "value": -0.03
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "W2",
+   "rank": 1,
+   "value": 8.0
+  },
+  {
+   "round": "W4",
+   "rank": 2,
+   "value": 7.0
+  },
+  {
+   "round": "W6",
+   "rank": 2,
+   "value": 7.0
+  },
+  {
+   "round": "W1",
+   "rank": 4,
+   "value": 6.0
+  },
+  {
+   "round": "W5",
+   "rank": 4,
+   "value": 6.0
+  },
+  {
+   "round": "W7",
+   "rank": 4,
+   "value": 6.0
+  },
+  {
+   "round": "W9",
+   "rank": 4,
+   "value": 6.0
+  },
+  {
+   "round": "W3",
+   "rank": 8,
+   "value": 5.0
+  },
+  {
+   "round": "W8",
+   "rank": 8,
+   "value": 5.0
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "W2",
+   "rank": 1,
+   "rank_sum": 6,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 2,
+    "robust": 1
+   }
+  },
+  {
+   "round": "W3",
+   "rank": 2,
+   "rank_sum": 10,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 1,
+    "robust": 8
+   }
+  },
+  {
+   "round": "W5",
+   "rank": 2,
+   "rank_sum": 10,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 4,
+    "robust": 4
+   }
+  },
+  {
+   "round": "W1",
+   "rank": 4,
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 3,
+    "robust": 4
+   }
+  },
+  {
+   "round": "W4",
+   "rank": 5,
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 5,
+    "robust": 2
+   }
+  },
+  {
+   "round": "W6",
+   "rank": 5,
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 5,
+    "robust": 2
+   }
+  },
+  {
+   "round": "W7",
+   "rank": 7,
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 5,
+    "robust": 4
+   }
+  },
+  {
+   "round": "W9",
+   "rank": 7,
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 5,
+    "robust": 4
+   }
+  },
+  {
+   "round": "W8",
+   "rank": 9,
+   "rank_sum": 22,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 9,
+    "robust": 8
+   }
+  }
+ ],
+ "caveats": [
+  "W3 gain is vt0.003 paper value (vt regime change, turnover +37pct); default KEEP_VT_NONE shelved, not adoptable.",
+  "W5 mh0 gain costs 16x turnover (no min-hold); mh4 halves dd but doubles turnover; audit only.",
+  "W2 etc_0.10 paper gain shifts concentration; default stays equal.",
+  "W1 trail gain costs +33pct turnover; W8 oracle gain not tradable; W4/W6/W9 descriptive/diagnostic; all 9 PENDING(P0-3 FAIL)."
+ ],
+ "conclusions": [
+  "Composite: W2(6) > W3=W5(10) > W1(11) > W4=W6(13) > W7=W9(15) > W8(22).",
+  "Paper sharpe leader W3 (+11.72) and dd leader W3 (-64.8pct) are vt-regime paper values, shelved.",
+  "Only actionable-leaning contrasts (W2 weights, W1 trail) fail adoption under P0-3 FAIL; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
