@@ -27,9 +27,13 @@ G2_MIN_CLOSED = 20
 G3_MIN_FUND = 0.001
 G4_MIN_SHARPE = 0.5
 G5_DD_MULT = 1.5
+G5_DD_HARD = 0.10
 G6_SLIP_MULT = 1.5
 ASSUMED_SLIP_BPS = 5.0
 DSR_MIN = 0.8
+# User policy 2026-09-14: 7d fills+closes>=2, monthly>=10%, max dd 10%.
+G10_MIN_7D_TRADES = 2
+G11_MIN_MONTHLY = 0.10
 
 
 def _load_demo():
@@ -95,9 +99,25 @@ def _demo_stats(rows):
                      if not x.get("ok") and not x.get("skipped"))
         if not r.get("ok"):
             diffs += 1
+    # User policy 2026-09-14: 7d trades>=2, monthly>=10%, max dd 10%.
+    import datetime as _dt
+    try:
+        _last = _dt.datetime.fromisoformat(rows[-1]["ts"].replace("Z", "+00:00"))
+        _cut = (_last - _dt.timedelta(days=7)).isoformat()
+        _t7 = sum(1 for r in rows if r.get("ts", "") >= _cut
+                  for x in (r.get("results", []) or []) + (r.get("sync", []) or [])
+                  if x.get("ok") or x.get("closed"))
+    except Exception:
+        _t7 = 0
+    try:
+        _m = sum(rets) / len(rets) if rets else 0.0
+        _monthly = (1.0 + _m) ** (24.0 * 30.0) - 1.0 if rets else 0.0
+    except Exception:
+        _monthly = 0.0
     return {"days": len(days), "fills": fills_n, "closes": closes_n,
             "fund_obs": fund_obs, "sharpe": sharpe, "dd": dd,
-            "med_slip_bps": med_bps, "reconcile_diffs": diffs}
+            "med_slip_bps": med_bps, "reconcile_diffs": diffs,
+            "trades_7d": _t7, "monthly": _monthly}
 
 
 def _h2_mdd():
@@ -143,6 +163,9 @@ def evaluate():
         "G8_drills_both": n_circuit >= 1 and n_deadman >= 1,
         "G9_micro_dsr_gt_08": (dsr is not None and trials is not None
                                and 50 <= trials <= 100 and dsr > DSR_MIN),
+        "G5b_dd_lt_10pct": st["dd"] < G5_DD_HARD,
+        "G10_trades_7d_ge_2": st.get("trades_7d", 0) >= G10_MIN_7D_TRADES,
+        "G11_monthly_ge_10pct": st.get("monthly", 0.0) >= G11_MIN_MONTHLY,
     }
     gaps = [k for k, v in checks.items() if not v]
     decision = "NO_PROMOTE_gaps_%d" % len(gaps) if gaps else "NO_PROMOTE_p03_freeze"
@@ -160,7 +183,8 @@ def test_promotion_gate_expected_fail_with_gaps():
     assert ev["decision"].startswith("NO_PROMOTE")
     for k in ("G1_days_ge_30", "G2_closed_ge_20", "G3_funding_cover_0001",
               "G4_demo_net_sharpe_gt_05", "G5_dd_lt_h2x15", "G6_slip_le_15x",
-              "G7_reconcile_zero", "G8_drills_both", "G9_micro_dsr_gt_08"):
+              "G7_reconcile_zero", "G8_drills_both", "G9_micro_dsr_gt_08",
+              "G5b_dd_lt_10pct", "G10_trades_7d_ge_2", "G11_monthly_ge_10pct"):
         assert k in ev["checks"] and isinstance(ev["checks"][k], bool)
     # Demo reality pins: 4 days, 1 close, no funding/slippage logs yet.
     assert ev["stats"]["days"] < G1_MIN_DAYS
