@@ -1,0 +1,394 @@
+{
+ "meta": {
+  "iter": "Y10",
+  "scope": "Top5 15m-native (ETC/TRX/ATOM/APT/KAS)",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "只读汇总，不跑回测；全部结论待定(P0-3 FAIL)，不做demo变更"
+ },
+ "baseline": {
+  "FULL_sharpe": 26.111,
+  "FULL_mdd": 0.2901,
+  "source": "Y1 equal arm FULL (Top5 15m-native, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "Y1",
+   "file": "results/iter_Y1_weights.json",
+   "topic": "权重优化 Top5",
+   "status": "done",
+   "sharpe_gain": 26.138,
+   "sharpe_gain_note": "FULL-vs-base (meanvar)",
+   "dd_cut_pct": 55.33,
+   "robustness": 8.0,
+   "detail": "best=meanvar FULL sharpe 52.249(+26.138) mdd 0.1296(-55.3%) turnover 0.009515 12fold-median 57.297; 5/5 arms ok; KEEP_equal (0/4 challengers beat all3)",
+   "conclusion_zh": "Y1 meanvar纸面最优(+26.14 sharpe/-55.3% dd)但集中90% TRX且换手+27%，三项未全胜，等权不动，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "Y2",
+   "file": "results/iter_Y2_stops.json",
+   "topic": "止损止盈调参",
+   "status": "done",
+   "sharpe_gain": 0.023,
+   "sharpe_gain_note": "FULL-vs-base",
+   "dd_cut_pct": 0.0,
+   "robustness": 6.0,
+   "detail": "2 uniform + 10 percoin: best-no-drop sl=None ts=24 d_sharpe=+0.023 d_mdd=0.0 turnover 0.007135; eligible 1/2; PENDING",
+   "conclusion_zh": "Y2无降dd无损sharpe格(sl=None ts=24仅+0.023)，维持锁定参数，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "Y3",
+   "file": "results/iter_Y3_thresh.json",
+   "topic": "阈值稳健验证",
+   "status": "done",
+   "sharpe_gain": 0.051,
+   "sharpe_gain_note": "FULL-vs-base (best positive d)",
+   "dd_cut_pct": 0.24,
+   "robustness": 5.0,
+   "detail": "20 runs: lth全平坦(max|d|=0.0)但sth敏感 max|d|=0.327>tol 0.15; best positive APT sth+0.02 +0.051; KEEP_LOCKED",
+   "conclusion_zh": "Y3阈值sth敏感(max|d|=0.327>0.15，lth平坦)，保持锁定值不调参，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "Y4",
+   "file": "results/iter_Y4_cost.json",
+   "topic": "换仓成本门",
+   "status": "done",
+   "sharpe_gain": 8.28,
+   "sharpe_gain_note": "stress-relative (slip20 K1-vs-K0)",
+   "dd_cut_pct": 38.14,
+   "robustness": 6.0,
+   "detail": "25 runs(5成本x5K): first-bite K per cell; slip20 K=1 turnover-35.2% d_sharpe=+8.28 blocked=36.0%; base K=1 blocked=5.0%超标; no joint K; GATE_OFF",
+   "conclusion_zh": "Y4成本门高耗格有效(slip20 K=1省35%换手)但无K同时满足静默base，门默认OFF搁置，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "Y5",
+   "file": "results/iter_Y5_scan.json",
+   "topic": "候选币扫描",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "opportunity-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 5.0,
+   "detail": "L0/L1 funnel 28/28 pass pending (addable=28 incl. PEPE, watch=0, reject=0, 无区分度); focus6 BTC/ETH/SOL/BNB/LINK/LTC detail; NO_COINS_ADDED",
+   "conclusion_zh": "Y5漏斗28/28全过无区分度(含PEPE)，不加币不观察，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "Y6",
+   "file": "results/iter_Y6_freq.json",
+   "topic": "信号频率实验",
+   "status": "done",
+   "sharpe_gain": 0.133,
+   "sharpe_gain_note": "FULL native-vs-thinned",
+   "dd_cut_pct": 7.52,
+   "robustness": 7.0,
+   "detail": "native vs 1h-thinned dFULL=+0.133 dH2=+0.061 turnover比=1.038 entries 647->623 fee2x gap -0.279/-0.270; ALIGN=1 shelved; PENDING",
+   "conclusion_zh": "Y6原生15m决策仅+0.13 sharpe多耗4%换手(dd反降7.5%但不足)，对齐门ALIGN=1搁置，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "Y7",
+   "file": "results/iter_Y7_lev.json",
+   "topic": "杠杆扫描",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "FULL-vs-base",
+   "dd_cut_pct": 0.0,
+   "robustness": 8.0,
+   "detail": "lev 1/2/3 sharpe invariant spread=0.000 (26.111); mdd 0.1451/0.2901/0.4352(线性放大); KEEP_LEV_2.0",
+   "conclusion_zh": "Y7杠杆下sharpe不变、dd线性放大，维持2x不动，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "Y8",
+   "file": "results/iter_Y8_fund.json",
+   "topic": "资金费率体制",
+   "status": "done",
+   "sharpe_gain": 23.689,
+   "sharpe_gain_note": "funding-driven (0.001 gate vs fee2x base)",
+   "dd_cut_pct": 2.65,
+   "robustness": 8.0,
+   "detail": "fund曲线单调升(净空rebate); 门0.001处 sharpe=49.521 mdd=0.2827; 下行零点fund约-0.000038 margin 0.001038; verdict=PASS(门控意义)",
+   "conclusion_zh": "Y8费率越高越赚(净空结构)，0.001门合理且margin足，通过但仅门控意义，不进demo(无变更)。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "Y9",
+   "file": "results/iter_Y9_corr.json",
+   "topic": "相关性监控",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "monitor-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 7.0,
+   "detail": "rolling960 34081窗 avg_max=0.6862 max>0.6占60% max>0.7占40% max>0.85占30%; 分散CONCENTRATED; 熔断OFF搁置; PENDING",
+   "conclusion_zh": "Y9分散CONCENTRATED(30%窗口max>0.85)，熔断规则已备但默认OFF，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "Y1",
+   "rank": 1,
+   "value": 26.138
+  },
+  {
+   "round": "Y8",
+   "rank": 2,
+   "value": 23.689
+  },
+  {
+   "round": "Y4",
+   "rank": 3,
+   "value": 8.28
+  },
+  {
+   "round": "Y6",
+   "rank": 4,
+   "value": 0.133
+  },
+  {
+   "round": "Y3",
+   "rank": 5,
+   "value": 0.051
+  },
+  {
+   "round": "Y2",
+   "rank": 6,
+   "value": 0.023
+  },
+  {
+   "round": "Y5",
+   "rank": 7,
+   "value": 0.0
+  },
+  {
+   "round": "Y7",
+   "rank": 7,
+   "value": 0.0
+  },
+  {
+   "round": "Y9",
+   "rank": 7,
+   "value": 0.0
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "Y1",
+   "rank": 1,
+   "value": 55.33
+  },
+  {
+   "round": "Y4",
+   "rank": 2,
+   "value": 38.14
+  },
+  {
+   "round": "Y6",
+   "rank": 3,
+   "value": 7.52
+  },
+  {
+   "round": "Y8",
+   "rank": 4,
+   "value": 2.65
+  },
+  {
+   "round": "Y3",
+   "rank": 5,
+   "value": 0.24
+  },
+  {
+   "round": "Y2",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "Y5",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "Y7",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "Y9",
+   "rank": 6,
+   "value": 0.0
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "Y1",
+   "rank": 1,
+   "value": 8.0
+  },
+  {
+   "round": "Y7",
+   "rank": 1,
+   "value": 8.0
+  },
+  {
+   "round": "Y8",
+   "rank": 1,
+   "value": 8.0
+  },
+  {
+   "round": "Y6",
+   "rank": 2,
+   "value": 7.0
+  },
+  {
+   "round": "Y9",
+   "rank": 2,
+   "value": 7.0
+  },
+  {
+   "round": "Y2",
+   "rank": 3,
+   "value": 6.0
+  },
+  {
+   "round": "Y4",
+   "rank": 3,
+   "value": 6.0
+  },
+  {
+   "round": "Y3",
+   "rank": 4,
+   "value": 5.0
+  },
+  {
+   "round": "Y5",
+   "rank": 4,
+   "value": 5.0
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "Y1",
+   "rank": 1,
+   "rank_sum": 3,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 1,
+    "robust": 1
+   }
+  },
+  {
+   "round": "Y8",
+   "rank": 2,
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 4,
+    "robust": 1
+   }
+  },
+  {
+   "round": "Y4",
+   "rank": 3,
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 2,
+    "robust": 3
+   }
+  },
+  {
+   "round": "Y6",
+   "rank": 4,
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 3,
+    "robust": 2
+   }
+  },
+  {
+   "round": "Y3",
+   "rank": 5,
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 5,
+    "robust": 4
+   }
+  },
+  {
+   "round": "Y7",
+   "rank": 5,
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 6,
+    "robust": 1
+   }
+  },
+  {
+   "round": "Y2",
+   "rank": 7,
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 6,
+    "robust": 3
+   }
+  },
+  {
+   "round": "Y9",
+   "rank": 7,
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 6,
+    "robust": 2
+   }
+  },
+  {
+   "round": "Y5",
+   "rank": 9,
+   "rank_sum": 17,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 6,
+    "robust": 4
+   }
+  }
+ ],
+ "caveats": [
+  "Y1增益为meanvar纸面值(90%集中TRX+换手+27%)，三项未全胜故KEEP_equal，不可直接采用。",
+  "Y4增益为高耗stress下相对值(slip20 K1-vs-K0)，绝对sharpe仍为负，仅证门有效、默认OFF搁置。",
+  "Y8增益为funding-driven(净空rebate随fund线性涨)，非alpha增益，不可直接对比。",
+  "Y5漏斗28/28全过(含PEPE)无区分度；可行动alpha增益为零，9轮全部待定(P0-3 FAIL)。"
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "P0-3 FAIL阴影下9轮全部PENDING，无一建议进demo。"
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
