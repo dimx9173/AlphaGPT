@@ -1,0 +1,334 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal Top5; 15m native cd/ts/vw x16",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "vw_grid": [
+   6,
+   12,
+   24
+  ],
+  "vt_grid": [
+   null,
+   0.006,
+   0.012
+  ],
+  "venue": "aster",
+  "lev": 2.0,
+  "lev_locked": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "bpy": 35040.0,
+  "scale": 16,
+  "note": "vol-window sweep only, read-only; live vt/vw untouched"
+ },
+ "rows": {
+  "vtNone_vw6": {
+   "vt": null,
+   "vw": 6,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "legs_sharpe": {
+     "ETC": 15.639,
+     "TRX": 50.347,
+     "ATOM": 16.967,
+     "APT": 15.241,
+     "KAS": 15.149
+    }
+   }
+  },
+  "vtNone_vw12": {
+   "vt": null,
+   "vw": 12,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "legs_sharpe": {
+     "ETC": 15.639,
+     "TRX": 50.347,
+     "ATOM": 16.967,
+     "APT": 15.241,
+     "KAS": 15.149
+    }
+   }
+  },
+  "vtNone_vw24": {
+   "vt": null,
+   "vw": 24,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "legs_sharpe": {
+     "ETC": 15.639,
+     "TRX": 50.347,
+     "ATOM": 16.967,
+     "APT": 15.241,
+     "KAS": 15.149
+    }
+   }
+  },
+  "vt0.006_vw6": {
+   "vt": 0.006,
+   "vw": 6,
+   "FULL": {
+    "sharpe": 33.371,
+    "ann": 32.6073,
+    "mdd": 0.1617,
+    "cum": 32.6073,
+    "final_x": 33.6073,
+    "n": 35040,
+    "turnover": 0.015723,
+    "legs_sharpe": {
+     "ETC": 20.665,
+     "TRX": 50.338,
+     "ATOM": 20.514,
+     "APT": 17.629,
+     "KAS": 17.961
+    }
+   }
+  },
+  "vt0.006_vw12": {
+   "vt": 0.006,
+   "vw": 12,
+   "FULL": {
+    "sharpe": 32.544,
+    "ann": 32.561,
+    "mdd": 0.1714,
+    "cum": 32.561,
+    "final_x": 33.561,
+    "n": 35040,
+    "turnover": 0.01421,
+    "legs_sharpe": {
+     "ETC": 19.863,
+     "TRX": 50.378,
+     "ATOM": 20.054,
+     "APT": 17.211,
+     "KAS": 18.043
+    }
+   }
+  },
+  "vt0.006_vw24": {
+   "vt": 0.006,
+   "vw": 24,
+   "FULL": {
+    "sharpe": 31.224,
+    "ann": 32.2674,
+    "mdd": 0.1934,
+    "cum": 32.2674,
+    "final_x": 33.2674,
+    "n": 35040,
+    "turnover": 0.01341,
+    "legs_sharpe": {
+     "ETC": 18.915,
+     "TRX": 50.397,
+     "ATOM": 19.148,
+     "APT": 16.636,
+     "KAS": 17.718
+    }
+   }
+  },
+  "vt0.012_vw6": {
+   "vt": 0.012,
+   "vw": 6,
+   "FULL": {
+    "sharpe": 28.523,
+    "ann": 38.7134,
+    "mdd": 0.2381,
+    "cum": 38.7134,
+    "final_x": 39.7134,
+    "n": 35040,
+    "turnover": 0.015189,
+    "legs_sharpe": {
+     "ETC": 17.973,
+     "TRX": 50.347,
+     "ATOM": 18.186,
+     "APT": 16.403,
+     "KAS": 15.883
+    }
+   }
+  },
+  "vt0.012_vw12": {
+   "vt": 0.012,
+   "vw": 12,
+   "FULL": {
+    "sharpe": 27.425,
+    "ann": 38.9618,
+    "mdd": 0.2945,
+    "cum": 38.9618,
+    "final_x": 39.9618,
+    "n": 35040,
+    "turnover": 0.014943,
+    "legs_sharpe": {
+     "ETC": 16.764,
+     "TRX": 50.344,
+     "ATOM": 17.704,
+     "APT": 15.891,
+     "KAS": 16.134
+    }
+   }
+  },
+  "vt0.012_vw24": {
+   "vt": 0.012,
+   "vw": 24,
+   "FULL": {
+    "sharpe": 26.971,
+    "ann": 38.8507,
+    "mdd": 0.3865,
+    "cum": 38.8507,
+    "final_x": 39.8507,
+    "n": 35040,
+    "turnover": 0.014844,
+    "legs_sharpe": {
+     "ETC": 16.275,
+     "TRX": 50.344,
+     "ATOM": 17.459,
+     "APT": 15.689,
+     "KAS": 15.881
+    }
+   }
+  }
+ },
+ "status": "done",
+ "compare": {
+  "sharpe_by_cell": {
+   "vtNone_vw6": 26.111,
+   "vtNone_vw12": 26.111,
+   "vtNone_vw24": 26.111,
+   "vt0.006_vw6": 33.371,
+   "vt0.006_vw12": 32.544,
+   "vt0.006_vw24": 31.224,
+   "vt0.012_vw6": 28.523,
+   "vt0.012_vw12": 27.425,
+   "vt0.012_vw24": 26.971
+  },
+  "mdd_by_cell": {
+   "vtNone_vw6": 0.2901,
+   "vtNone_vw12": 0.2901,
+   "vtNone_vw24": 0.2901,
+   "vt0.006_vw6": 0.1617,
+   "vt0.006_vw12": 0.1714,
+   "vt0.006_vw24": 0.1934,
+   "vt0.012_vw6": 0.2381,
+   "vt0.012_vw12": 0.2945,
+   "vt0.012_vw24": 0.3865
+  },
+  "best_cell": "vt0.006_vw6",
+  "best_sharpe": 33.371,
+  "vt_none_flat_across_vw": true,
+  "vt_effect_at_vw12": {
+   "None": 26.111,
+   "0.006": 32.544,
+   "0.012": 27.425
+  },
+  "vw_effect_by_vt": {
+   "None": {
+    "min": 26.111,
+    "max": 26.111,
+    "spread": 0.0
+   },
+   "0.006": {
+    "min": 31.224,
+    "max": 33.371,
+    "spread": 2.147
+   },
+   "0.012": {
+    "min": 26.971,
+    "max": 28.523,
+    "spread": 1.552
+   }
+  }
+ },
+ "verdict": "PENDING",
+ "p03": "FAIL",
+ "decision": "NO_CHANGE",
+ "decision_note": "待定，不採用。vol-window掃描僅研究對照；P0-3 FAIL，live vt/vw 不動 (vt None, vw12)。"
+}
