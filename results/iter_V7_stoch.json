@@ -1,0 +1,459 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; Stoch(56,3) entry gate on legs pre-cooldown (long K>D / short K<D); static equal 0.2 Top5; 15m native cd/ts/vw x16",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 35040.0,
+  "grid": "15m",
+  "scale": 16,
+  "stoch": {
+   "window": 56,
+   "smooth": 3,
+   "window_hours": 14.0,
+   "k_def": "%K=SMA3(Fast%K_56)",
+   "d_def": "%D=SMA3(%K)",
+   "long_gate": "K>D",
+   "short_gate": "K<D",
+   "warmup_value": 50.0,
+   "warmup_bars": 60,
+   "applied": "entry-only on legs pre-cooldown (post quantile mask)"
+  },
+  "note": "E10 FORMULA untouched; live default untouched; offline read-only",
+  "grid_bars": 35040
+ },
+ "coins": {
+  "ETC": {
+   "FULL": {
+    "sharpe": 14.539,
+    "ann": 17.802,
+    "mdd": 0.685,
+    "cum": 17.802,
+    "final_x": 18.802,
+    "n": 35040,
+    "turnover": 0.003482,
+    "trades": 61,
+    "active_bars": 17691
+   },
+   "LONG": {
+    "sharpe": -3.904,
+    "ann": -0.3697,
+    "mdd": 0.4109,
+    "cum": -0.3697,
+    "final_x": 0.6303,
+    "n": 35040,
+    "turnover": 5.7e-05,
+    "trades": 1,
+    "active_bars": 289,
+    "pnl_share": -0.0208
+   },
+   "SHORT": {
+    "sharpe": 14.887,
+    "ann": 18.1717,
+    "mdd": 0.685,
+    "cum": 18.1717,
+    "final_x": 19.1717,
+    "n": 35040,
+    "turnover": 0.003425,
+    "trades": 60,
+    "active_bars": 17402,
+    "pnl_share": 1.0208
+   },
+   "BASE_FULL": {
+    "sharpe": 15.639,
+    "ann": 19.6947,
+    "mdd": 0.685,
+    "cum": 19.6947,
+    "final_x": 20.6947,
+    "n": 35040,
+    "turnover": 0.0
+   },
+   "stoch": {
+    "mean_k": 49.157,
+    "mean_d": 49.156,
+    "min_k": 0.564,
+    "max_k": 99.417,
+    "min_d": 1.123,
+    "max_d": 98.782,
+    "n_long_open": 17359,
+    "n_short_open": 17590,
+    "frac_long_open": 0.4954,
+    "frac_short_open": 0.502,
+    "warmup_bars": 60
+   }
+  },
+  "TRX": {
+   "FULL": {
+    "sharpe": 48.368,
+    "ann": 16.6706,
+    "mdd": 0.1708,
+    "cum": 16.6706,
+    "final_x": 17.6706,
+    "n": 35040,
+    "turnover": 0.01016,
+    "trades": 178,
+    "active_bars": 17425
+   },
+   "LONG": {
+    "sharpe": -5.34,
+    "ann": -0.4201,
+    "mdd": 0.438,
+    "cum": -0.4201,
+    "final_x": 0.5799,
+    "n": 35040,
+    "turnover": 0.000228,
+    "trades": 4,
+    "active_bars": 389,
+    "pnl_share": -0.0252
+   },
+   "SHORT": {
+    "sharpe": 51.026,
+    "ann": 17.0908,
+    "mdd": 0.0834,
+    "cum": 17.0908,
+    "final_x": 18.0908,
+    "n": 35040,
+    "turnover": 0.009932,
+    "trades": 174,
+    "active_bars": 17036,
+    "pnl_share": 1.0252
+   },
+   "BASE_FULL": {
+    "sharpe": 50.347,
+    "ann": 17.4868,
+    "mdd": 0.1484,
+    "cum": 17.4868,
+    "final_x": 18.4868,
+    "n": 35040,
+    "turnover": 0.0
+   },
+   "stoch": {
+    "mean_k": 52.88,
+    "mean_d": 52.88,
+    "min_k": 0.074,
+    "max_k": 100.0,
+    "min_d": 0.119,
+    "max_d": 99.819,
+    "n_long_open": 17708,
+    "n_short_open": 17240,
+    "frac_long_open": 0.5054,
+    "frac_short_open": 0.492,
+    "warmup_bars": 60
+   }
+  },
+  "ATOM": {
+   "FULL": {
+    "sharpe": 18.577,
+    "ann": 18.9664,
+    "mdd": 0.2781,
+    "cum": 18.9664,
+    "final_x": 19.9664,
+    "n": 35040,
+    "turnover": 0.011587,
+    "trades": 203,
+    "active_bars": 17594
+   },
+   "LONG": {
+    "sharpe": -0.787,
+    "ann": -0.2191,
+    "mdd": 0.4487,
+    "cum": -0.2191,
+    "final_x": 0.7809,
+    "n": 35040,
+    "turnover": 0.000342,
+    "trades": 6,
+    "active_bars": 386,
+    "pnl_share": -0.0116
+   },
+   "SHORT": {
+    "sharpe": 19.535,
+    "ann": 19.1855,
+    "mdd": 0.2781,
+    "cum": 19.1855,
+    "final_x": 20.1855,
+    "n": 35040,
+    "turnover": 0.011244,
+    "trades": 197,
+    "active_bars": 17208,
+    "pnl_share": 1.0116
+   },
+   "BASE_FULL": {
+    "sharpe": 16.967,
+    "ann": 20.6124,
+    "mdd": 0.4679,
+    "cum": 20.6124,
+    "final_x": 21.6124,
+    "n": 35040,
+    "turnover": 0.0
+   },
+   "stoch": {
+    "mean_k": 48.09,
+    "mean_d": 48.09,
+    "min_k": 0.186,
+    "max_k": 100.0,
+    "min_d": 0.756,
+    "max_d": 99.087,
+    "n_long_open": 17329,
+    "n_short_open": 17515,
+    "frac_long_open": 0.4945,
+    "frac_short_open": 0.4999,
+    "warmup_bars": 60
+   }
+  },
+  "APT": {
+   "FULL": {
+    "sharpe": 13.588,
+    "ann": 19.3124,
+    "mdd": 0.5092,
+    "cum": 19.3124,
+    "final_x": 20.3124,
+    "n": 35040,
+    "turnover": 0.003482,
+    "trades": 61,
+    "active_bars": 17509
+   },
+   "LONG": {
+    "sharpe": 0.0,
+    "ann": 0.0,
+    "mdd": 0.0,
+    "cum": 0.0,
+    "final_x": 1.0,
+    "n": 35040,
+    "turnover": 0.0,
+    "trades": 0,
+    "active_bars": 0,
+    "pnl_share": 0.0
+   },
+   "SHORT": {
+    "sharpe": 13.588,
+    "ann": 19.3124,
+    "mdd": 0.5092,
+    "cum": 19.3124,
+    "final_x": 20.3124,
+    "n": 35040,
+    "turnover": 0.003482,
+    "trades": 61,
+    "active_bars": 17509,
+    "pnl_share": 1.0
+   },
+   "BASE_FULL": {
+    "sharpe": 15.241,
+    "ann": 21.3801,
+    "mdd": 0.5092,
+    "cum": 21.3801,
+    "final_x": 22.3801,
+    "n": 35040,
+    "turnover": 0.0
+   },
+   "stoch": {
+    "mean_k": 48.493,
+    "mean_d": 48.493,
+    "min_k": 0.37,
+    "max_k": 99.67,
+    "min_d": 1.444,
+    "max_d": 99.276,
+    "n_long_open": 17427,
+    "n_short_open": 17535,
+    "frac_long_open": 0.4973,
+    "frac_short_open": 0.5004,
+    "warmup_bars": 60
+   }
+  },
+  "KAS": {
+   "FULL": {
+    "sharpe": 14.375,
+    "ann": 17.3525,
+    "mdd": 0.482,
+    "cum": 17.3525,
+    "final_x": 18.3525,
+    "n": 35040,
+    "turnover": 0.010103,
+    "trades": 177,
+    "active_bars": 17375
+   },
+   "LONG": {
+    "sharpe": -1.763,
+    "ann": -0.4907,
+    "mdd": 0.6387,
+    "cum": -0.4907,
+    "final_x": 0.5093,
+    "n": 35040,
+    "turnover": 0.000171,
+    "trades": 3,
+    "active_bars": 291,
+    "pnl_share": -0.0283
+   },
+   "SHORT": {
+    "sharpe": 15.194,
+    "ann": 17.8432,
+    "mdd": 0.397,
+    "cum": 17.8432,
+    "final_x": 18.8432,
+    "n": 35040,
+    "turnover": 0.009932,
+    "trades": 174,
+    "active_bars": 17084,
+    "pnl_share": 1.0283
+   },
+   "BASE_FULL": {
+    "sharpe": 15.149,
+    "ann": 18.8424,
+    "mdd": 0.4551,
+    "cum": 18.8424,
+    "final_x": 19.8424,
+    "n": 35040,
+    "turnover": 0.0
+   },
+   "stoch": {
+    "mean_k": 47.791,
+    "mean_d": 47.79,
+    "min_k": 0.501,
+    "max_k": 99.608,
+    "min_d": 1.12,
+    "max_d": 98.886,
+    "n_long_open": 17336,
+    "n_short_open": 17572,
+    "frac_long_open": 0.4947,
+    "frac_short_open": 0.5015,
+    "warmup_bars": 60
+   }
+  }
+ },
+ "basket": {
+  "FULL": {
+   "sharpe": 26.07,
+   "ann": 18.0208,
+   "mdd": 0.2383,
+   "cum": 18.0208,
+   "final_x": 19.0208,
+   "n": 35040,
+   "turnover": 0.007763,
+   "trades": 680,
+   "active_bars": 87594
+  },
+  "LONG": {
+   "sharpe": -3.529,
+   "ann": -0.2999,
+   "mdd": 0.3064,
+   "cum": -0.2999,
+   "final_x": 0.7001,
+   "n": 35040,
+   "turnover": 0.00016,
+   "pnl_share": -0.0166
+  },
+  "SHORT": {
+   "sharpe": 26.232,
+   "ann": 18.3207,
+   "mdd": 0.2383,
+   "cum": 18.3207,
+   "final_x": 19.3207,
+   "n": 35040,
+   "turnover": 0.007603,
+   "pnl_share": 1.0166
+  },
+  "coin_pnl_share": {
+   "ETC": 0.1976,
+   "TRX": 0.185,
+   "ATOM": 0.2105,
+   "APT": 0.2143,
+   "KAS": 0.1926
+  }
+ },
+ "baseline": {
+  "basket_FULL": {
+   "sharpe": 26.111,
+   "ann": 19.6033,
+   "mdd": 0.2901,
+   "cum": 19.6033,
+   "final_x": 20.6033,
+   "n": 35040,
+   "turnover": 0.0
+  },
+  "coin_FULL": {
+   "ETC": 19.6947,
+   "TRX": 17.4868,
+   "ATOM": 20.6124,
+   "APT": 21.3801,
+   "KAS": 18.8424
+  }
+ },
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "P0-3 permutation FAIL => V7 verdict PENDING; Stoch-gate attribution only, nothing promoted, live untouched.",
+ "conclusion": "PENDING: V7 15m Stoch(56,3) entry gate Top5; no adoption, live untouched.",
+ "status": "COMPLETE"
+}
