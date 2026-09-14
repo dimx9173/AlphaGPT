@@ -1,0 +1,280 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; bb BB(96,2) entry gate on raw intent pre-cooldown",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "lev_locked": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bb": {
+   "window": 96,
+   "k": 2.0,
+   "on": "close",
+   "warmup": "pass-through",
+   "gate": "raw intent pre-cooldown"
+  },
+  "arms": [
+   "base",
+   "bb"
+  ],
+  "grid": "15m",
+  "grid_bars": 35040,
+  "bpy": 35040.0,
+  "scale": 16,
+  "smoke": false,
+  "note": "entry-filter only, read-only; live chain untouched; PENDING (P0-3 FAIL), not demo evidence"
+ },
+ "status": "done",
+ "units": {
+  "ETC": {
+   "base": {
+    "FULL": {
+     "sharpe": 15.639,
+     "ann": 19.6947,
+     "mdd": 0.685,
+     "cum": 19.6947,
+     "n": 35040,
+     "turnover": 0.003425
+    },
+    "trades": 59
+   },
+   "bb": {
+    "FULL": {
+     "sharpe": 12.552,
+     "ann": 15.3272,
+     "mdd": 0.685,
+     "cum": 15.3272,
+     "n": 35040,
+     "turnover": 0.003253
+    },
+    "trades": 57
+   },
+   "d_sharpe": -3.087,
+   "d_trades": -2,
+   "bb_pass": 5144,
+   "bb_pass_rate": 0.1468
+  },
+  "TRX": {
+   "base": {
+    "FULL": {
+     "sharpe": 50.347,
+     "ann": 17.4868,
+     "mdd": 0.1484,
+     "cum": 17.4868,
+     "n": 35040,
+     "turnover": 0.009703
+    },
+    "trades": 166
+   },
+   "bb": {
+    "FULL": {
+     "sharpe": 36.242,
+     "ann": 12.2542,
+     "mdd": 0.255,
+     "cum": 12.2542,
+     "n": 35040,
+     "turnover": 0.008619
+    },
+    "trades": 151
+   },
+   "d_sharpe": -14.105,
+   "d_trades": -15,
+   "bb_pass": 5464,
+   "bb_pass_rate": 0.15594
+  },
+  "ATOM": {
+   "base": {
+    "FULL": {
+     "sharpe": 16.967,
+     "ann": 20.6124,
+     "mdd": 0.4679,
+     "cum": 20.6124,
+     "n": 35040,
+     "turnover": 0.01113
+    },
+    "trades": 193
+   },
+   "bb": {
+    "FULL": {
+     "sharpe": 14.745,
+     "ann": 14.155,
+     "mdd": 0.6186,
+     "cum": 14.155,
+     "n": 35040,
+     "turnover": 0.009304
+    },
+    "trades": 163
+   },
+   "d_sharpe": -2.222,
+   "d_trades": -30,
+   "bb_pass": 5020,
+   "bb_pass_rate": 0.14326
+  },
+  "APT": {
+   "base": {
+    "FULL": {
+     "sharpe": 15.241,
+     "ann": 21.3801,
+     "mdd": 0.5092,
+     "cum": 21.3801,
+     "n": 35040,
+     "turnover": 0.003425
+    },
+    "trades": 60
+   },
+   "bb": {
+    "FULL": {
+     "sharpe": 10.783,
+     "ann": 15.0251,
+     "mdd": 0.8193,
+     "cum": 15.0251,
+     "n": 35040,
+     "turnover": 0.003253
+    },
+    "trades": 57
+   },
+   "d_sharpe": -4.458,
+   "d_trades": -3,
+   "bb_pass": 5126,
+   "bb_pass_rate": 0.14629
+  },
+  "KAS": {
+   "base": {
+    "FULL": {
+     "sharpe": 15.149,
+     "ann": 18.8424,
+     "mdd": 0.4551,
+     "cum": 18.8424,
+     "n": 35040,
+     "turnover": 0.009646
+    },
+    "trades": 169
+   },
+   "bb": {
+    "FULL": {
+     "sharpe": 5.19,
+     "ann": 11.0709,
+     "mdd": 2.0243,
+     "cum": 11.0709,
+     "n": 35040,
+     "turnover": 0.008562
+    },
+    "trades": 148
+   },
+   "d_sharpe": -9.959,
+   "d_trades": -21,
+   "bb_pass": 5008,
+   "bb_pass_rate": 0.14292
+  }
+ },
+ "verdict": "PENDING",
+ "base": {
+  "sharpe": 26.111,
+  "ann": 19.6033,
+  "mdd": 0.2901,
+  "cum": 19.6033,
+  "n": 35040,
+  "turnover": 0.007466,
+  "trades": 647
+ },
+ "bb": {
+  "sharpe": 16.053,
+  "ann": 13.5665,
+  "mdd": 0.556,
+  "cum": 13.5665,
+  "n": 35040,
+  "turnover": 0.006598,
+  "trades": 576
+ },
+ "compare": {
+  "d_sharpe": -10.058,
+  "d_trades": -71,
+  "d_turnover": -0.000868,
+  "d_mdd": 0.2659,
+  "d_cum": -6.0368
+ },
+ "verdict_detail": "PENDING_P03_FAIL",
+ "decision": "NO_CHANGE",
+ "decision_note": "待定(P0-3 FAIL): no adoption, live untouched; bb entry filter diagnostic only (dsh=-10.058 dtr=-71).",
+ "conclusion": "PENDING: V5 15m BB(96,2) entry filter Top5 ['ETC', 'TRX', 'ATOM', 'APT', 'KAS']; base vs bb FULL sharpe/trades; no live change"
+}
