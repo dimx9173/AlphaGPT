@@ -1,0 +1,304 @@
+{
+ "config": {
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "grid": "1h",
+  "grid_bars": 24543,
+  "h2_len": 1972,
+  "fee": 0.0004,
+  "fund": 0.0005,
+  "lev": 2.0,
+  "params_scaled_x4": [
+   "cd",
+   "ts",
+   "vw"
+  ],
+  "smoke": false
+ },
+ "arms": {
+  "hourly": {
+   "FULL": {
+    "sharpe": 6.075,
+    "ann": 4.8591,
+    "mdd": 0.4878,
+    "cum": 13.6137,
+    "n": 24543,
+    "turnover": 0.027055
+   },
+   "H2": {
+    "sharpe": 11.673,
+    "ann": 5.9144,
+    "mdd": 0.1598,
+    "cum": 1.3314,
+    "n": 1972,
+    "turnover": 0.024848
+   },
+   "flips": 17,
+   "entries": 1644,
+   "per_coin": {
+    "ETC": {
+     "FULL": {
+      "sharpe": 3.868,
+      "ann": 4.3401,
+      "mdd": 0.9645,
+      "cum": 12.1597,
+      "n": 24543,
+      "turnover": 0.015116
+     },
+     "H2": {
+      "sharpe": 7.564,
+      "ann": 5.7728,
+      "mdd": 0.262,
+      "cum": 1.2995,
+      "n": 1972,
+      "turnover": 0.014199
+     },
+     "flips": 2,
+     "entries": 184
+    },
+    "TRX": {
+     "FULL": {
+      "sharpe": 7.015,
+      "ann": 4.63,
+      "mdd": 1.0796,
+      "cum": 12.972,
+      "n": 24543,
+      "turnover": 0.034226
+     },
+     "H2": {
+      "sharpe": 17.518,
+      "ann": 4.9098,
+      "mdd": 0.0612,
+      "cum": 1.1053,
+      "n": 1972,
+      "turnover": 0.029412
+     },
+     "flips": 6,
+     "entries": 414
+    },
+    "ATOM": {
+     "FULL": {
+      "sharpe": 4.681,
+      "ann": 5.8113,
+      "mdd": 1.5508,
+      "cum": 16.2815,
+      "n": 24543,
+      "turnover": 0.040378
+     },
+     "H2": {
+      "sharpe": 9.311,
+      "ann": 7.8742,
+      "mdd": 0.3731,
+      "cum": 1.7726,
+      "n": 1972,
+      "turnover": 0.034483
+     },
+     "flips": 6,
+     "entries": 490
+    },
+    "APT": {
+     "FULL": {
+      "sharpe": 3.548,
+      "ann": 4.9552,
+      "mdd": 0.819,
+      "cum": 13.8829,
+      "n": 24543,
+      "turnover": 0.01475
+     },
+     "H2": {
+      "sharpe": 6.238,
+      "ann": 6.1931,
+      "mdd": 0.1542,
+      "cum": 1.3941,
+      "n": 1972,
+      "turnover": 0.016227
+     },
+     "flips": 1,
+     "entries": 180
+    },
+    "KAS": {
+     "FULL": {
+      "sharpe": 2.828,
+      "ann": 4.5588,
+      "mdd": 1.0315,
+      "cum": 12.7723,
+      "n": 24543,
+      "turnover": 0.030803
+     },
+     "H2": {
+      "sharpe": 4.549,
+      "ann": 4.8222,
+      "mdd": 0.4014,
+      "cum": 1.0855,
+      "n": 1972,
+      "turnover": 0.029919
+     },
+     "flips": 2,
+     "entries": 376
+    }
+   }
+  },
+  "aligned_4h": {
+   "FULL": {
+    "sharpe": 5.966,
+    "ann": 4.7667,
+    "mdd": 0.5595,
+    "cum": 13.3549,
+    "n": 24543,
+    "turnover": 0.024121
+   },
+   "H2": {
+    "sharpe": 11.516,
+    "ann": 5.9839,
+    "mdd": 0.1617,
+    "cum": 1.3471,
+    "n": 1972,
+    "turnover": 0.022414
+   },
+   "flips": 17,
+   "entries": 1464,
+   "per_coin": {
+    "ETC": {
+     "FULL": {
+      "sharpe": 3.817,
+      "ann": 4.3055,
+      "mdd": 0.9178,
+      "cum": 12.0628,
+      "n": 24543,
+      "turnover": 0.013242
+     },
+     "H2": {
+      "sharpe": 7.959,
+      "ann": 6.091,
+      "mdd": 0.2075,
+      "cum": 1.3712,
+      "n": 1972,
+      "turnover": 0.013185
+     },
+     "flips": 2,
+     "entries": 161
+    },
+    "TRX": {
+     "FULL": {
+      "sharpe": 7.867,
+      "ann": 4.8279,
+      "mdd": 0.5555,
+      "cum": 13.5263,
+      "n": 24543,
+      "turnover": 0.032107
+     },
+     "H2": {
+      "sharpe": 16.973,
+      "ann": 4.8571,
+      "mdd": 0.0604,
+      "cum": 1.0934,
+      "n": 1972,
+      "turnover": 0.026369
+     },
+     "flips": 6,
+     "entries": 388
+    },
+    "ATOM": {
+     "FULL": {
+      "sharpe": 4.574,
+      "ann": 5.7387,
+      "mdd": 1.4705,
+      "cum": 16.0781,
+      "n": 24543,
+      "turnover": 0.031903
+     },
+     "H2": {
+      "sharpe": 9.365,
+      "ann": 8.4399,
+      "mdd": 0.3448,
+      "cum": 1.9,
+      "n": 1972,
+      "turnover": 0.03144
+     },
+     "flips": 6,
+     "entries": 386
+    },
+    "APT": {
+     "FULL": {
+      "sharpe": 3.45,
+      "ann": 4.8184,
+      "mdd": 0.7421,
+      "cum": 13.4999,
+      "n": 24543,
+      "turnover": 0.01312
+     },
+     "H2": {
+      "sharpe": 6.003,
+      "ann": 5.9878,
+      "mdd": 0.1542,
+      "cum": 1.3479,
+      "n": 1972,
+      "turnover": 0.01217
+     },
+     "flips": 1,
+     "entries": 160
+    },
+    "KAS": {
+     "FULL": {
+      "sharpe": 2.58,
+      "ann": 4.1431,
+      "mdd": 1.2166,
+      "cum": 11.6077,
+      "n": 24543,
+      "turnover": 0.030233
+     },
+     "H2": {
+      "sharpe": 4.3,
+      "ann": 4.5438,
+      "mdd": 0.3942,
+      "cum": 1.0229,
+      "n": 1972,
+      "turnover": 0.028905
+     },
+     "flips": 2,
+     "entries": 369
+    }
+   }
+  }
+ },
+ "fee2x": {
+  "hourly": {
+   "FULL_sharpe": 5.838,
+   "H2_sharpe": 11.33,
+   "FULL_cum": 13.0825
+  },
+  "aligned_4h": {
+   "FULL_sharpe": 5.754,
+   "H2_sharpe": 11.213,
+   "FULL_cum": 12.8813
+  }
+ },
+ "compare": {
+  "d_sharpe_FULL": 0.109,
+  "d_sharpe_H2": 0.157,
+  "d_cum_FULL": 0.2588,
+  "d_turnover_FULL": 0.002934,
+  "turnover_ratio_hourly_over_4h": 1.1216,
+  "d_flips": 0,
+  "d_entries": 180
+ },
+ "recommendation": {
+  "Y1B_DECISION_ALIGN": "1",
+  "reason": "hourly churn not paid (d=+0.109, ratio=1.12)",
+  "status": "shelved (executor default stays unset)"
+ },
+ "decision": "PENDING",
+ "conclusion": "X6 1h replay hourly vs 4h-aligned dFULL=+0.109 ratio=1.12 ALIGN=1 (hourly churn not paid (d=+0.109, ratio=1.12)). PENDING; no live change."
+}
