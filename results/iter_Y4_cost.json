@@ -1,0 +1,693 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 15m native cd/ts/vw x16",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "costs": [
+   {
+    "label": "base",
+    "fee": 0.0004,
+    "slip_bp": 0,
+    "fund": 0.0005
+   },
+   {
+    "label": "fee2x",
+    "fee": 0.0008,
+    "slip_bp": 0,
+    "fund": 0.0005
+   },
+   {
+    "label": "slip10",
+    "fee": 0.0004,
+    "slip_bp": 10,
+    "fund": 0.0005
+   },
+   {
+    "label": "slip20",
+    "fee": 0.0004,
+    "slip_bp": 20,
+    "fund": 0.0005
+   },
+   {
+    "label": "fundhi",
+    "fee": 0.0008,
+    "slip_bp": 0,
+    "fund": 0.002
+   }
+  ],
+  "Ks": [
+   0,
+   1,
+   2,
+   3,
+   5
+  ],
+  "top_cell": "fundhi",
+  "base_cell": "base",
+  "lev": 2.0,
+  "edge_def": "LEV*|sg-0.5|*trail_vol_60, entry-only gate, abs-cost accounting",
+  "bite_cut": 0.2,
+  "noop_blocked": 0.05,
+  "smoke": false,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "bpy": 35040.0,
+  "scale": 16
+ },
+ "rows": [
+  {
+   "cost": "base",
+   "fee": 0.0004,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0009,
+   "K": 0,
+   "thr": 0.0,
+   "FULL": {
+    "sharpe": -22.555,
+    "ann": -16.9028,
+    "mdd": 16.9382,
+    "cum": -16.9028,
+    "final_x": -15.9028,
+    "n": 35040,
+    "turnover": 0.007454
+   },
+   "blocked_frac": 0.0,
+   "turnover_cut_vs_k0": 0.0,
+   "d_sharpe_vs_k0": 0.0
+  },
+  {
+   "cost": "base",
+   "fee": 0.0004,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0009,
+   "K": 1,
+   "thr": 0.0009,
+   "FULL": {
+    "sharpe": -21.275,
+    "ann": -15.9014,
+    "mdd": 15.9336,
+    "cum": -15.9014,
+    "final_x": -14.9014,
+    "n": 35040,
+    "turnover": 0.007215
+   },
+   "blocked_frac": 0.0501,
+   "turnover_cut_vs_k0": 0.0321,
+   "d_sharpe_vs_k0": 1.28
+  },
+  {
+   "cost": "base",
+   "fee": 0.0004,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0009,
+   "K": 2,
+   "thr": 0.0018,
+   "FULL": {
+    "sharpe": -18.422,
+    "ann": -13.5898,
+    "mdd": 13.6158,
+    "cum": -13.5898,
+    "final_x": -12.5898,
+    "n": 35040,
+    "turnover": 0.005982
+   },
+   "blocked_frac": 0.1756,
+   "turnover_cut_vs_k0": 0.1975,
+   "d_sharpe_vs_k0": 4.133
+  },
+  {
+   "cost": "base",
+   "fee": 0.0004,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0009,
+   "K": 3,
+   "thr": 0.0027,
+   "FULL": {
+    "sharpe": -15.6,
+    "ann": -11.1903,
+    "mdd": 11.2193,
+    "cum": -11.1903,
+    "final_x": -10.1903,
+    "n": 35040,
+    "turnover": 0.00516
+   },
+   "blocked_frac": 0.3138,
+   "turnover_cut_vs_k0": 0.3078,
+   "d_sharpe_vs_k0": 6.955
+  },
+  {
+   "cost": "base",
+   "fee": 0.0004,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0009,
+   "K": 5,
+   "thr": 0.0045,
+   "FULL": {
+    "sharpe": -8.577,
+    "ann": -5.2698,
+    "mdd": 5.5445,
+    "cum": -5.2698,
+    "final_x": -4.2698,
+    "n": 35040,
+    "turnover": 0.002791
+   },
+   "blocked_frac": 0.6559,
+   "turnover_cut_vs_k0": 0.6256,
+   "d_sharpe_vs_k0": 13.978
+  },
+  {
+   "cost": "fee2x",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0013,
+   "K": 0,
+   "thr": 0.0,
+   "FULL": {
+    "sharpe": -22.834,
+    "ann": -17.1117,
+    "mdd": 17.1462,
+    "cum": -17.1117,
+    "final_x": -16.1117,
+    "n": 35040,
+    "turnover": 0.007454
+   },
+   "blocked_frac": 0.0,
+   "turnover_cut_vs_k0": 0.0,
+   "d_sharpe_vs_k0": 0.0
+  },
+  {
+   "cost": "fee2x",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0013,
+   "K": 1,
+   "thr": 0.0013,
+   "FULL": {
+    "sharpe": -19.665,
+    "ann": -14.612,
+    "mdd": 14.6421,
+    "cum": -14.612,
+    "final_x": -13.612,
+    "n": 35040,
+    "turnover": 0.006404
+   },
+   "blocked_frac": 0.1281,
+   "turnover_cut_vs_k0": 0.1409,
+   "d_sharpe_vs_k0": 3.169
+  },
+  {
+   "cost": "fee2x",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0013,
+   "K": 2,
+   "thr": 0.0026,
+   "FULL": {
+    "sharpe": -16.128,
+    "ann": -11.611,
+    "mdd": 11.6373,
+    "cum": -11.611,
+    "final_x": -10.611,
+    "n": 35040,
+    "turnover": 0.005263
+   },
+   "blocked_frac": 0.2983,
+   "turnover_cut_vs_k0": 0.2939,
+   "d_sharpe_vs_k0": 6.706
+  },
+  {
+   "cost": "fee2x",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0013,
+   "K": 3,
+   "thr": 0.0039,
+   "FULL": {
+    "sharpe": -10.625,
+    "ann": -6.8889,
+    "mdd": 6.9598,
+    "cum": -6.8889,
+    "final_x": -5.8889,
+    "n": 35040,
+    "turnover": 0.003562
+   },
+   "blocked_frac": 0.5626,
+   "turnover_cut_vs_k0": 0.5221,
+   "d_sharpe_vs_k0": 12.209
+  },
+  {
+   "cost": "fee2x",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.0005,
+   "unit": 0.0013,
+   "K": 5,
+   "thr": 0.0065,
+   "FULL": {
+    "sharpe": -5.851,
+    "ann": -1.8678,
+    "mdd": 1.9253,
+    "cum": -1.8678,
+    "final_x": -0.8678,
+    "n": 35040,
+    "turnover": 0.001079
+   },
+   "blocked_frac": 0.8823,
+   "turnover_cut_vs_k0": 0.8552,
+   "d_sharpe_vs_k0": 16.983
+  },
+  {
+   "cost": "slip10",
+   "fee": 0.0004,
+   "slip_bp": 10,
+   "slip": 0.001,
+   "fund": 0.0005,
+   "unit": 0.0019,
+   "K": 0,
+   "thr": 0.0,
+   "FULL": {
+    "sharpe": -23.249,
+    "ann": -17.4252,
+    "mdd": 17.4582,
+    "cum": -17.4252,
+    "final_x": -16.4252,
+    "n": 35040,
+    "turnover": 0.007454
+   },
+   "blocked_frac": 0.0,
+   "turnover_cut_vs_k0": 0.0,
+   "d_sharpe_vs_k0": 0.0
+  },
+  {
+   "cost": "slip10",
+   "fee": 0.0004,
+   "slip_bp": 10,
+   "slip": 0.001,
+   "fund": 0.0005,
+   "unit": 0.0019,
+   "K": 1,
+   "thr": 0.0019,
+   "FULL": {
+    "sharpe": -18.733,
+    "ann": -13.8041,
+    "mdd": 13.8267,
+    "cum": -13.8041,
+    "final_x": -12.8041,
+    "n": 35040,
+    "turnover": 0.005902
+   },
+   "blocked_frac": 0.188,
+   "turnover_cut_vs_k0": 0.2082,
+   "d_sharpe_vs_k0": 4.516
+  },
+  {
+   "cost": "slip10",
+   "fee": 0.0004,
+   "slip_bp": 10,
+   "slip": 0.001,
+   "fund": 0.0005,
+   "unit": 0.0019,
+   "K": 2,
+   "thr": 0.0038,
+   "FULL": {
+    "sharpe": -11.34,
+    "ann": -7.4177,
+    "mdd": 7.4219,
+    "cum": -7.4177,
+    "final_x": -6.4177,
+    "n": 35040,
+    "turnover": 0.003664
+   },
+   "blocked_frac": 0.5459,
+   "turnover_cut_vs_k0": 0.5085,
+   "d_sharpe_vs_k0": 11.909
+  },
+  {
+   "cost": "slip10",
+   "fee": 0.0004,
+   "slip_bp": 10,
+   "slip": 0.001,
+   "fund": 0.0005,
+   "unit": 0.0019,
+   "K": 3,
+   "thr": 0.0057,
+   "FULL": {
+    "sharpe": -7.586,
+    "ann": -3.1532,
+    "mdd": 3.3086,
+    "cum": -3.1532,
+    "final_x": -2.1532,
+    "n": 35040,
+    "turnover": 0.001775
+   },
+   "blocked_frac": 0.8012,
+   "turnover_cut_vs_k0": 0.7619,
+   "d_sharpe_vs_k0": 15.663
+  },
+  {
+   "cost": "slip10",
+   "fee": 0.0004,
+   "slip_bp": 10,
+   "slip": 0.001,
+   "fund": 0.0005,
+   "unit": 0.0019,
+   "K": 5,
+   "thr": 0.0095,
+   "FULL": {
+    "sharpe": -3.796,
+    "ann": -0.7284,
+    "mdd": 0.7791,
+    "cum": -0.7284,
+    "final_x": 0.2716,
+    "n": 35040,
+    "turnover": 0.000285
+   },
+   "blocked_frac": 0.9682,
+   "turnover_cut_vs_k0": 0.9618,
+   "d_sharpe_vs_k0": 19.453
+  },
+  {
+   "cost": "slip20",
+   "fee": 0.0004,
+   "slip_bp": 20,
+   "slip": 0.002,
+   "fund": 0.0005,
+   "unit": 0.0029,
+   "K": 0,
+   "thr": 0.0,
+   "FULL": {
+    "sharpe": -23.933,
+    "ann": -17.9476,
+    "mdd": 17.9782,
+    "cum": -17.9476,
+    "final_x": -16.9476,
+    "n": 35040,
+    "turnover": 0.007454
+   },
+   "blocked_frac": 0.0,
+   "turnover_cut_vs_k0": 0.0,
+   "d_sharpe_vs_k0": 0.0
+  },
+  {
+   "cost": "slip20",
+   "fee": 0.0004,
+   "slip_bp": 20,
+   "slip": 0.002,
+   "fund": 0.0005,
+   "unit": 0.0029,
+   "K": 1,
+   "thr": 0.0029,
+   "FULL": {
+    "sharpe": -15.653,
+    "ann": -11.0918,
+    "mdd": 11.1216,
+    "cum": -11.0918,
+    "final_x": -10.0918,
+    "n": 35040,
+    "turnover": 0.004829
+   },
+   "blocked_frac": 0.3602,
+   "turnover_cut_vs_k0": 0.3522,
+   "d_sharpe_vs_k0": 8.28
+  },
+  {
+   "cost": "slip20",
+   "fee": 0.0004,
+   "slip_bp": 20,
+   "slip": 0.002,
+   "fund": 0.0005,
+   "unit": 0.0029,
+   "K": 2,
+   "thr": 0.0058,
+   "FULL": {
+    "sharpe": -7.4,
+    "ann": -3.0231,
+    "mdd": 3.1757,
+    "cum": -3.0231,
+    "final_x": -2.0231,
+    "n": 35040,
+    "turnover": 0.001661
+   },
+   "blocked_frac": 0.8142,
+   "turnover_cut_vs_k0": 0.7772,
+   "d_sharpe_vs_k0": 16.533
+  },
+  {
+   "cost": "slip20",
+   "fee": 0.0004,
+   "slip_bp": 20,
+   "slip": 0.002,
+   "fund": 0.0005,
+   "unit": 0.0029,
+   "K": 3,
+   "thr": 0.0087,
+   "FULL": {
+    "sharpe": -3.428,
+    "ann": -0.6982,
+    "mdd": 0.7645,
+    "cum": -0.6982,
+    "final_x": 0.3018,
+    "n": 35040,
+    "turnover": 0.000377
+   },
+   "blocked_frac": 0.9629,
+   "turnover_cut_vs_k0": 0.9494,
+   "d_sharpe_vs_k0": 20.505
+  },
+  {
+   "cost": "slip20",
+   "fee": 0.0004,
+   "slip_bp": 20,
+   "slip": 0.002,
+   "fund": 0.0005,
+   "unit": 0.0029,
+   "K": 5,
+   "thr": 0.0145,
+   "FULL": {
+    "sharpe": -1.809,
+    "ann": -0.2669,
+    "mdd": 0.3196,
+    "cum": -0.2669,
+    "final_x": 0.7331,
+    "n": 35040,
+    "turnover": 9.1e-05
+   },
+   "blocked_frac": 0.9919,
+   "turnover_cut_vs_k0": 0.9878,
+   "d_sharpe_vs_k0": 22.124
+  },
+  {
+   "cost": "fundhi",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.002,
+   "unit": 0.0028,
+   "K": 0,
+   "thr": 0.0,
+   "FULL": {
+    "sharpe": -94.963,
+    "ann": -72.6267,
+    "mdd": 72.6272,
+    "cum": -72.6267,
+    "final_x": -71.6267,
+    "n": 35040,
+    "turnover": 0.007454
+   },
+   "blocked_frac": 0.0,
+   "turnover_cut_vs_k0": 0.0,
+   "d_sharpe_vs_k0": 0.0
+  },
+  {
+   "cost": "fundhi",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.002,
+   "unit": 0.0028,
+   "K": 1,
+   "thr": 0.0028,
+   "FULL": {
+    "sharpe": -66.35,
+    "ann": -48.2727,
+    "mdd": 48.2727,
+    "cum": -48.2727,
+    "final_x": -47.2727,
+    "n": 35040,
+    "turnover": 0.00508
+   },
+   "blocked_frac": 0.3287,
+   "turnover_cut_vs_k0": 0.3185,
+   "d_sharpe_vs_k0": 28.613
+  },
+  {
+   "cost": "fundhi",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.002,
+   "unit": 0.0028,
+   "K": 2,
+   "thr": 0.0056,
+   "FULL": {
+    "sharpe": -34.189,
+    "ann": -14.9431,
+    "mdd": 14.9431,
+    "cum": -14.9431,
+    "final_x": -13.9431,
+    "n": 35040,
+    "turnover": 0.001901
+   },
+   "blocked_frac": 0.79,
+   "turnover_cut_vs_k0": 0.745,
+   "d_sharpe_vs_k0": 60.774
+  },
+  {
+   "cost": "fundhi",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.002,
+   "unit": 0.0028,
+   "K": 3,
+   "thr": 0.0084,
+   "FULL": {
+    "sharpe": -13.9,
+    "ann": -3.0704,
+    "mdd": 3.1251,
+    "cum": -3.0704,
+    "final_x": -2.0704,
+    "n": 35040,
+    "turnover": 0.0004
+   },
+   "blocked_frac": 0.9579,
+   "turnover_cut_vs_k0": 0.9463,
+   "d_sharpe_vs_k0": 81.063
+  },
+  {
+   "cost": "fundhi",
+   "fee": 0.0008,
+   "slip_bp": 0,
+   "slip": 0.0,
+   "fund": 0.002,
+   "unit": 0.0028,
+   "K": 5,
+   "thr": 0.014,
+   "FULL": {
+    "sharpe": -4.696,
+    "ann": -0.7108,
+    "mdd": 0.7612,
+    "cum": -0.7108,
+    "final_x": 0.2892,
+    "n": 35040,
+    "turnover": 9.1e-05
+   },
+   "blocked_frac": 0.9919,
+   "turnover_cut_vs_k0": 0.9878,
+   "d_sharpe_vs_k0": 90.267
+  }
+ ],
+ "cells_done": [
+  "base",
+  "fee2x",
+  "fundhi",
+  "slip10",
+  "slip20"
+ ],
+ "complete": true,
+ "first_bite": {
+  "base": 3,
+  "fee2x": 2,
+  "slip10": 1,
+  "slip20": 1,
+  "fundhi": 1
+ },
+ "recommendation": {
+  "Y1B_COST_K": null,
+  "reason": "no K satisfies bite-top + noop-base jointly"
+ },
+ "verdict": "PENDING",
+ "decision": "GATE_OFF",
+ "decision_note": "待定,不动YZ1B_COST_K(保持默认OFF)。本步只推荐备选K值,不启用,不改现货行为。",
+ "conclusion": "PENDING (待定): 15m原生格子; Y1B_COST_K stays default OFF, no adoption, no live change; recommended shelf value K=None for future enablement only."
+}
