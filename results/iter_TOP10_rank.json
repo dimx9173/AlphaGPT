@@ -1,0 +1,394 @@
+{
+ "meta": {
+  "iter": "X10",
+  "scope": "Top5 (ETC/TRX/ATOM/APT/KAS)",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "只读汇总，不跑回测；全部结论待定(P0-3 FAIL)，不做demo变更"
+ },
+ "baseline": {
+  "FULL_sharpe": 1.977,
+  "FULL_mdd": 0.8114,
+  "source": "X1/X2/X3 base_FULL (Top5 equal-weight, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "X1",
+   "file": "results/iter_X1_weights.json",
+   "topic": "权重优化 Top5",
+   "status": "done",
+   "sharpe_gain": 0.206,
+   "sharpe_gain_note": "FULL-vs-base",
+   "dd_cut_pct": 14.46,
+   "robustness": 8.0,
+   "detail": "best=meanvar FULL sharpe 2.183 mdd 0.6941 turnover 0.0927 12fold-median 2.761; 6/6 eligible; KEEP_equal",
+   "conclusion_zh": "X1 meanvar最优(+0.206 sharpe/-14.5% dd)但结论待定，不切换等权，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "X2",
+   "file": "results/iter_X2_stops.json",
+   "topic": "止损止盈调参",
+   "status": "done",
+   "sharpe_gain": 0.077,
+   "sharpe_gain_note": "FULL-vs-base",
+   "dd_cut_pct": 20.5,
+   "robustness": 7.0,
+   "detail": "72格(uniform12+逐币60): best uniform sl=0.03 ts=36 d_sharpe=+0.077 d_mdd=-0.1663 dd-20.5% eligible 46/72; PENDING",
+   "conclusion_zh": "X2统一sl0.03/ts36降dd20.5%且sharpe+0.077(46/72达标)，但仍待定，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "X3",
+   "file": "results/iter_X3_thresh.json",
+   "topic": "阈值稳健验证",
+   "status": "done",
+   "sharpe_gain": 0.12,
+   "sharpe_gain_note": "FULL-vs-base",
+   "dd_cut_pct": 9.37,
+   "robustness": 9.0,
+   "detail": "full 20 runs flat=True max|d sharpe|=0.120 tol=0.15; lth全平坦; no adoption",
+   "conclusion_zh": "X3阈值±0.02全平坦(max|d|=0.12<0.15，20 runs)，稳健最佳，无需调参，无变更故不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "X4",
+   "file": "results/iter_X4_cost.json",
+   "topic": "换仓成本门",
+   "status": "done",
+   "sharpe_gain": 1.425,
+   "sharpe_gain_note": "stress-relative",
+   "dd_cut_pct": 23.68,
+   "robustness": 6.0,
+   "detail": "full 5成本格; 20bp-0.002格 K=2 turnover-22.0%% sharpe+1.425 blocked=22.0%%; base格blocked<2%%静默; 架值K=2(默认OFF)",
+   "conclusion_zh": "X4高成本下K=2省22%换手(sharpe相对+1.425但绝对仍负)，门默认OFF搁置，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "X5",
+   "file": "results/iter_X5_scan.json",
+   "topic": "候选币扫描",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "opportunity-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 5.0,
+   "detail": "L0/L1 only: addable=['DOT', 'ETH'] watch=['ARB', 'BNB', 'BTC', 'LTC', 'SUI'] reject=12/19; DOT sharpe 1.428 ETH 1.362",
+   "conclusion_zh": "X5仅DOT/ETH过L1(均为PENDING候选)，其余拒收或观察，不加币，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "X6",
+   "file": "results/iter_X6_freq.json",
+   "topic": "信号频率实验",
+   "status": "done",
+   "sharpe_gain": -0.109,
+   "sharpe_gain_note": "FULL-vs-base",
+   "dd_cut_pct": -14.7,
+   "robustness": 7.0,
+   "detail": "hourly vs 4h对齐 dFULL=+0.109 turnover比=1.122 entries 1644->1464; ALIGN=1 shelved; PENDING",
+   "conclusion_zh": "X6每小时决策多耗12%换手仅换+0.11 sharpe(dd反升14.7%)，对齐门搁置，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "X7",
+   "file": "results/iter_X7_lev.json",
+   "topic": "杠杆扫描",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "FULL-vs-base",
+   "dd_cut_pct": 0.0,
+   "robustness": 8.0,
+   "detail": "sharpe invariant spread=0.000; mdd 1x=0.406 2x=0.811 3x=1.217(失控); KEEP_LEV_2.0",
+   "conclusion_zh": "X7杠杆下sharpe不变、dd线性放大，3x失控(mdd>1)，维持2x不动，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "X8",
+   "file": "results/iter_X8_fund.json",
+   "topic": "资金费率体制",
+   "status": "done",
+   "sharpe_gain": 1.674,
+   "sharpe_gain_note": "funding-driven",
+   "dd_cut_pct": 23.35,
+   "robustness": 8.0,
+   "detail": "fund曲线单调升(净空rebate); 门0.001处 sharpe=3.471 mdd=0.6647; 上限内无失效; 下行零点≈-3.6e-05; verdict=PASS",
+   "conclusion_zh": "X8费率越高越赚(净空结构)，0.001门合理偏保守，上限无失效，不进demo(无变更)。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  },
+  {
+   "round": "X9",
+   "file": "results/iter_X9_corr.json",
+   "topic": "相关性监控",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "monitor-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 7.0,
+   "detail": "rolling60 6075窗 max>0.6占96.4% avg_max=0.805; 分散LIMITED; 熔断OFF搁置; PENDING",
+   "conclusion_zh": "X9分散有效性有限(96.4%窗口max>0.6)，熔断规则已备但默认OFF，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): 无demo变更"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "X8",
+   "rank": 1,
+   "value": 1.674
+  },
+  {
+   "round": "X4",
+   "rank": 2,
+   "value": 1.425
+  },
+  {
+   "round": "X1",
+   "rank": 3,
+   "value": 0.206
+  },
+  {
+   "round": "X3",
+   "rank": 4,
+   "value": 0.12
+  },
+  {
+   "round": "X2",
+   "rank": 5,
+   "value": 0.077
+  },
+  {
+   "round": "X5",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "X7",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "X9",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "X6",
+   "rank": 9,
+   "value": -0.109
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "X4",
+   "rank": 1,
+   "value": 23.68
+  },
+  {
+   "round": "X8",
+   "rank": 2,
+   "value": 23.35
+  },
+  {
+   "round": "X2",
+   "rank": 3,
+   "value": 20.5
+  },
+  {
+   "round": "X1",
+   "rank": 4,
+   "value": 14.46
+  },
+  {
+   "round": "X3",
+   "rank": 5,
+   "value": 9.37
+  },
+  {
+   "round": "X5",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "X7",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "X9",
+   "rank": 6,
+   "value": 0.0
+  },
+  {
+   "round": "X6",
+   "rank": 9,
+   "value": -14.7
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "X3",
+   "rank": 1,
+   "value": 9.0
+  },
+  {
+   "round": "X1",
+   "rank": 2,
+   "value": 8.0
+  },
+  {
+   "round": "X7",
+   "rank": 2,
+   "value": 8.0
+  },
+  {
+   "round": "X8",
+   "rank": 2,
+   "value": 8.0
+  },
+  {
+   "round": "X2",
+   "rank": 5,
+   "value": 7.0
+  },
+  {
+   "round": "X6",
+   "rank": 5,
+   "value": 7.0
+  },
+  {
+   "round": "X9",
+   "rank": 5,
+   "value": 7.0
+  },
+  {
+   "round": "X4",
+   "rank": 8,
+   "value": 6.0
+  },
+  {
+   "round": "X5",
+   "rank": 9,
+   "value": 5.0
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "X8",
+   "rank": 1,
+   "rank_sum": 5,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 2,
+    "robust": 2
+   }
+  },
+  {
+   "round": "X1",
+   "rank": 2,
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 4,
+    "robust": 2
+   }
+  },
+  {
+   "round": "X3",
+   "rank": 3,
+   "rank_sum": 10,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 5,
+    "robust": 1
+   }
+  },
+  {
+   "round": "X4",
+   "rank": 4,
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 1,
+    "robust": 8
+   }
+  },
+  {
+   "round": "X2",
+   "rank": 5,
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 3,
+    "robust": 5
+   }
+  },
+  {
+   "round": "X7",
+   "rank": 6,
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 6,
+    "robust": 2
+   }
+  },
+  {
+   "round": "X9",
+   "rank": 7,
+   "rank_sum": 17,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 6,
+    "robust": 5
+   }
+  },
+  {
+   "round": "X5",
+   "rank": 8,
+   "rank_sum": 21,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 6,
+    "robust": 9
+   }
+  },
+  {
+   "round": "X6",
+   "rank": 9,
+   "rank_sum": 23,
+   "ranks": {
+    "sharpe": 9,
+    "dd": 9,
+    "robust": 5
+   }
+  }
+ ],
+ "caveats": [
+  "X8 sharpe增益为funding-driven(净空rebate随fund线性涨)，非alpha增益，不可直接对比。",
+  "X4增益为高成本stress下相对值(20bp-0.002格)，绝对sharpe仍为负，仅证门有效、默认OFF搁置。",
+  "X6对齐省12%换手但丢0.11 sharpe且dd反升14.7%，ALIGN=1已搁置。",
+  "可行动alpha增益为X1 meanvar(+0.206/-14.5%)与X2统一sl0.03/ts36(+0.077/-20.5%)，均仍待定(P0-3 FAIL)。"
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "P0-3 FAIL阴影下9轮全部PENDING，无一建议进demo。"
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
