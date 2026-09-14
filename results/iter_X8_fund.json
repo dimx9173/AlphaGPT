@@ -1,0 +1,293 @@
+{
+ "config": {
+  "engine": "mirror research/run_micro.py S5 funding sweep, locked Top5 q0.3 legs, E10 FORMULA untouched, offline read-only",
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "weight_each": 0.2,
+  "lev": 2.0,
+  "fee": 0.0008,
+  "fund_grid": [
+   0.0001,
+   0.0005,
+   0.001,
+   0.002,
+   0.005
+  ],
+  "gate_fund": 0.001,
+  "note": "book is net-short: funding earned, sharpe rises with fund; failure only on downside"
+ },
+ "curve": {
+  "rows": [
+   {
+    "fund": 0.0001,
+    "sharpe": 0.456,
+    "ann": 0.3904,
+    "mdd": 1.276,
+    "cum": 1.0938,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": 0.0005,
+    "sharpe": 1.797,
+    "ann": 1.5401,
+    "mdd": 0.8672,
+    "cum": 4.3144,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": 0.001,
+    "sharpe": 3.471,
+    "ann": 2.9772,
+    "mdd": 0.6647,
+    "cum": 8.3402,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": 0.002,
+    "sharpe": 6.809,
+    "ann": 5.8514,
+    "mdd": 0.4111,
+    "cum": 16.3918,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": 0.005,
+    "sharpe": 16.659,
+    "ann": 14.4738,
+    "mdd": 0.236,
+    "cum": 40.5466,
+    "n": 6135,
+    "turnover": 0.088215
+   }
+  ],
+  "monotone_up": true,
+  "turnover_flat": true
+ },
+ "upside": {
+  "max_fund": 0.005,
+  "max_sharpe": 16.659,
+  "failure_in_grid": false,
+  "note": "no upside failure in [0.0001, 0.005]; sharpe monotone increasing (short rebate scales linearly)"
+ },
+ "downside": {
+  "bracket_lo": -0.001,
+  "bracket_hi": -3.569459915161132e-05,
+  "zero_cross_fund": -3.6e-05,
+  "zero_cross_check": {
+   "sharpe": 0.0,
+   "ann": 0.0004,
+   "mdd": 1.5733,
+   "cum": 0.0012,
+   "n": 6135,
+   "turnover": 0.088215
+  },
+  "bisection_rows": [
+   {
+    "fund": -0.001,
+    "sharpe": -3.235,
+    "ann": -2.7711,
+    "mdd": 7.8486,
+    "cum": -7.763,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -0.00045,
+    "sharpe": -1.389,
+    "ann": -1.1904,
+    "mdd": 3.6347,
+    "cum": -3.3346,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -0.000175,
+    "sharpe": -0.467,
+    "ann": -0.4,
+    "mdd": 2.2599,
+    "cum": -1.1204,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.75e-05,
+    "sharpe": -0.006,
+    "ann": -0.0048,
+    "mdd": 1.5822,
+    "cum": -0.0133,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": 3.125e-05,
+    "sharpe": 0.225,
+    "ann": 0.1928,
+    "mdd": 1.3463,
+    "cum": 0.5402,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.124999999999998e-06,
+    "sharpe": 0.11,
+    "ann": 0.094,
+    "mdd": 1.4224,
+    "cum": 0.2634,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -2.03125e-05,
+    "sharpe": 0.052,
+    "ann": 0.0446,
+    "mdd": 1.4975,
+    "cum": 0.1251,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -2.8906249999999998e-05,
+    "sharpe": 0.023,
+    "ann": 0.0199,
+    "mdd": 1.5399,
+    "cum": 0.0559,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.3203124999999996e-05,
+    "sharpe": 0.009,
+    "ann": 0.0076,
+    "mdd": 1.561,
+    "cum": 0.0213,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.5351562499999996e-05,
+    "sharpe": 0.002,
+    "ann": 0.0014,
+    "mdd": 1.5716,
+    "cum": 0.004,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.642578125e-05,
+    "sharpe": -0.002,
+    "ann": -0.0017,
+    "mdd": 1.5769,
+    "cum": -0.0047,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.5888671875e-05,
+    "sharpe": -0.0,
+    "ann": -0.0001,
+    "mdd": 1.5743,
+    "cum": -0.0004,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.5620117187499994e-05,
+    "sharpe": 0.001,
+    "ann": 0.0006,
+    "mdd": 1.5729,
+    "cum": 0.0018,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.575439453124999e-05,
+    "sharpe": 0.0,
+    "ann": 0.0003,
+    "mdd": 1.5736,
+    "cum": 0.0007,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.568725585937499e-05,
+    "sharpe": 0.001,
+    "ann": 0.0004,
+    "mdd": 1.5733,
+    "cum": 0.0013,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.572082519531249e-05,
+    "sharpe": 0.0,
+    "ann": 0.0004,
+    "mdd": 1.5734,
+    "cum": 0.001,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.570404052734374e-05,
+    "sharpe": 0.0,
+    "ann": 0.0004,
+    "mdd": 1.5734,
+    "cum": 0.0011,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.569564819335937e-05,
+    "sharpe": 0.0,
+    "ann": 0.0004,
+    "mdd": 1.5733,
+    "cum": 0.0012,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.569145202636718e-05,
+    "sharpe": 0.001,
+    "ann": 0.0004,
+    "mdd": 1.5733,
+    "cum": 0.0012,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.569355010986327e-05,
+    "sharpe": 0.001,
+    "ann": 0.0004,
+    "mdd": 1.5733,
+    "cum": 0.0012,
+    "n": 6135,
+    "turnover": 0.088215
+   },
+   {
+    "fund": -3.569459915161132e-05,
+    "sharpe": 0.001,
+    "ann": 0.0004,
+    "mdd": 1.5733,
+    "cum": 0.0012,
+    "n": 6135,
+    "turnover": 0.088215
+   }
+  ]
+ },
+ "gate_0001": {
+  "sharpe": 3.471,
+  "pass_sharpe_gt_0": true,
+  "margin_to_failure": 0.001036,
+  "reasonable": true,
+  "note": "0.001 gate passes with sharpe=3.471; failure only at fund=-0.000036 (short-pays regime), margin 0.001036"
+ },
+ "verdict": "PASS"
+}
