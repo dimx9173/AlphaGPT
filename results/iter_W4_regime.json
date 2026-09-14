@@ -1,0 +1,307 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal weights; 15m native cd/ts/vw x16",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "venue": "aster",
+  "lev": 2.0,
+  "lev_locked": 2.0,
+  "fee": 0.0004,
+  "fund": 0.0005,
+  "grid": "15m",
+  "grid_bars": 35039,
+  "bpy": 35040.0,
+  "scale": 16,
+  "ma_window": 960,
+  "regime": "bull = BTC 15m close[t] >= trailing MA960[t] (partial warmup window); else bear",
+  "smoke": false,
+  "note": "regime split only, read-only; live LEV/FUND/FEE untouched"
+ },
+ "status": "done",
+ "per_coin": {
+  "ETC": {
+   "FULL": {
+    "sharpe": 15.639,
+    "ann": 19.6953,
+    "mdd": 0.685,
+    "cum": 19.6947,
+    "n": 35039,
+    "coverage": 1.0,
+    "turnover": 0.003425
+   },
+   "bull": {
+    "sharpe": 22.985,
+    "ann": 20.2302,
+    "mdd": 0.1557,
+    "cum": 9.0557,
+    "n": 15685,
+    "coverage": 0.4476,
+    "turnover": 0.003379
+   },
+   "bear": {
+    "sharpe": 12.859,
+    "ann": 19.2617,
+    "mdd": 0.685,
+    "cum": 10.639,
+    "n": 19354,
+    "coverage": 0.5524,
+    "turnover": 0.003462
+   }
+  },
+  "TRX": {
+   "FULL": {
+    "sharpe": 50.348,
+    "ann": 17.4873,
+    "mdd": 0.1484,
+    "cum": 17.4868,
+    "n": 35039,
+    "coverage": 1.0,
+    "turnover": 0.009703
+   },
+   "bull": {
+    "sharpe": 60.41,
+    "ann": 18.165,
+    "mdd": 0.055,
+    "cum": 8.1312,
+    "n": 15685,
+    "coverage": 0.4476,
+    "turnover": 0.009691
+   },
+   "bear": {
+    "sharpe": 44.464,
+    "ann": 16.9381,
+    "mdd": 0.1362,
+    "cum": 9.3556,
+    "n": 19354,
+    "coverage": 0.5524,
+    "turnover": 0.009714
+   }
+  },
+  "ATOM": {
+   "FULL": {
+    "sharpe": 16.968,
+    "ann": 20.613,
+    "mdd": 0.4679,
+    "cum": 20.6124,
+    "n": 35039,
+    "coverage": 1.0,
+    "turnover": 0.01113
+   },
+   "bull": {
+    "sharpe": 23.075,
+    "ann": 20.9603,
+    "mdd": 0.1823,
+    "cum": 9.3825,
+    "n": 15685,
+    "coverage": 0.4476,
+    "turnover": 0.011476
+   },
+   "bear": {
+    "sharpe": 14.365,
+    "ann": 20.3315,
+    "mdd": 0.4679,
+    "cum": 11.2299,
+    "n": 19354,
+    "coverage": 0.5524,
+    "turnover": 0.01085
+   }
+  },
+  "APT": {
+   "FULL": {
+    "sharpe": 15.244,
+    "ann": 21.3841,
+    "mdd": 0.5092,
+    "cum": 21.3835,
+    "n": 35039,
+    "coverage": 1.0,
+    "turnover": 0.003425
+   },
+   "bull": {
+    "sharpe": 20.164,
+    "ann": 22.1501,
+    "mdd": 0.2229,
+    "cum": 9.9151,
+    "n": 15685,
+    "coverage": 0.4476,
+    "turnover": 0.003507
+   },
+   "bear": {
+    "sharpe": 12.915,
+    "ann": 20.7633,
+    "mdd": 0.5092,
+    "cum": 11.4684,
+    "n": 19354,
+    "coverage": 0.5524,
+    "turnover": 0.003358
+   }
+  },
+  "KAS": {
+   "FULL": {
+    "sharpe": 15.153,
+    "ann": 18.8479,
+    "mdd": 0.4551,
+    "cum": 18.8474,
+    "n": 35039,
+    "coverage": 1.0,
+    "turnover": 0.009646
+   },
+   "bull": {
+    "sharpe": 18.021,
+    "ann": 19.7684,
+    "mdd": 0.2504,
+    "cum": 8.849,
+    "n": 15685,
+    "coverage": 0.4476,
+    "turnover": 0.009818
+   },
+   "bear": {
+    "sharpe": 13.397,
+    "ann": 18.1019,
+    "mdd": 0.4551,
+    "cum": 9.9984,
+    "n": 19354,
+    "coverage": 0.5524,
+    "turnover": 0.009507
+   }
+  }
+ },
+ "basket": {
+  "FULL": {
+   "sharpe": 26.114,
+   "ann": 19.6055,
+   "mdd": 0.2901,
+   "cum": 19.605,
+   "n": 35039,
+   "coverage": 1.0,
+   "turnover": 0.007466
+  },
+  "bull": {
+   "sharpe": 36.428,
+   "ann": 20.2548,
+   "mdd": 0.0866,
+   "cum": 9.0667,
+   "n": 15685,
+   "coverage": 0.4476,
+   "turnover": 0.007574
+  },
+  "bear": {
+   "sharpe": 21.744,
+   "ann": 19.0793,
+   "mdd": 0.2901,
+   "cum": 10.5383,
+   "n": 19354,
+   "coverage": 0.5524,
+   "turnover": 0.007378
+  }
+ },
+ "funding_split": {
+  "fund_pos_pay": {
+   "sharpe": -34.688,
+   "ann": -9.0167,
+   "mdd": 0.0202,
+   "cum": -0.0172,
+   "n": 67,
+   "coverage": 0.0019,
+   "turnover": 0.00597
+  },
+  "fund_neg_earn": {
+   "sharpe": 26.722,
+   "ann": 20.4515,
+   "mdd": 0.2901,
+   "cum": 19.6298,
+   "n": 33632,
+   "coverage": 0.9598,
+   "turnover": 0.007493
+  },
+  "fund_zero_n": 1340,
+  "note": "split by sign of basket funding leg F[t]=mean_c pos_c[t]*fund*lev: pay>0 / earn<0 (fund=0.0005>0 const)"
+ },
+ "regime": {
+  "ma_window": 960,
+  "bull_n": 15685,
+  "bear_n": 19354,
+  "bull_coverage": 0.4476,
+  "bear_coverage": 0.5524
+ },
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "P0-3 permutation FAIL => W4 verdict PENDING; regime/funding splits are descriptive only, no adoption, live untouched."
+}
