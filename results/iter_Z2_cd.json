@@ -1,0 +1,676 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-mask + cooldown + stops + vol_scale(vt None->1.0) + roll1; 15m native, cd/ts/vw x16",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "cd_grid": [
+   3,
+   6,
+   12,
+   24
+  ],
+  "cd_unit": "4h-bar, engine x16 internally",
+  "knee_cut": 0.2,
+  "knee_rule": "turnover cut>=20% vs base + FULL sharpe>=base; min turnover wins",
+  "uniform_cells": 4,
+  "percoin_runs": 20,
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 35040.0,
+  "scale": 16,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "h2_start": 17520,
+  "smoke": false,
+  "note": "uniform cd {3,6,12,24} + per-coin cd sensitivity; sl/ts locked. E10 FORMULA untouched; live chain untouched; offline read-only."
+ },
+ "base_FULL": {
+  "sharpe": 26.111,
+  "ann": 19.6033,
+  "mdd": 0.2901,
+  "cum": 19.6033,
+  "final_x": 20.6033,
+  "n": 35040,
+  "turnover": 0.007466,
+  "trades": 647
+ },
+ "base_H2_sharpe": 33.824,
+ "base_H2_trades": 322,
+ "uniform_rows": [
+  {
+   "cd": 3,
+   "FULL": {
+    "sharpe": 21.731,
+    "ann": 19.3196,
+    "mdd": 0.5144,
+    "cum": 19.3196,
+    "final_x": 20.3196,
+    "n": 35040,
+    "turnover": 0.018208,
+    "trades": 1568
+   },
+   "H2_sharpe": 31.629,
+   "H2_trades": 784,
+   "d_sharpe_vs_base": -4.38,
+   "d_mdd_vs_base": 0.2243,
+   "d_turnover_vs_base": 0.010742,
+   "turnover_cut_vs_base": -1.4388
+  },
+  {
+   "cd": 6,
+   "FULL": {
+    "sharpe": 27.102,
+    "ann": 19.0199,
+    "mdd": 0.2466,
+    "cum": 19.0199,
+    "final_x": 20.0199,
+    "n": 35040,
+    "turnover": 0.010023,
+    "trades": 865
+   },
+   "H2_sharpe": 32.189,
+   "H2_trades": 430,
+   "d_sharpe_vs_base": 0.991,
+   "d_mdd_vs_base": -0.0435,
+   "d_turnover_vs_base": 0.002557,
+   "turnover_cut_vs_base": -0.3425
+  },
+  {
+   "cd": 12,
+   "FULL": {
+    "sharpe": 18.62,
+    "ann": 18.3742,
+    "mdd": 0.6756,
+    "cum": 18.3742,
+    "final_x": 19.3742,
+    "n": 35040,
+    "turnover": 0.005457,
+    "trades": 472
+   },
+   "H2_sharpe": 33.64,
+   "H2_trades": 238,
+   "d_sharpe_vs_base": -7.491,
+   "d_mdd_vs_base": 0.3855,
+   "d_turnover_vs_base": -0.002009,
+   "turnover_cut_vs_base": 0.2691
+  },
+  {
+   "cd": 24,
+   "FULL": {
+    "sharpe": 20.266,
+    "ann": 18.3514,
+    "mdd": 0.5755,
+    "cum": 18.3514,
+    "final_x": 19.3514,
+    "n": 35040,
+    "turnover": 0.005183,
+    "trades": 453
+   },
+   "H2_sharpe": 29.684,
+   "H2_trades": 228,
+   "d_sharpe_vs_base": -5.845,
+   "d_mdd_vs_base": 0.2854,
+   "d_turnover_vs_base": -0.002283,
+   "turnover_cut_vs_base": 0.3058
+  }
+ ],
+ "percoin_rows": [
+  {
+   "coin": "ETC",
+   "cd": 3,
+   "FULL": {
+    "sharpe": 28.095,
+    "ann": 19.5484,
+    "mdd": 0.149,
+    "cum": 19.5484,
+    "final_x": 20.5484,
+    "n": 35040,
+    "turnover": 0.010388,
+    "trades": 896
+   },
+   "H2_sharpe": 32.032,
+   "H2_trades": 447,
+   "d_sharpe_vs_base": 1.984,
+   "d_mdd_vs_base": -0.1411,
+   "d_turnover_vs_base": 0.002922
+  },
+  {
+   "coin": "ETC",
+   "cd": 6,
+   "FULL": {
+    "sharpe": 25.111,
+    "ann": 19.2729,
+    "mdd": 0.2881,
+    "cum": 19.2729,
+    "final_x": 20.2729,
+    "n": 35040,
+    "turnover": 0.008733,
+    "trades": 757
+   },
+   "H2_sharpe": 32.714,
+   "H2_trades": 376,
+   "d_sharpe_vs_base": -1.0,
+   "d_mdd_vs_base": -0.002,
+   "d_turnover_vs_base": 0.001267
+  },
+  {
+   "coin": "ETC",
+   "cd": 12,
+   "FULL": {
+    "sharpe": 25.849,
+    "ann": 19.5307,
+    "mdd": 0.2901,
+    "cum": 19.5307,
+    "final_x": 20.5307,
+    "n": 35040,
+    "turnover": 0.007785,
+    "trades": 676
+   },
+   "H2_sharpe": 33.131,
+   "H2_trades": 336,
+   "d_sharpe_vs_base": -0.262,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.000319
+  },
+  {
+   "coin": "ETC",
+   "cd": 24,
+   "FULL": {
+    "sharpe": 27.629,
+    "ann": 19.0731,
+    "mdd": 0.1616,
+    "cum": 19.0731,
+    "final_x": 20.0731,
+    "n": 35040,
+    "turnover": 0.00782,
+    "trades": 678
+   },
+   "H2_sharpe": 33.018,
+   "H2_trades": 337,
+   "d_sharpe_vs_base": 1.518,
+   "d_mdd_vs_base": -0.1285,
+   "d_turnover_vs_base": 0.000354
+  },
+  {
+   "coin": "TRX",
+   "cd": 3,
+   "FULL": {
+    "sharpe": 26.481,
+    "ann": 19.6929,
+    "mdd": 0.3005,
+    "cum": 19.6929,
+    "final_x": 20.6929,
+    "n": 35040,
+    "turnover": 0.009121,
+    "trades": 784
+   },
+   "H2_sharpe": 34.02,
+   "H2_trades": 391,
+   "d_sharpe_vs_base": 0.37,
+   "d_mdd_vs_base": 0.0104,
+   "d_turnover_vs_base": 0.001655
+  },
+  {
+   "coin": "TRX",
+   "cd": 6,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "trades": 647
+   },
+   "H2_sharpe": 33.824,
+   "H2_trades": 322,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "coin": "TRX",
+   "cd": 12,
+   "FULL": {
+    "sharpe": 25.459,
+    "ann": 19.3988,
+    "mdd": 0.3033,
+    "cum": 19.3988,
+    "final_x": 20.3988,
+    "n": 35040,
+    "turnover": 0.006541,
+    "trades": 567
+   },
+   "H2_sharpe": 33.468,
+   "H2_trades": 283,
+   "d_sharpe_vs_base": -0.652,
+   "d_mdd_vs_base": 0.0132,
+   "d_turnover_vs_base": -0.000925
+  },
+  {
+   "coin": "TRX",
+   "cd": 24,
+   "FULL": {
+    "sharpe": 25.556,
+    "ann": 19.5112,
+    "mdd": 0.3033,
+    "cum": 19.5112,
+    "final_x": 20.5112,
+    "n": 35040,
+    "turnover": 0.006553,
+    "trades": 571
+   },
+   "H2_sharpe": 33.81,
+   "H2_trades": 285,
+   "d_sharpe_vs_base": -0.555,
+   "d_mdd_vs_base": 0.0132,
+   "d_turnover_vs_base": -0.000913
+  },
+  {
+   "coin": "ATOM",
+   "cd": 3,
+   "FULL": {
+    "sharpe": 25.518,
+    "ann": 19.3693,
+    "mdd": 0.332,
+    "cum": 19.3693,
+    "final_x": 20.3693,
+    "n": 35040,
+    "turnover": 0.009053,
+    "trades": 786
+   },
+   "H2_sharpe": 33.394,
+   "H2_trades": 393,
+   "d_sharpe_vs_base": -0.593,
+   "d_mdd_vs_base": 0.0419,
+   "d_turnover_vs_base": 0.001587
+  },
+  {
+   "coin": "ATOM",
+   "cd": 6,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "trades": 647
+   },
+   "H2_sharpe": 33.824,
+   "H2_trades": 322,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "coin": "ATOM",
+   "cd": 12,
+   "FULL": {
+    "sharpe": 25.292,
+    "ann": 18.9976,
+    "mdd": 0.332,
+    "cum": 18.9976,
+    "final_x": 19.9976,
+    "n": 35040,
+    "turnover": 0.006667,
+    "trades": 576
+   },
+   "H2_sharpe": 33.41,
+   "H2_trades": 289,
+   "d_sharpe_vs_base": -0.819,
+   "d_mdd_vs_base": 0.0419,
+   "d_turnover_vs_base": -0.000799
+  },
+  {
+   "coin": "ATOM",
+   "cd": 24,
+   "FULL": {
+    "sharpe": 25.729,
+    "ann": 19.327,
+    "mdd": 0.332,
+    "cum": 19.327,
+    "final_x": 20.327,
+    "n": 35040,
+    "turnover": 0.006313,
+    "trades": 548
+   },
+   "H2_sharpe": 33.486,
+   "H2_trades": 273,
+   "d_sharpe_vs_base": -0.382,
+   "d_mdd_vs_base": 0.0419,
+   "d_turnover_vs_base": -0.001153
+  },
+  {
+   "coin": "APT",
+   "cd": 3,
+   "FULL": {
+    "sharpe": 25.515,
+    "ann": 19.3409,
+    "mdd": 0.2901,
+    "cum": 19.3409,
+    "final_x": 20.3409,
+    "n": 35040,
+    "turnover": 0.010365,
+    "trades": 898
+   },
+   "H2_sharpe": 32.561,
+   "H2_trades": 446,
+   "d_sharpe_vs_base": -0.596,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.002899
+  },
+  {
+   "coin": "APT",
+   "cd": 6,
+   "FULL": {
+    "sharpe": 28.237,
+    "ann": 19.3503,
+    "mdd": 0.2169,
+    "cum": 19.3503,
+    "final_x": 20.3503,
+    "n": 35040,
+    "turnover": 0.008756,
+    "trades": 755
+   },
+   "H2_sharpe": 32.862,
+   "H2_trades": 376,
+   "d_sharpe_vs_base": 2.126,
+   "d_mdd_vs_base": -0.0732,
+   "d_turnover_vs_base": 0.00129
+  },
+  {
+   "coin": "APT",
+   "cd": 12,
+   "FULL": {
+    "sharpe": 25.897,
+    "ann": 19.192,
+    "mdd": 0.2538,
+    "cum": 19.192,
+    "final_x": 20.192,
+    "n": 35040,
+    "turnover": 0.007785,
+    "trades": 675
+   },
+   "H2_sharpe": 33.225,
+   "H2_trades": 336,
+   "d_sharpe_vs_base": -0.214,
+   "d_mdd_vs_base": -0.0363,
+   "d_turnover_vs_base": 0.000319
+  },
+  {
+   "coin": "APT",
+   "cd": 24,
+   "FULL": {
+    "sharpe": 25.74,
+    "ann": 19.4205,
+    "mdd": 0.2901,
+    "cum": 19.4205,
+    "final_x": 20.4205,
+    "n": 35040,
+    "turnover": 0.007797,
+    "trades": 676
+   },
+   "H2_sharpe": 32.131,
+   "H2_trades": 337,
+   "d_sharpe_vs_base": -0.371,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.000331
+  },
+  {
+   "coin": "KAS",
+   "cd": 3,
+   "FULL": {
+    "sharpe": 20.431,
+    "ann": 19.7811,
+    "mdd": 0.664,
+    "cum": 19.7811,
+    "final_x": 20.7811,
+    "n": 35040,
+    "turnover": 0.009144,
+    "trades": 792
+   },
+   "H2_sharpe": 34.724,
+   "H2_trades": 395,
+   "d_sharpe_vs_base": -5.68,
+   "d_mdd_vs_base": 0.3739,
+   "d_turnover_vs_base": 0.001678
+  },
+  {
+   "coin": "KAS",
+   "cd": 6,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "trades": 647
+   },
+   "H2_sharpe": 33.824,
+   "H2_trades": 322,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "coin": "KAS",
+   "cd": 12,
+   "FULL": {
+    "sharpe": 20.31,
+    "ann": 19.6682,
+    "mdd": 0.664,
+    "cum": 19.6682,
+    "final_x": 20.6682,
+    "n": 35040,
+    "turnover": 0.006541,
+    "trades": 566
+   },
+   "H2_sharpe": 34.37,
+   "H2_trades": 282,
+   "d_sharpe_vs_base": -5.801,
+   "d_mdd_vs_base": 0.3739,
+   "d_turnover_vs_base": -0.000925
+  },
+  {
+   "coin": "KAS",
+   "cd": 24,
+   "FULL": {
+    "sharpe": 20.077,
+    "ann": 19.4328,
+    "mdd": 0.664,
+    "cum": 19.4328,
+    "final_x": 20.4328,
+    "n": 35040,
+    "turnover": 0.006564,
+    "trades": 568
+   },
+   "H2_sharpe": 33.515,
+   "H2_trades": 284,
+   "d_sharpe_vs_base": -6.034,
+   "d_mdd_vs_base": 0.3739,
+   "d_turnover_vs_base": -0.000902
+  }
+ ],
+ "percoin_best": {
+  "ETC": {
+   "cd": 3,
+   "FULL": {
+    "sharpe": 28.095,
+    "ann": 19.5484,
+    "mdd": 0.149,
+    "cum": 19.5484,
+    "final_x": 20.5484,
+    "n": 35040,
+    "turnover": 0.010388,
+    "trades": 896
+   },
+   "H2_sharpe": 32.032
+  },
+  "TRX": {
+   "cd": 3,
+   "FULL": {
+    "sharpe": 26.481,
+    "ann": 19.6929,
+    "mdd": 0.3005,
+    "cum": 19.6929,
+    "final_x": 20.6929,
+    "n": 35040,
+    "turnover": 0.009121,
+    "trades": 784
+   },
+   "H2_sharpe": 34.02
+  },
+  "ATOM": {
+   "cd": 6,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "trades": 647
+   },
+   "H2_sharpe": 33.824
+  },
+  "APT": {
+   "cd": 6,
+   "FULL": {
+    "sharpe": 28.237,
+    "ann": 19.3503,
+    "mdd": 0.2169,
+    "cum": 19.3503,
+    "final_x": 20.3503,
+    "n": 35040,
+    "turnover": 0.008756,
+    "trades": 755
+   },
+   "H2_sharpe": 32.862
+  },
+  "KAS": {
+   "cd": 6,
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "trades": 647
+   },
+   "H2_sharpe": 33.824
+  }
+ },
+ "best_no_drop_dd_min": {
+  "cd": 6,
+  "FULL": {
+   "sharpe": 27.102,
+   "ann": 19.0199,
+   "mdd": 0.2466,
+   "cum": 19.0199,
+   "final_x": 20.0199,
+   "n": 35040,
+   "turnover": 0.010023,
+   "trades": 865
+  },
+  "H2_sharpe": 32.189,
+  "H2_trades": 430,
+  "d_sharpe_vs_base": 0.991,
+  "d_mdd_vs_base": -0.0435,
+  "d_turnover_vs_base": 0.002557,
+  "turnover_cut_vs_base": -0.3425
+ },
+ "best_note": "min FULL mdd among uniform cells with sharpe>=base: cd=6",
+ "knee": null,
+ "knee_note": "no uniform cell with turnover cut>=20% + sharpe no-drop; knee=null",
+ "verdict": "PENDING",
+ "decision": "PENDING",
+ "conclusion": "PENDING (P0-3 FAIL): Z2 15m cooldown sweep diagnostic only; knee + no-drop dd-min selections are shelf value, no adoption, no live change, live untouched."
+}
