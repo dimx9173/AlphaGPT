@@ -1,0 +1,394 @@
+{
+ "meta": {
+  "iter": "Z10",
+  "scope": "Top5 15m-native (ETC/TRX/ATOM/APT/KAS)",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "baseline": {
+  "FULL_sharpe": 26.111,
+  "FULL_mdd": 0.2901,
+  "source": "Z1-Z9 base FULL (Top5 15m-native, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "Z1",
+   "file": "results/iter_Z1_tp.json",
+   "topic": "take-profit sweep",
+   "status": "done",
+   "sharpe_gain": 2.237,
+   "sharpe_gain_note": "FULL-vs-base no-drop dd-min tp0.1 trail0.03",
+   "dd_cut_pct": 44.02,
+   "robustness": 5.0,
+   "detail": "4 cells tp x trail; best-no-drop tp=0.1 trail=0.03 sharpe 28.348(+2.237) mdd 0.1624(-44.0%) turnover 0.014566; PENDING shelf",
+   "conclusion_zh": "Z1 tp=0.1+trail=0.03 paper +2.24/-44pct but turnover doubled, shelf only, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "Z2",
+   "file": "results/iter_Z2_cd.json",
+   "topic": "cooldown sweep",
+   "status": "done",
+   "sharpe_gain": 1.984,
+   "sharpe_gain_note": "FULL-vs-base no-drop dd-min per-coin ETC cd3",
+   "dd_cut_pct": 48.64,
+   "robustness": 6.0,
+   "detail": "uniform cd 3/6/12/24 knee=null; no-drop best ETC cd3 sharpe 28.095(+1.984) mdd 0.149(-48.6%); PENDING",
+   "conclusion_zh": "Z2 no knee; single-coin ETC cd3 best paper value, not uniform, shelf only, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "Z3",
+   "file": "results/iter_Z3_ts.json",
+   "topic": "time-stop sweep",
+   "status": "done",
+   "sharpe_gain": 0.001,
+   "sharpe_gain_note": "FULL-vs-base no-drop dd-min per-coin APT ts12",
+   "dd_cut_pct": 0.69,
+   "robustness": 6.0,
+   "detail": "uniform ts 12/24/36/48 flat; best APT ts12 +0.001; keep locked ts24; PENDING",
+   "conclusion_zh": "Z3 time-stop flat (best +0.001), keep locked ts24, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "Z4",
+   "file": "results/iter_Z4_vw.json",
+   "topic": "vol-window sweep",
+   "status": "done",
+   "sharpe_gain": 7.26,
+   "sharpe_gain_note": "FULL-vs-base best cell vt0.006_vw6",
+   "dd_cut_pct": 44.26,
+   "robustness": 5.0,
+   "detail": "vw x vt 9 cells; best vt0.006_vw6 sharpe 33.371(+7.26) mdd 0.1617(-44.3%) turnover 0.0157; vt=None flat; NO_CHANGE; PENDING",
+   "conclusion_zh": "Z4 vt0.006_vw6 paper +7.26/-44pct but turnover doubled, default unchanged, shelved, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "Z5",
+   "file": "results/iter_Z5_q.json",
+   "topic": "quantile sweep",
+   "status": "done",
+   "sharpe_gain": 0.2,
+   "sharpe_gain_note": "FULL-vs-base best q0.4",
+   "dd_cut_pct": 0.69,
+   "robustness": 7.0,
+   "detail": "q 0.1-0.5 best q0.4 sharpe 26.311(+0.2); knee q0.4 fee2x; q0.3 gap +2.1pct not isolated; KEEP_q0.3; PENDING",
+   "conclusion_zh": "Z5 q0.4 knee but gain only +0.2, keep q0.3, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "Z6",
+   "file": "results/iter_Z6_ls.json",
+   "topic": "long/short attribution",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "attribution-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 7.0,
+   "detail": "per-coin LONG vs SHORT: SHORT dominates, LONG sharpe<=0; bear ~2/3 cum; NO_ADOPTION diagnostic; PENDING",
+   "conclusion_zh": "Z6 SHORT dominates LONG nil, diagnostic only, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "Z7",
+   "file": "results/iter_Z7_fee.json",
+   "topic": "fee sensitivity",
+   "status": "done",
+   "sharpe_gain": 0.139,
+   "sharpe_gain_note": "FULL-vs-base fee 0.0002",
+   "dd_cut_pct": 0.03,
+   "robustness": 6.0,
+   "detail": "fee grid monotone down turnover flat; breakeven fee 0.037778 far above grid; diagnostic; PENDING",
+   "conclusion_zh": "Z7 fee monotone slight down, breakeven 0.0378 far away, diagnostic only, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "Z8",
+   "file": "results/iter_Z8_slip.json",
+   "topic": "slip sensitivity",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "stress-relative slip0-vs-base",
+   "dd_cut_pct": 0.0,
+   "robustness": 6.0,
+   "detail": "slip 0-20bp monotone down slope -0.0706/bp drop -1.412 turnover flat; diagnostic; PENDING",
+   "conclusion_zh": "Z8 slip linear slight down turnover flat, diagnostic only, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "Z9",
+   "file": "results/iter_Z9_h1h2.json",
+   "topic": "H1/H2 stability",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "stability-n/a",
+   "dd_cut_pct": 0.0,
+   "robustness": 5.0,
+   "detail": "split-half rank corr 0.1 low sign-match 1.0; TRX leads both; NO_ADOPTION_KEEP_EQUAL; PENDING",
+   "conclusion_zh": "Z9 H1/H2 rank corr 0.1 weak but sign consistent, keep equal, no demo.",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "Z4",
+   "rank": 1,
+   "value": 7.26
+  },
+  {
+   "round": "Z1",
+   "rank": 2,
+   "value": 2.237
+  },
+  {
+   "round": "Z2",
+   "rank": 3,
+   "value": 1.984
+  },
+  {
+   "round": "Z5",
+   "rank": 4,
+   "value": 0.2
+  },
+  {
+   "round": "Z7",
+   "rank": 5,
+   "value": 0.139
+  },
+  {
+   "round": "Z3",
+   "rank": 6,
+   "value": 0.001
+  },
+  {
+   "round": "Z6",
+   "rank": 7,
+   "value": 0.0
+  },
+  {
+   "round": "Z8",
+   "rank": 7,
+   "value": 0.0
+  },
+  {
+   "round": "Z9",
+   "rank": 7,
+   "value": 0.0
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "Z2",
+   "rank": 1,
+   "value": 48.64
+  },
+  {
+   "round": "Z4",
+   "rank": 2,
+   "value": 44.26
+  },
+  {
+   "round": "Z1",
+   "rank": 3,
+   "value": 44.02
+  },
+  {
+   "round": "Z3",
+   "rank": 4,
+   "value": 0.69
+  },
+  {
+   "round": "Z5",
+   "rank": 4,
+   "value": 0.69
+  },
+  {
+   "round": "Z7",
+   "rank": 6,
+   "value": 0.03
+  },
+  {
+   "round": "Z6",
+   "rank": 7,
+   "value": 0.0
+  },
+  {
+   "round": "Z8",
+   "rank": 7,
+   "value": 0.0
+  },
+  {
+   "round": "Z9",
+   "rank": 7,
+   "value": 0.0
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "Z5",
+   "rank": 1,
+   "value": 7.0
+  },
+  {
+   "round": "Z6",
+   "rank": 1,
+   "value": 7.0
+  },
+  {
+   "round": "Z2",
+   "rank": 3,
+   "value": 6.0
+  },
+  {
+   "round": "Z3",
+   "rank": 3,
+   "value": 6.0
+  },
+  {
+   "round": "Z7",
+   "rank": 3,
+   "value": 6.0
+  },
+  {
+   "round": "Z8",
+   "rank": 3,
+   "value": 6.0
+  },
+  {
+   "round": "Z1",
+   "rank": 7,
+   "value": 5.0
+  },
+  {
+   "round": "Z4",
+   "rank": 7,
+   "value": 5.0
+  },
+  {
+   "round": "Z9",
+   "rank": 7,
+   "value": 5.0
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "Z2",
+   "rank": 1,
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 1,
+    "robust": 3
+   }
+  },
+  {
+   "round": "Z5",
+   "rank": 2,
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 4,
+    "robust": 1
+   }
+  },
+  {
+   "round": "Z4",
+   "rank": 3,
+   "rank_sum": 10,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 2,
+    "robust": 7
+   }
+  },
+  {
+   "round": "Z1",
+   "rank": 4,
+   "rank_sum": 12,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 3,
+    "robust": 7
+   }
+  },
+  {
+   "round": "Z3",
+   "rank": 5,
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 4,
+    "robust": 3
+   }
+  },
+  {
+   "round": "Z7",
+   "rank": 6,
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 6,
+    "robust": 3
+   }
+  },
+  {
+   "round": "Z6",
+   "rank": 7,
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 7,
+    "robust": 1
+   }
+  },
+  {
+   "round": "Z8",
+   "rank": 8,
+   "rank_sum": 17,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 7,
+    "robust": 3
+   }
+  },
+  {
+   "round": "Z9",
+   "rank": 9,
+   "rank_sum": 21,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 7,
+    "robust": 7
+   }
+  }
+ ],
+ "caveats": [
+  "Z4 gain is vt0.006 paper value (turnover doubled, vt changed), default NO_CHANGE shelved, not adoptable.",
+  "Z1 take-profit gain comes with doubled turnover (0.0146 vs 0.0075), shelf value only.",
+  "Z2 best is single-coin ETC cd3 not uniform; uniform knee=null no feasible cut.",
+  "Z5/Z7/Z8/Z3 micro-gains or diagnostic-only; Z6/Z9 attribution/stability read-only; all 9 PENDING(P0-3 FAIL)."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
