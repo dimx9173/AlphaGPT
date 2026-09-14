@@ -1,0 +1,282 @@
+{
+ "config": {
+  "engine": "mirror run_iter_y7_lev leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 15m native cd/ts/vw x16; early-exit K bars before opposite-signal flip (oracle lookahead, diagnostic only)",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "ks": [
+   0,
+   1,
+   2
+  ],
+  "venue": "aster",
+  "lev_locked": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "grid": "15m",
+  "grid_bars": 35040,
+  "bpy": 35040.0,
+  "scale": 16,
+  "oracle": true,
+  "note": "K>0 uses future flip time; not tradable; live untouched"
+ },
+ "rows": {
+  "0": {
+   "FULL": {
+    "sharpe": 26.111,
+    "ann": 19.6033,
+    "mdd": 0.2901,
+    "cum": 19.6033,
+    "final_x": 20.6033,
+    "n": 35040,
+    "turnover": 0.007466,
+    "trades": 647,
+    "entries": 647,
+    "exits": 647,
+    "flips": 7,
+    "changes": 1299,
+    "by_coin": {
+     "ETC": {
+      "trades": 59,
+      "entries": 59,
+      "exits": 59,
+      "flips": 1,
+      "changes": 119
+     },
+     "TRX": {
+      "trades": 166,
+      "entries": 166,
+      "exits": 166,
+      "flips": 4,
+      "changes": 336
+     },
+     "ATOM": {
+      "trades": 193,
+      "entries": 193,
+      "exits": 193,
+      "flips": 2,
+      "changes": 388
+     },
+     "APT": {
+      "trades": 60,
+      "entries": 60,
+      "exits": 60,
+      "flips": 0,
+      "changes": 119
+     },
+     "KAS": {
+      "trades": 169,
+      "entries": 169,
+      "exits": 169,
+      "flips": 0,
+      "changes": 337
+     }
+    }
+   }
+  },
+  "1": {
+   "FULL": {
+    "sharpe": 26.131,
+    "ann": 19.531,
+    "mdd": 0.2902,
+    "cum": 19.531,
+    "final_x": 20.531,
+    "n": 35040,
+    "turnover": 0.007466,
+    "trades": 654,
+    "entries": 654,
+    "exits": 654,
+    "flips": 0,
+    "changes": 1306,
+    "by_coin": {
+     "ETC": {
+      "trades": 60,
+      "entries": 60,
+      "exits": 60,
+      "flips": 0,
+      "changes": 120
+     },
+     "TRX": {
+      "trades": 170,
+      "entries": 170,
+      "exits": 170,
+      "flips": 0,
+      "changes": 340
+     },
+     "ATOM": {
+      "trades": 195,
+      "entries": 195,
+      "exits": 195,
+      "flips": 0,
+      "changes": 390
+     },
+     "APT": {
+      "trades": 60,
+      "entries": 60,
+      "exits": 60,
+      "flips": 0,
+      "changes": 119
+     },
+     "KAS": {
+      "trades": 169,
+      "entries": 169,
+      "exits": 169,
+      "flips": 0,
+      "changes": 337
+     }
+    }
+   }
+  },
+  "2": {
+   "FULL": {
+    "sharpe": 25.447,
+    "ann": 18.8756,
+    "mdd": 0.292,
+    "cum": 18.8756,
+    "final_x": 19.8756,
+    "n": 35040,
+    "turnover": 0.007466,
+    "trades": 654,
+    "entries": 654,
+    "exits": 654,
+    "flips": 0,
+    "changes": 1306,
+    "by_coin": {
+     "ETC": {
+      "trades": 60,
+      "entries": 60,
+      "exits": 60,
+      "flips": 0,
+      "changes": 120
+     },
+     "TRX": {
+      "trades": 170,
+      "entries": 170,
+      "exits": 170,
+      "flips": 0,
+      "changes": 340
+     },
+     "ATOM": {
+      "trades": 195,
+      "entries": 195,
+      "exits": 195,
+      "flips": 0,
+      "changes": 390
+     },
+     "APT": {
+      "trades": 60,
+      "entries": 60,
+      "exits": 60,
+      "flips": 0,
+      "changes": 119
+     },
+     "KAS": {
+      "trades": 169,
+      "entries": 169,
+      "exits": 169,
+      "flips": 0,
+      "changes": 337
+     }
+    }
+   }
+  }
+ },
+ "compare": {
+  "sharpe_by_k": {
+   "0": 26.111,
+   "1": 26.131,
+   "2": 25.447
+  },
+  "trades_by_k": {
+   "0": 647,
+   "1": 654,
+   "2": 654
+  },
+  "turnover_by_k": {
+   "0": 0.007466,
+   "1": 0.007466,
+   "2": 0.007466
+  },
+  "d_sharpe_vs_hold": {
+   "1": 0.02,
+   "2": -0.664
+  },
+  "d_trades_vs_hold": {
+   "1": 7,
+   "2": 7
+  }
+ },
+ "verdict": "PENDING",
+ "decision": "KEEP_HOLD_TO_FLIP",
+ "decision_note": "P0-3 FAIL => verdict PENDING; oracle early-exit diagnostic only, hold-to-flip stays, no adoption, live untouched."
+}
