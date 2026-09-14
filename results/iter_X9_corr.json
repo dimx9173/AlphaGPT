@@ -1,0 +1,107 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.common4h (15m x16 -> 4h closes); rolling 60-bar Pearson on simple returns; offline read-only",
+  "basket_source": "results/grid_coarse.json config.weights",
+  "coins": [
+   "APT",
+   "ATOM",
+   "ETC",
+   "KAS",
+   "TRX"
+  ],
+  "window": 60,
+  "thresholds": {
+   "high": 0.6,
+   "cut": 0.7,
+   "halt": 0.85
+  },
+  "n_bars": 6135,
+  "n_win": 6075,
+  "note": "E10 FORMULA untouched; live chain untouched; P0-3 FAIL => PENDING"
+ },
+ "pairs": {
+  "APT-ATOM": {
+   "mean": 0.702,
+   "max": 0.945,
+   "share_gt_0.6": 0.7676
+  },
+  "APT-ETC": {
+   "mean": 0.713,
+   "max": 0.961,
+   "share_gt_0.6": 0.7656
+  },
+  "APT-KAS": {
+   "mean": 0.576,
+   "max": 0.907,
+   "share_gt_0.6": 0.5063
+  },
+  "APT-TRX": {
+   "mean": 0.372,
+   "max": 0.931,
+   "share_gt_0.6": 0.1802
+  },
+  "ATOM-ETC": {
+   "mean": 0.732,
+   "max": 0.981,
+   "share_gt_0.6": 0.7974
+  },
+  "ATOM-KAS": {
+   "mean": 0.592,
+   "max": 0.969,
+   "share_gt_0.6": 0.5192
+  },
+  "ATOM-TRX": {
+   "mean": 0.402,
+   "max": 0.936,
+   "share_gt_0.6": 0.2018
+  },
+  "ETC-KAS": {
+   "mean": 0.615,
+   "max": 0.971,
+   "share_gt_0.6": 0.5877
+  },
+  "ETC-TRX": {
+   "mean": 0.413,
+   "max": 0.906,
+   "share_gt_0.6": 0.2265
+  },
+  "KAS-TRX": {
+   "mean": 0.339,
+   "max": 0.864,
+   "share_gt_0.6": 0.1539
+  }
+ },
+ "aggregate": {
+  "avg_max": 0.805,
+  "max_max": 0.981,
+  "q50_max": 0.827,
+  "q75_max": 0.891,
+  "q90_max": 0.921,
+  "q95_max": 0.935,
+  "q99_max": 0.954,
+  "share_max_gt_0.6": 0.964,
+  "share_max_gt_0.7": 0.8086,
+  "share_max_gt_0.85": 0.416,
+  "avg_mean": 0.546,
+  "max_mean": 0.888,
+  "share_mean_gt_0.6": 0.3695,
+  "share_mean_gt_0.4": 0.8273
+ },
+ "diversification": {
+  "verdict": "LIMITED",
+  "reason": "max_corr>0.6 in 96.4% of windows (avg_max=0.805); mean_corr avg=0.546; TRX legs least correlated, ETC/ATOM/APT block most correlated"
+ },
+ "breaker": {
+  "rule": "max_corr>0.85 -> lev_scale 0.25 (halt new opens); max_corr>0.7 -> lev_scale 0.5; mean_corr>0.6 -> lev_scale 0.5; else 1.0; recover only after max_corr<0.6 for 12 bars (hysteresis)",
+  "default": "OFF",
+  "env": "Y1B_CORR_BRAKE",
+  "example": {
+   "max_corr>0.7": 0.5,
+   "max_corr>0.85": 0.25
+  }
+ },
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "NO_CHANGE",
+ "decision_note": "P0-3 permutation FAIL => X9 verdict PENDING; breaker is recommendation only, live default stays OFF.",
+ "conclusion": "待定 (P0-3 FAIL): Top5 rolling-60 corr high (max>0.6 96.4%), diversification LIMITED; breaker rec max>0.7 halve, max>0.85 quarter, default OFF"
+}
