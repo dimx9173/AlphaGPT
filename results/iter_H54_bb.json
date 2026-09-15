@@ -1,0 +1,436 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; BB(96,2) outside-band entry gate on both legs pre-cooldown; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 8760.0,
+  "grid": "1h",
+  "scale": 4,
+  "data_dir": "data/data_1y/1h",
+  "bb": {
+   "window": 96,
+   "window_hours": 96.0,
+   "k": 2.0,
+   "method": "SMA(96) +/- k * population-SD(96), causal current-bar inclusive",
+   "gate": "entry only outside band: close > upper OR close < lower (both legs)",
+   "warmup_value": "neutral (both legs closed)",
+   "warmup_bars": 96,
+   "applied": "on both legs pre-cooldown (post quantile mask)"
+  },
+  "note": "E10 FORMULA untouched; live default untouched; offline read-only",
+  "grid_bars": 8760,
+  "h2_start": 4380,
+  "smoke": false,
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ]
+ },
+ "coins": {
+  "ETC": {
+   "FULL": {
+    "sharpe": 3.916,
+    "ann": 3.0912,
+    "mdd": 0.7171,
+    "cum": 3.0912,
+    "final_x": 4.0912,
+    "n": 8760,
+    "turnover": 0.010274,
+    "trades": 45,
+    "active_bars": 3221
+   },
+   "LONG": {
+    "sharpe": 0.688,
+    "ann": 0.0784,
+    "mdd": 0.0706,
+    "cum": 0.0784,
+    "final_x": 1.0784,
+    "n": 8760,
+    "turnover": 0.000228,
+    "trades": 1,
+    "active_bars": 73,
+    "pnl_share": 0.0254
+   },
+   "SHORT": {
+    "sharpe": 3.857,
+    "ann": 3.0128,
+    "mdd": 0.7171,
+    "cum": 3.0128,
+    "final_x": 4.0128,
+    "n": 8760,
+    "turnover": 0.010046,
+    "trades": 44,
+    "active_bars": 3148,
+    "pnl_share": 0.9746
+   },
+   "BASE_FULL": {
+    "sharpe": 5.156,
+    "ann": 5.0031,
+    "mdd": 0.5391,
+    "cum": 5.0031,
+    "final_x": 6.0031,
+    "n": 8760,
+    "turnover": 0.015068
+   },
+   "H2_FULL_sharpe": 2.955,
+   "bb": {
+    "width_mean": 1.012373,
+    "width_max": 8.908909,
+    "n_outside": 1189,
+    "frac_outside": 0.1357
+   }
+  },
+  "TRX": {
+   "FULL": {
+    "sharpe": 6.029,
+    "ann": 1.6635,
+    "mdd": 0.1202,
+    "cum": 1.6635,
+    "final_x": 2.6635,
+    "n": 8760,
+    "turnover": 0.020091,
+    "trades": 88,
+    "active_bars": 2284
+   },
+   "LONG": {
+    "sharpe": -2.06,
+    "ann": -0.2178,
+    "mdd": 0.2429,
+    "cum": -0.2178,
+    "final_x": 0.7822,
+    "n": 8760,
+    "turnover": 0.00137,
+    "trades": 6,
+    "active_bars": 150,
+    "pnl_share": -0.1309
+   },
+   "SHORT": {
+    "sharpe": 7.386,
+    "ann": 1.8813,
+    "mdd": 0.0628,
+    "cum": 1.8813,
+    "final_x": 2.8813,
+    "n": 8760,
+    "turnover": 0.018721,
+    "trades": 82,
+    "active_bars": 2134,
+    "pnl_share": 1.1309
+   },
+   "BASE_FULL": {
+    "sharpe": 12.624,
+    "ann": 4.6577,
+    "mdd": 0.0789,
+    "cum": 4.6577,
+    "final_x": 5.6577,
+    "n": 8760,
+    "turnover": 0.031735
+   },
+   "H2_FULL_sharpe": 9.061,
+   "bb": {
+    "width_mean": 0.01127,
+    "width_max": 0.051024,
+    "n_outside": 1295,
+    "frac_outside": 0.1478
+   }
+  },
+  "ATOM": {
+   "FULL": {
+    "sharpe": 3.922,
+    "ann": 3.2813,
+    "mdd": 0.3,
+    "cum": 3.2813,
+    "final_x": 4.2813,
+    "n": 8760,
+    "turnover": 0.022374,
+    "trades": 98,
+    "active_bars": 2168
+   },
+   "LONG": {
+    "sharpe": 0.677,
+    "ann": 0.0489,
+    "mdd": 0.0299,
+    "cum": 0.0489,
+    "final_x": 1.0489,
+    "n": 8760,
+    "turnover": 0.000228,
+    "trades": 1,
+    "active_bars": 25,
+    "pnl_share": 0.0149
+   },
+   "SHORT": {
+    "sharpe": 3.878,
+    "ann": 3.2324,
+    "mdd": 0.3,
+    "cum": 3.2324,
+    "final_x": 4.2324,
+    "n": 8760,
+    "turnover": 0.022146,
+    "trades": 97,
+    "active_bars": 2143,
+    "pnl_share": 0.9851
+   },
+   "BASE_FULL": {
+    "sharpe": 5.692,
+    "ann": 6.4742,
+    "mdd": 0.5199,
+    "cum": 6.4742,
+    "final_x": 7.4742,
+    "n": 8760,
+    "turnover": 0.039726
+   },
+   "H2_FULL_sharpe": 4.201,
+   "bb": {
+    "width_mean": 0.224215,
+    "width_max": 1.865943,
+    "n_outside": 1248,
+    "frac_outside": 0.1425
+   }
+  },
+  "APT": {
+   "FULL": {
+    "sharpe": 3.93,
+    "ann": 4.6083,
+    "mdd": 0.4725,
+    "cum": 4.6083,
+    "final_x": 5.6083,
+    "n": 8760,
+    "turnover": 0.010959,
+    "trades": 48,
+    "active_bars": 3511
+   },
+   "LONG": {
+    "sharpe": -0.084,
+    "ann": -0.0206,
+    "mdd": 0.2069,
+    "cum": -0.0206,
+    "final_x": 0.9794,
+    "n": 8760,
+    "turnover": 0.000457,
+    "trades": 2,
+    "active_bars": 146,
+    "pnl_share": -0.0045
+   },
+   "SHORT": {
+    "sharpe": 4.036,
+    "ann": 4.6289,
+    "mdd": 0.4725,
+    "cum": 4.6289,
+    "final_x": 5.6289,
+    "n": 8760,
+    "turnover": 0.010502,
+    "trades": 46,
+    "active_bars": 3365,
+    "pnl_share": 1.0045
+   },
+   "BASE_FULL": {
+    "sharpe": 5.927,
+    "ann": 7.9179,
+    "mdd": 0.4548,
+    "cum": 7.9179,
+    "final_x": 8.9179,
+    "n": 8760,
+    "turnover": 0.015068
+   },
+   "H2_FULL_sharpe": 3.764,
+   "bb": {
+    "width_mean": 0.220146,
+    "width_max": 2.633394,
+    "n_outside": 1240,
+    "frac_outside": 0.1416
+   }
+  },
+  "KAS": {
+   "FULL": {
+    "sharpe": 1.947,
+    "ann": 1.7181,
+    "mdd": 0.5755,
+    "cum": 1.7181,
+    "final_x": 2.7181,
+    "n": 8760,
+    "turnover": 0.020091,
+    "trades": 88,
+    "active_bars": 2223
+   },
+   "LONG": {
+    "sharpe": -0.622,
+    "ann": -0.1549,
+    "mdd": 0.3649,
+    "cum": -0.1549,
+    "final_x": 0.8451,
+    "n": 8760,
+    "turnover": 0.000685,
+    "trades": 3,
+    "active_bars": 75,
+    "pnl_share": -0.0901
+   },
+   "SHORT": {
+    "sharpe": 2.213,
+    "ann": 1.8729,
+    "mdd": 0.611,
+    "cum": 1.8729,
+    "final_x": 2.8729,
+    "n": 8760,
+    "turnover": 0.019406,
+    "trades": 85,
+    "active_bars": 2148,
+    "pnl_share": 1.0901
+   },
+   "BASE_FULL": {
+    "sharpe": 4.169,
+    "ann": 5.3711,
+    "mdd": 0.6402,
+    "cum": 5.3711,
+    "final_x": 6.3711,
+    "n": 8760,
+    "turnover": 0.031735
+   },
+   "H2_FULL_sharpe": 2.303,
+   "bb": {
+    "width_mean": 0.004787,
+    "width_max": 0.034018,
+    "n_outside": 1262,
+    "frac_outside": 0.1441
+   }
+  }
+ },
+ "basket": {
+  "FULL": {
+   "sharpe": 5.825,
+   "ann": 2.8725,
+   "mdd": 0.2463,
+   "cum": 2.8725,
+   "final_x": 3.8725,
+   "n": 8760,
+   "turnover": 0.016758
+  },
+  "LONG": {
+   "sharpe": -0.539,
+   "ann": -0.0532,
+   "mdd": 0.0865,
+   "cum": -0.0532,
+   "final_x": 0.9468,
+   "n": 8760,
+   "turnover": 0.000594,
+   "pnl_share": -0.0185
+  },
+  "SHORT": {
+   "sharpe": 5.959,
+   "ann": 2.9257,
+   "mdd": 0.2463,
+   "cum": 2.9257,
+   "final_x": 3.9257,
+   "n": 8760,
+   "turnover": 0.016164,
+   "pnl_share": 1.0185
+  },
+  "H2_FULL_sharpe": 6.102,
+  "coin_pnl_share": {
+   "ETC": 0.2152,
+   "TRX": 0.1158,
+   "ATOM": 0.2285,
+   "APT": 0.3209,
+   "KAS": 0.1196
+  }
+ },
+ "baseline": {
+  "basket_FULL": {
+   "sharpe": 8.514,
+   "ann": 5.8848,
+   "mdd": 0.1998,
+   "cum": 5.8848,
+   "final_x": 6.8848,
+   "n": 8760,
+   "turnover": 0.026667
+  },
+  "coin_FULL": {
+   "ETC": 5.0031,
+   "TRX": 4.6577,
+   "ATOM": 6.4742,
+   "APT": 7.9179,
+   "KAS": 5.3711
+  }
+ },
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "P0-3 permutation FAIL => H54 verdict PENDING; BB-gate attribution only, nothing promoted, live untouched.",
+ "status": "COMPLETE",
+ "conclusion": "PENDING (P0-3 FAIL): H54 1h BB(96,2) outside-band entry gate gated sh=5.825 vs base sh=8.514; diagnostic only, no adoption, no live change, live untouched."
+}
