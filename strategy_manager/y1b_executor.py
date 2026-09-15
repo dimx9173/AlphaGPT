@@ -69,7 +69,8 @@ def paper_mode() -> bool:
 # === P0-2 swap gates (E14/E15). ALL default OFF. ===
 # Y1B_HYST_EPS: sigmoid hysteresis band half-width (e.g. 0.1). When ON, a flip
 #   needs |sg-0.5| >= eps on the new side, else want degrades to 0 (hold).
-# Y1B_MIN_HOLD_BARS: min 4h bars to hold before a flip (e.g. 2). Uses
+# Y1B_MIN_HOLD_BARS: min bars to hold before a flip (bar unit follows
+#   Y1B_BAR: 4h bars in 4h mode, 15m bars in 15m mode). Uses
 #   PortfolioManager entry_time; risk-reducing closes (want==0/flat) exempt.
 # Y1B_COST_K: cost-aware flips. Expected edge per unit must exceed
 #   k*(fee2x + slip_bp + funding) else degrade flip to hold (close-only if
@@ -130,8 +131,13 @@ def apply_swap_gates(want: float, sg: float | None, coin: str, pm=None,
                     continue
             if hit is not None:
                 import time as _t
+                try:
+                    from strategy_manager.y1b_basket import bar_interval as _bi2
+                    _bar_h = 0.25 if _bi2() == "15m" else 4.0
+                except Exception:
+                    _bar_h = 4.0
                 age_h = (_t.time() - float(getattr(hit, "entry_time", 0) or 0)) / 3600.0
-                if 0 <= age_h < mh * 4.0:
+                if 0 <= age_h < mh * _bar_h:
                     return 0.0, "min-hold"
         except Exception:
             pass
@@ -320,10 +326,14 @@ async def sync_positions(broker, plans: list[Plan], pm, live: bool):
     return actions
 
 
-def decision_aligned(hour: int | None = None) -> bool:
-    """4h decision gate: only UTC hour%4==0 may open/flip. Default OFF."""
+def decision_aligned(hour: int | None = None, minute: int | None = None) -> bool:
+    """Decision gate: 4h mode only UTC hour%4==0 may open/flip; 15m mode every
+    cycle may decide (bars close every 15m). Default OFF (always True)."""
     import datetime as _dt
     if (__import__("os").getenv("Y1B_DECISION_ALIGN", "") or "").lower() not in {"1", "true", "yes"}:
+        return True
+    from strategy_manager.y1b_basket import bar_interval as _bi
+    if _bi() == "15m":
         return True
     h = hour if hour is not None else _dt.datetime.now(_dt.timezone.utc).hour
     return (h % 4) == 0

@@ -43,13 +43,51 @@ BASKET_5 = {
 }
 WEIGHTS_5 = {"ETC": 0.2, "TRX": 0.2, "ATOM": 0.2, "APT": 0.2, "KAS": 0.2}
 
+# === 15m mode (2026-09-14): Y1B_BAR=15m reads data/data_1y/15m directly,
+# no x16 aggregation. cd/ts/vw scale x16 (4h-bar units -> 15m-bar units),
+# bars_per_year 2190 -> 35040. Default 4h (legacy, unchanged).
+BAR_INTERVALS = ("4h", "15m")
+BPY_MAP = {"4h": 2190.0, "15m": 35040.0}
+AGG_MAP = {"4h": 16, "15m": 1}
+DATA_DIR_MAP = {"4h": "data/data_15m_3y", "15m": "data/data_1y/15m"}
+
+
+def bar_interval() -> str:
+    import os as _os
+    v = (_os.getenv("Y1B_BAR", "4h") or "4h").strip().lower()
+    return v if v in BAR_INTERVALS else "4h"
+
+
+def bars_per_year() -> float:
+    return BPY_MAP[bar_interval()]
+
+
+def _scale_spec(spec: dict) -> dict:
+    """Scale bar-count params (cd/ts/vw) 4h->15m when in 15m mode."""
+    if bar_interval() != "15m":
+        return spec
+    out = dict(spec)
+    for k in ("cd", "ts", "vw"):
+        try:
+            if out.get(k) is not None:
+                out[k] = int(out[k]) * 16
+        except (TypeError, ValueError):
+            pass
+    return out
+
+
 def load_bars_4h(coin: str, path: str | None = None):
-    p = path or f"data/data_15m_3y/{coin}.csv"
+    bi = bar_interval()
+    if path is None:
+        p = f"{DATA_DIR_MAP[bi]}/{coin}.csv"
+    else:
+        p = path
     rows = list(csv.DictReader(open(p)))
+    agg = AGG_MAP[bi]
     bars = []
-    for i in range(0, len(rows), 16):
-        blk = rows[i:i+16]
-        if len(blk) < 16:
+    for i in range(0, len(rows), agg):
+        blk = rows[i:i+agg]
+        if len(blk) < agg:
             break
         bars.append((float(blk[0]["open"]), max(float(x["high"]) for x in blk),
                      min(float(x["low"]) for x in blk), float(blk[-1]["close"]),
@@ -65,6 +103,7 @@ def _quantile_mask_long(sig, q):
     return (sig.detach().float().abs() >= thr).float()
 
 def leg_position(bars, spec: dict):
+    spec = _scale_spec(spec)
     n = len(bars)
     raw = {"open": torch.tensor([[x[0] for x in bars]]),
            "high": torch.tensor([[x[1] for x in bars]]),
@@ -77,7 +116,7 @@ def leg_position(bars, spec: dict):
     rets = [(bars[i+1][3]-bars[i][3])/bars[i][3] if i < n-1 else 0.0 for i in range(n)]
     bt = MemeBacktest(venue="aster", leverage=LEV, short_enabled=True,
                       funding_override=FUND, long_th=spec["lth"], short_th=spec["sth"],
-                      cooldown_bars=spec["cd"], bars_per_year=2190.0,
+                      cooldown_bars=spec["cd"], bars_per_year=bars_per_year(),
                       stop_loss=spec["sl"], time_stop=spec["ts"],
                       vol_target=spec["vt"], vol_window=spec["vw"])
     sg = torch.sigmoid(sig)
@@ -149,7 +188,7 @@ def realized_vol(closes, window=Y1B_VOL_WINDOW):
         return 0.0
     m = sum(r) / len(r)
     var = sum((x - m) ** 2 for x in r) / (len(r) - 1)
-    return _m.sqrt(max(var, 0.0)) * _m.sqrt(2190.0)
+    return _m.sqrt(max(var, 0.0)) * _m.sqrt(bars_per_year())
 
 
 def invvol_weights(vols: dict, lo=Y1B_W_MIN, hi=Y1B_W_MAX):
@@ -241,7 +280,7 @@ def weights_for_bars(bars_map: dict, mode: str | None = None,
                     cov = sum((mat[i][k] - means[i]) * (mat[j][k] - means[j])
                               for k in range(m)) / (m - 1)
                     pv += w[coins[i]] * w[coins[j]] * cov
-            port_vol = _m.sqrt(max(pv, 0.0)) * _m.sqrt(2190.0)
+            port_vol = _m.sqrt(max(pv, 0.0)) * _m.sqrt(bars_per_year())
             tgt = meta["vol_target"]
             scale = tgt / port_vol if port_vol > 1e-9 else 1.0
             scale = min(max(scale, Y1B_LEV_SCALE_MIN), Y1B_LEV_SCALE_MAX)
@@ -298,7 +337,7 @@ DD_BRAKE_DEFAULTS = {
     "half": 0.5,
 }
 DD_BRAKE_WINDOW = 60
-DD_BRAKE_BPY = 2190.0
+DD_BRAKE_BPY = None  # resolved via bars_per_year() at call time
 
 
 def _brake_env_on(name: str) -> bool:
@@ -334,8 +373,9 @@ def brakes_all_off() -> bool:
 
 
 def trailing_vol(rets: list, window: int = DD_BRAKE_WINDOW,
-                 bpy: float = DD_BRAKE_BPY) -> list:
+                 bpy: float | None = None) -> list:
     """Trailing sample-stdev annualized (causal window ending at t)."""
+    bpy = bpy or bars_per_year()
     import statistics as _st
     out = []
     for t in range(len(rets)):
