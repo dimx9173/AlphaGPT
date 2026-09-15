@@ -1,0 +1,401 @@
+{
+ "meta": {
+  "iter": "H30",
+  "scope": "Top5 1h-native (ETC/TRX/ATOM/APT/KAS) batch H21-H29",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "baseline": {
+  "FULL_sharpe": 8.514,
+  "FULL_mdd": 0.1998,
+  "source": "H1 base FULL (Top5 1h-native, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "H21",
+   "file": "results/iter_H21_tp.json",
+   "topic": "1h take-profit sweep (tp x trail 12 cells + no-drop dd-min)",
+   "status": "done",
+   "sharpe_gain": 0.13,
+   "sharpe_gain_note": "no-drop dd-min FULL-vs-base tp=0.05 trail=0.05",
+   "dd_cut_pct": 9.71,
+   "robustness": 6,
+   "detail": "12 cells tp{None,0.05,0.1,0.2}x trail{None,0.03,0.05}; no-drop dd-min tp0.05/trail0.05 sh=8.644(+0.13) mdd=0.1804(-9.7%) to=0.038995; max-sh cell tp0.05/no-trail +0.199 shelf; PENDING shelf",
+   "conclusion_zh": "H21 tp0.05+trail0.05纸面+0.13/-9.7%但换手+46%，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H22",
+   "file": "results/iter_H22_cd.json",
+   "topic": "1h cooldown sweep (uniform cd + per-coin best + knee)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "no uniform gain arm (all uniform FULL below base; knee=null)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6,
+   "detail": "uniform cd{3,6,12,24} FULL sh 7.671/7.84/7.517/7.162 all below base, knee=null; per-coin best TRX cd3 sh=8.694(+0.18/mdd0.1922) APT cd24 sh=8.717(+0.203) ETC cd3 +0.059; shelf only",
+   "conclusion_zh": "H22统一cd全低于基线(knee空)，逐币最优TRX/APT纸面小增，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H23",
+   "file": "results/iter_H23_vw.json",
+   "topic": "1h vol-window sweep (vw x vt 9 cells, best-sharpe)",
+   "status": "done",
+   "sharpe_gain": 2.13,
+   "sharpe_gain_note": "best-sharpe FULL-vs-base vw=24 vt=0.006 (paper, turnover +25%)",
+   "dd_cut_pct": 25.03,
+   "robustness": 7,
+   "detail": "9 cells vw{6,12,24}x vt{None,0.006,0.012}; best vw24/vt0.006 sh=10.644(+2.13) mdd=0.1498(-25.0%) to=0.033415 H2 10.343; vt0.012 cells dd-negative; NO_ADOPTION_KEEP_EQUAL shelved",
+   "conclusion_zh": "H23 vw24/vt0.006纸面+2.13/-25.0%但换手+25%，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H24",
+   "file": "results/iter_H24_q.json",
+   "topic": "1h quantile sweep (q0.1-0.5 + fee2x knee + long/short attribution)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "knee confirms locked q0.3 (no gain arm)",
+   "dd_cut_pct": 0.0,
+   "robustness": 7,
+   "detail": "FULL sh q0.1 8.223/q0.2 8.2/q0.3 8.514/q0.4 8.49/q0.5 8.445; fee2x knee q=0.3 (8.242, gap+2.2% vs others, not isolated peak); long share ~0 (q0.3 -0.0024); KEEP_q0.3",
+   "conclusion_zh": "H24分位扫描确认锁定q0.3(fee2x knee)，long几乎为零，仅诊断，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H25",
+   "file": "results/iter_H25_ls.json",
+   "topic": "1h long/short attribution (per-coin LONG vs SHORT + bull/bear)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "attribution probe, no gain arm (LONG share -0.002)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6,
+   "detail": "basket FULL sh=8.514 LONG sh=-0.376 share=-0.0024 / SHORT sh=8.51 share=1.0024; per-coin FULL TRX 12.624 best KAS 4.169 weakest; bear cum share 72.9%; NO_ADOPTION",
+   "conclusion_zh": "H25收益几乎全由空头贡献、多头为零，熊市占七成，仅归因，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H26",
+   "file": "results/iter_H26_atr.json",
+   "topic": "1h ATR-stop sweep (uniform atr + per-coin best + no-drop dd-min)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "no-drop dd-min is base itself (atr=None; no gain arm)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6,
+   "detail": "uniform atr{None,1.5,2.0,3.0} FULL sh 8.514/8.174/8.185/8.436 all <=base, turnover +53-115%; per-coin best ETC atr1.5 +0.154 APT atr3.0 +0.034; shelf only",
+   "conclusion_zh": "H26统一ATR全不超基线且换手大增，逐币最优ETC纸面+0.15，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H27",
+   "file": "results/iter_H27_rsi.json",
+   "topic": "1h RSI(14) gate attribution (legs RSI>50/<50 + basket)",
+   "status": "done",
+   "sharpe_gain": -1.764,
+   "sharpe_gain_note": "RSI-gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 6.26,
+   "robustness": 6,
+   "detail": "gated basket sh=6.75(-1.764) mdd=0.1873(-6.3%) LONG share 0.0; per-coin gated ETC 5.507(+0.351 sole gain) TRX 10.942(-1.682) ATOM 3.292 APT 3.967 KAS 3.417; NO_ADOPTION",
+   "conclusion_zh": "H27 RSI门组合-1.76，仅ETC纸面小增，其余全降，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H28",
+   "file": "results/iter_H28_adx.json",
+   "topic": "1h ADX(14) filter (base + ADX>20/25/30 FULL/coverage)",
+   "status": "done",
+   "sharpe_gain": -2.113,
+   "sharpe_gain_note": "best ADX cell FULL-vs-base adx>20 (loses; no gain arm)",
+   "dd_cut_pct": 18.77,
+   "robustness": 6,
+   "detail": "base sh=8.515 vs adx>20 6.402(-2.113/mdd0.1623/cov24.7%) adx>25 5.091 adx>30 3.762; per-coin TRX leads all cells; coverage collapses; NO_ADOPTION",
+   "conclusion_zh": "H28 ADX过滤全降、覆盖坍缩，最优>20仍-2.11，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H29",
+   "file": "results/iter_H29_macd.json",
+   "topic": "1h MACD(12,26,9) sign-agreement gate attribution",
+   "status": "done",
+   "sharpe_gain": -3.263,
+   "sharpe_gain_note": "MACD-gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -44.64,
+   "robustness": 6,
+   "detail": "gated basket sh=5.251(-3.263) mdd=0.2890(dd+44.6%) to=0.022192 LONG share 0.0; per-coin gated TRX 10.323 best APT 2.927 weakest; NO_ADOPTION",
+   "conclusion_zh": "H29 MACD门组合-3.26且dd+44.6%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "H23",
+   "rank": 1,
+   "value": 2.13
+  },
+  {
+   "round": "H21",
+   "rank": 2,
+   "value": 0.13
+  },
+  {
+   "round": "H22",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H24",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H25",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H26",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H27",
+   "rank": 7,
+   "value": -1.764
+  },
+  {
+   "round": "H28",
+   "rank": 8,
+   "value": -2.113
+  },
+  {
+   "round": "H29",
+   "rank": 9,
+   "value": -3.263
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "H23",
+   "rank": 1,
+   "value": 25.03
+  },
+  {
+   "round": "H28",
+   "rank": 2,
+   "value": 18.77
+  },
+  {
+   "round": "H21",
+   "rank": 3,
+   "value": 9.71
+  },
+  {
+   "round": "H27",
+   "rank": 4,
+   "value": 6.26
+  },
+  {
+   "round": "H22",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "H24",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "H25",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "H26",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "H29",
+   "rank": 9,
+   "value": -44.64
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "H23",
+   "rank": 1,
+   "value": 7
+  },
+  {
+   "round": "H24",
+   "rank": 1,
+   "value": 7
+  },
+  {
+   "round": "H21",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H22",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H25",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H26",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H27",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H28",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H29",
+   "rank": 3,
+   "value": 6
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "H23",
+   "rank_sum": 3,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 1,
+    "robust": 1
+   },
+   "rank": 1
+  },
+  {
+   "round": "H21",
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 3,
+    "robust": 3
+   },
+   "rank": 2
+  },
+  {
+   "round": "H24",
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 5,
+    "robust": 1
+   },
+   "rank": 3
+  },
+  {
+   "round": "H22",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 5,
+    "robust": 3
+   },
+   "rank": 4
+  },
+  {
+   "round": "H25",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 5,
+    "robust": 3
+   },
+   "rank": 4
+  },
+  {
+   "round": "H26",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 5,
+    "robust": 3
+   },
+   "rank": 4
+  },
+  {
+   "round": "H28",
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 8,
+    "dd": 2,
+    "robust": 3
+   },
+   "rank": 7
+  },
+  {
+   "round": "H27",
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 4,
+    "robust": 3
+   },
+   "rank": 8
+  },
+  {
+   "round": "H29",
+   "rank_sum": 21,
+   "ranks": {
+    "sharpe": 9,
+    "dd": 9,
+    "robust": 3
+   },
+   "rank": 9
+  }
+ ],
+ "caveats": [
+  "H23 vt0.006 paper gain (+2.13/-25.0%) costs +25% turnover; shelved under P0-3 FAIL.",
+  "H21 tp+trail paper gain (+0.13/-9.7%) costs +46% turnover; shelved.",
+  "H22/H26 uniform overlays never beat base (knee=null / dd-min=None); per-coin bests shelf-only.",
+  "H24 knee confirms locked q0.3; H25/H27/H29 attributions show LONG share ~0, SHORT carries all PnL.",
+  "H27/H28/H29 gates all lose on sharpe (H28 dd-cut +18.8% but coverage collapses to 24.7%; H29 dd +44.7%); all 9 PENDING(P0-3 FAIL)."
+ ],
+ "conclusions": [
+  "Composite: H23(3) > H21(8) > H24(9) > H22=H25=H26(11) > H28(13) > H27(14) > H29(21).",
+  "Paper sharpe leader H23 (+2.13) and dd leader H23 (-25.0%) are shelved under P0-3 FAIL.",
+  "Only actionable-leaning contrasts (H23 vt, H21 tp+trail, H22/H26 per-coin) fail adoption under P0-3 FAIL; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
