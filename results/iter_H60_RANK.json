@@ -1,0 +1,400 @@
+{
+ "meta": {
+  "iter": "H60",
+  "scope": "Top5 1h-native (ETC/TRX/ATOM/APT/KAS) batch H51-H59",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "rounds": [
+  {
+   "round": "H51",
+   "file": "results/iter_H51_donch.json",
+   "topic": "1h Donchian(N) entry-only breakout filter v3 (N=12/24/48, holds/exits pass)",
+   "status": "done",
+   "sharpe_gain": -0.447,
+   "sharpe_gain_note": "best donch FULL-vs-base donch_12 (loses; no gain arm)",
+   "dd_cut_pct": 2.45,
+   "robustness": 6,
+   "detail": "base sh=8.515 mdd=0.1998 vs donch_12 8.068(-0.447/mdd0.1949/-2.5%) donch_24 7.811 donch_48 6.582(-1.933/mdd0.1398); wider N loses more; NO_ADOPTION",
+   "conclusion_zh": "H51 Donchian过滤全低于基线，N越大损失越大，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H52",
+   "file": "results/iter_H52_obv.json",
+   "topic": "1h OBV-slope(96) gate v3 (legs pass-through warmup 96 bars)",
+   "status": "done",
+   "sharpe_gain": -2.186,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 23.57,
+   "robustness": 6,
+   "detail": "gated basket sh=6.328(-2.186) mdd=0.1527(-23.6%) to=0.033059 LONG share 0.0; per-coin gated ETC 4.143 TRX gated below base; NO_ADOPTION",
+   "conclusion_zh": "H52 OBV门组合-2.19、dd纸面-23.6%但sharpe大降，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H53",
+   "file": "results/iter_H53_vwap.json",
+   "topic": "1h VWAP(96) gate v3 (legs pre-cooldown, close>vwap long / below short)",
+   "status": "done",
+   "sharpe_gain": -2.406,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -42.64,
+   "robustness": 6,
+   "detail": "gated basket sh=6.108(-2.406) mdd=0.285(dd+42.6%) to=0.02242 trades=491 LONG share -0.0014; per-coin gated all below base; NO_ADOPTION",
+   "conclusion_zh": "H53 VWAP门组合-2.41且dd+42.6%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H54",
+   "file": "results/iter_H54_bb.json",
+   "topic": "1h BB(96,2) outside-band entry gate v3 (both legs pre-cooldown, H2 check)",
+   "status": "done",
+   "sharpe_gain": -2.689,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -23.27,
+   "robustness": 6,
+   "detail": "gated basket sh=5.825(-2.689) mdd=0.2463(dd+23.3%) to=0.016758 H2 6.102; per-coin gated TRX 6.029(-6.595) all coins lose; NO_ADOPTION",
+   "conclusion_zh": "H54 BB门组合-2.69且dd+23.3%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H55",
+   "file": "results/iter_H55_stoch.json",
+   "topic": "1h Stoch(56,3) entry gate v3 (legs pre-cooldown, K>D long / K<D short)",
+   "status": "done",
+   "sharpe_gain": -0.704,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 3.45,
+   "robustness": 6,
+   "detail": "gated basket sh=7.81(-0.704) mdd=0.1929(-3.5%) to=0.028174 trades=617 LONG share -0.0049; per-coin gated TRX 11.581 best KAS weakest; NO_ADOPTION",
+   "conclusion_zh": "H55 Stoch门组合-0.70、dd纸面-3.5%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H56",
+   "file": "results/iter_H56_macd.json",
+   "topic": "1h MACD(48,96,18) sign-agreement gate v3 (H2 check)",
+   "status": "done",
+   "sharpe_gain": -2.634,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -26.58,
+   "robustness": 6,
+   "detail": "gated basket sh=5.88(-2.634) mdd=0.2529(dd+26.6%) to=0.017945 H2 6.771 LONG share -0.0067; per-coin gated TRX 8.578(-4.046) all coins lose; NO_ADOPTION",
+   "conclusion_zh": "H56 MACD门组合-2.63且dd+26.6%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H57",
+   "file": "results/iter_H57_rsi.json",
+   "topic": "1h RSI(56) gate v3 (legs RSI>50/<50, basket LONG/SHORT split)",
+   "status": "done",
+   "sharpe_gain": -2.383,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -7.71,
+   "robustness": 6,
+   "detail": "gated basket sh=6.131(-2.383) mdd=0.2152(dd+7.7%) to=0.021872 LONG share 0.0; per-coin gated TRX 10.352(-2.272) all coins lose; NO_ADOPTION",
+   "conclusion_zh": "H57 RSI门组合-2.38且dd+7.7%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H58",
+   "file": "results/iter_H58_adx.json",
+   "topic": "1h ADX(56) filter v3 (base + ADX>20/25/30 FULL/coverage)",
+   "status": "done",
+   "sharpe_gain": -4.778,
+   "sharpe_gain_note": "best-cell FULL-vs-base adx>20 (loses; coverage collapses)",
+   "dd_cut_pct": 7.26,
+   "robustness": 6,
+   "detail": "base sh=8.515 vs adx>20 3.737(-4.778/mdd0.1853/cov3.3%) adx>25 2.934 adx>30 0.012; coverage collapses; NO_ADOPTION",
+   "conclusion_zh": "H58 ADX过滤-4.78且覆盖坍缩至3.3%，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H59",
+   "file": "results/iter_H59_atr.json",
+   "topic": "1h ATR-stop sweep v3 (uniform atr + per-coin best + no-drop dd-min, H2)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "no-drop dd-min is base itself (atr=None; no gain arm)",
+   "dd_cut_pct": 0.0,
+   "robustness": 7,
+   "detail": "uniform atr{None,1.5,2.0,3.0} FULL sh 8.514/8.253/8.29/8.374 all <=base, turnover +54-114%; per-coin best ETC atr1.5 +0.159 APT atr2.0 +0.009; shelf only",
+   "conclusion_zh": "H59统一ATR全不超基线且换手大增，逐币最优ETC纸面+0.16，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "H51",
+   "rank": 2,
+   "value": -0.447
+  },
+  {
+   "round": "H52",
+   "rank": 4,
+   "value": -2.186
+  },
+  {
+   "round": "H53",
+   "rank": 6,
+   "value": -2.406
+  },
+  {
+   "round": "H54",
+   "rank": 8,
+   "value": -2.689
+  },
+  {
+   "round": "H55",
+   "rank": 3,
+   "value": -0.704
+  },
+  {
+   "round": "H56",
+   "rank": 7,
+   "value": -2.634
+  },
+  {
+   "round": "H57",
+   "rank": 5,
+   "value": -2.383
+  },
+  {
+   "round": "H58",
+   "rank": 9,
+   "value": -4.778
+  },
+  {
+   "round": "H59",
+   "rank": 1,
+   "value": 0.0
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "H51",
+   "rank": 4,
+   "value": 2.45
+  },
+  {
+   "round": "H52",
+   "rank": 1,
+   "value": 23.57
+  },
+  {
+   "round": "H53",
+   "rank": 9,
+   "value": -42.64
+  },
+  {
+   "round": "H54",
+   "rank": 7,
+   "value": -23.27
+  },
+  {
+   "round": "H55",
+   "rank": 3,
+   "value": 3.45
+  },
+  {
+   "round": "H56",
+   "rank": 8,
+   "value": -26.58
+  },
+  {
+   "round": "H57",
+   "rank": 6,
+   "value": -7.71
+  },
+  {
+   "round": "H58",
+   "rank": 2,
+   "value": 7.26
+  },
+  {
+   "round": "H59",
+   "rank": 5,
+   "value": 0.0
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "H51",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H52",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H53",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H54",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H55",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H56",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H57",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H58",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H59",
+   "rank": 1,
+   "value": 7
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "H52",
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 1,
+    "robust": 2
+   },
+   "rank": 1
+  },
+  {
+   "round": "H59",
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 5,
+    "robust": 1
+   },
+   "rank": 1
+  },
+  {
+   "round": "H51",
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 4,
+    "robust": 2
+   },
+   "rank": 2
+  },
+  {
+   "round": "H55",
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 2
+   },
+   "rank": 2
+  },
+  {
+   "round": "H57",
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 6,
+    "robust": 2
+   },
+   "rank": 3
+  },
+  {
+   "round": "H58",
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 9,
+    "dd": 2,
+    "robust": 2
+   },
+   "rank": 3
+  },
+  {
+   "round": "H53",
+   "rank_sum": 17,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 9,
+    "robust": 2
+   },
+   "rank": 4
+  },
+  {
+   "round": "H54",
+   "rank_sum": 17,
+   "ranks": {
+    "sharpe": 8,
+    "dd": 7,
+    "robust": 2
+   },
+   "rank": 4
+  },
+  {
+   "round": "H56",
+   "rank_sum": 17,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 8,
+    "robust": 2
+   },
+   "rank": 4
+  }
+ ],
+ "baseline": {
+  "FULL_sharpe": 8.514,
+  "FULL_mdd": 0.1998,
+  "source": "H1 base FULL (Top5 1h-native, lev2, q0.3)"
+ },
+ "caveats": [
+  "H51/H58/H59 overlays never beat base (H51 wider-N loses more; H59 dd-min is base itself, uniform atr turnover +54-114%; H58 coverage collapses to 3.3%).",
+  "H52-H57 gates all lose on sharpe (H58 -4.778 worst cell, H54 -2.689 worst gate; H53 dd +42.6% worst, H56 +26.6%, H54 +23.3%).",
+  "Only paper dd-cut positives: H52 +23.6% (sharpe -2.19), H58 +7.3% (coverage collapse), H55 +3.5%, H51 +2.5%; all sharpe-negative.",
+  "Sole per-coin paper gains ETC atr1.5 (+0.159) and APT atr2.0 (+0.009) in H59 are shelf-only. All 9 PENDING(P0-3 FAIL)."
+ ],
+ "conclusions": [
+  "Composite: H52(7), H59(7), H51(8), H55(8), H57(13), H58(13), H53(17), H54(17), H56(17).",
+  "Least-loss leader H59/H51 (0.0/-0.447) and dd leader H52 (+23.6%) are all sharpe-negative or base-itself; shelved under P0-3 FAIL.",
+  "No gain arm in any of H51-H59; per-coin bests shelf-only; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
