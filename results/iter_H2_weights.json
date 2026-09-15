@@ -1,0 +1,496 @@
+{
+ "config": {
+  "engine": "mirror research/run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "locked_4h": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "specs_1h": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   }
+  },
+  "scale_4h_to_1h": 4,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "vol_window": 60,
+  "clip": [
+   0.1,
+   0.35
+  ],
+  "vol_target": 0.35,
+  "lev_clamp": [
+   0.25,
+   2.0
+  ],
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "fee2x": 0.0008,
+  "arms": [
+   "equal",
+   "invvol",
+   "invvol_cap",
+   "meanvar",
+   "riskparity"
+  ],
+  "note": "E10 FORMULA untouched; live default equal; offline read-only"
+ },
+ "arms": {
+  "equal": {
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2": {
+    "sharpe": 8.343,
+    "ann": 4.8534,
+    "mdd": 0.1598,
+    "cum": 2.4267,
+    "final_x": 3.4267,
+    "n": 4380,
+    "turnover": 0.026073
+   },
+   "fee2x_FULL": {
+    "sharpe": 8.242,
+    "ann": 5.6979,
+    "mdd": 0.2015,
+    "cum": 5.6979,
+    "final_x": 6.6979,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "fold12": {
+    "sharpes": [
+     9.189,
+     7.855,
+     7.575,
+     7.394,
+     13.671,
+     7.191,
+     8.155,
+     6.169,
+     7.127,
+     11.236,
+     17.173,
+     5.201
+    ],
+    "median": 7.855,
+    "mean": 8.995
+   },
+   "w_final": {
+    "ETC": 0.2,
+    "TRX": 0.2,
+    "ATOM": 0.2,
+    "APT": 0.2,
+    "KAS": 0.2
+   },
+   "lev_final": 1.0,
+   "w_mean": {
+    "ETC": 0.2,
+    "TRX": 0.2,
+    "ATOM": 0.2,
+    "APT": 0.2,
+    "KAS": 0.2
+   },
+   "lev_mean": 1.0
+  },
+  "invvol": {
+   "FULL": {
+    "sharpe": 9.438,
+    "ann": 5.5613,
+    "mdd": 0.1738,
+    "cum": 5.5613,
+    "final_x": 6.5613,
+    "n": 8760,
+    "turnover": 0.027686
+   },
+   "H2": {
+    "sharpe": 9.703,
+    "ann": 4.7068,
+    "mdd": 0.14,
+    "cum": 2.3534,
+    "final_x": 3.3534,
+    "n": 4380,
+    "turnover": 0.026845
+   },
+   "fee2x_FULL": {
+    "sharpe": 9.106,
+    "ann": 5.3673,
+    "mdd": 0.1749,
+    "cum": 5.3673,
+    "final_x": 6.3673,
+    "n": 8760,
+    "turnover": 0.027686
+   },
+   "fold12": {
+    "sharpes": [
+     9.905,
+     7.671,
+     9.031,
+     8.239,
+     14.539,
+     8.006,
+     9.654,
+     7.677,
+     8.476,
+     12.838,
+     19.593,
+     5.68
+    ],
+    "median": 9.031,
+    "mean": 10.109
+   },
+   "w_final": {
+    "ETC": 0.17977998766600625,
+    "TRX": 0.35,
+    "ATOM": 0.19295963834638827,
+    "APT": 0.13260272677890403,
+    "KAS": 0.14465764720870156
+   },
+   "lev_final": 1.0,
+   "w_mean": {
+    "ETC": 0.1858,
+    "TRX": 0.3438,
+    "ATOM": 0.1773,
+    "APT": 0.1396,
+    "KAS": 0.1535
+   },
+   "lev_mean": 1.0
+  },
+  "invvol_cap": {
+   "FULL": {
+    "sharpe": 10.752,
+    "ann": 5.3389,
+    "mdd": 0.1287,
+    "cum": 5.3389,
+    "final_x": 6.3389,
+    "n": 8760,
+    "turnover": 0.026127
+   },
+   "H2": {
+    "sharpe": 10.707,
+    "ann": 5.5286,
+    "mdd": 0.1287,
+    "cum": 2.7643,
+    "final_x": 3.7643,
+    "n": 4380,
+    "turnover": 0.029985
+   },
+   "fee2x_FULL": {
+    "sharpe": 10.38,
+    "ann": 5.1558,
+    "mdd": 0.1297,
+    "cum": 5.1558,
+    "final_x": 6.1558,
+    "n": 8760,
+    "turnover": 0.026127
+   },
+   "fold12": {
+    "sharpes": [
+     13.462,
+     8.682,
+     10.422,
+     8.946,
+     15.7,
+     7.887,
+     9.622,
+     6.932,
+     9.244,
+     12.661,
+     19.898,
+     6.488
+    ],
+    "median": 9.622,
+    "mean": 10.829
+   },
+   "w_final": {
+    "ETC": 0.17977998766600625,
+    "TRX": 0.35,
+    "ATOM": 0.19295963834638827,
+    "APT": 0.13260272677890403,
+    "KAS": 0.14465764720870156
+   },
+   "lev_final": 0.8414,
+   "w_mean": {
+    "ETC": 0.1858,
+    "TRX": 0.3438,
+    "ATOM": 0.1773,
+    "APT": 0.1396,
+    "KAS": 0.1535
+   },
+   "lev_mean": 0.9645
+  },
+  "meanvar": {
+   "FULL": {
+    "sharpe": 13.423,
+    "ann": 4.9088,
+    "mdd": 0.0827,
+    "cum": 4.9088,
+    "final_x": 5.9088,
+    "n": 8760,
+    "turnover": 0.030465
+   },
+   "H2": {
+    "sharpe": 14.128,
+    "ann": 4.5917,
+    "mdd": 0.0668,
+    "cum": 2.2958,
+    "final_x": 3.2958,
+    "n": 4380,
+    "turnover": 0.02832
+   },
+   "fee2x_FULL": {
+    "sharpe": 12.821,
+    "ann": 4.6953,
+    "mdd": 0.0835,
+    "cum": 4.6953,
+    "final_x": 5.6953,
+    "n": 8760,
+    "turnover": 0.030465
+   },
+   "fold12": {
+    "sharpes": [
+     15.897,
+     8.242,
+     13.658,
+     13.896,
+     16.38,
+     13.35,
+     11.607,
+     10.894,
+     11.605,
+     16.769,
+     25.231,
+     14.96
+    ],
+    "median": 13.896,
+    "mean": 14.374
+   },
+   "w_final": {
+    "ETC": 0.0525,
+    "TRX": 0.8503,
+    "ATOM": 0.0444,
+    "APT": 0.045,
+    "KAS": 0.0078
+   },
+   "lev_final": 1.0,
+   "w_mean": {
+    "ETC": 0.0525,
+    "TRX": 0.8503,
+    "ATOM": 0.0444,
+    "APT": 0.045,
+    "KAS": 0.0078
+   },
+   "lev_mean": 1.0
+  },
+  "riskparity": {
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2": {
+    "sharpe": 8.343,
+    "ann": 4.8534,
+    "mdd": 0.1598,
+    "cum": 2.4267,
+    "final_x": 3.4267,
+    "n": 4380,
+    "turnover": 0.026073
+   },
+   "fee2x_FULL": {
+    "sharpe": 8.242,
+    "ann": 5.6979,
+    "mdd": 0.2015,
+    "cum": 5.6979,
+    "final_x": 6.6979,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "fold12": {
+    "sharpes": [
+     9.189,
+     7.855,
+     7.575,
+     7.394,
+     13.671,
+     7.191,
+     8.155,
+     6.169,
+     7.127,
+     11.236,
+     17.173,
+     5.201
+    ],
+    "median": 7.855,
+    "mean": 8.995
+   },
+   "w_final": {
+    "ETC": 0.2,
+    "TRX": 0.2,
+    "ATOM": 0.2,
+    "APT": 0.2,
+    "KAS": 0.2
+   },
+   "lev_final": 1.0,
+   "w_mean": {
+    "ETC": 0.2,
+    "TRX": 0.2,
+    "ATOM": 0.2,
+    "APT": 0.2,
+    "KAS": 0.2
+   },
+   "lev_mean": 1.0
+  }
+ },
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "REVIEW_invvol_cap",
+ "decision_note": "Challenger invvol_cap beats equal on sharpe AND mdd AND turnover; verdict stays PENDING pending review.",
+ "compare": {
+  "invvol": {
+   "beats_equal_on_all3": false,
+   "d_sharpe": 0.924,
+   "d_mdd": -0.026,
+   "d_turnover": 0.001019
+  },
+  "invvol_cap": {
+   "beats_equal_on_all3": true,
+   "d_sharpe": 2.238,
+   "d_mdd": -0.0711,
+   "d_turnover": -0.00054
+  },
+  "meanvar": {
+   "beats_equal_on_all3": false,
+   "d_sharpe": 4.909,
+   "d_mdd": -0.1171,
+   "d_turnover": 0.003798
+  },
+  "riskparity": {
+   "beats_equal_on_all3": false,
+   "d_sharpe": 0.0,
+   "d_mdd": 0.0,
+   "d_turnover": 0.0
+  }
+ }
+}
