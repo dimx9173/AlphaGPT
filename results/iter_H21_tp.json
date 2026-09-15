@@ -1,0 +1,325 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-mask + cooldown + stops + vol_scale(vt None->1.0) + roll1; 1h native, cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "tp_grid": [
+   null,
+   0.05,
+   0.1,
+   0.2
+  ],
+  "trail_grid": [
+   null,
+   0.03,
+   0.05
+  ],
+  "uniform_cells": 12,
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 8760.0,
+  "scale": 4,
+  "grid_bars": 8760,
+  "h2_start": 4380,
+  "smoke": false,
+  "partial": false,
+  "trail_spec": "post-stop give-back exit on binary positions pre-vol_scale: armed once peak excursion > 0, flat when peak - excursion >= drop; no separate activation",
+  "note": "tp 4 x trail 3 = 12 uniform cells. E10 FORMULA untouched; live chain untouched; offline read-only."
+ },
+ "base_FULL": {
+  "sharpe": 8.514,
+  "ann": 5.8848,
+  "mdd": 0.1998,
+  "cum": 5.8848,
+  "final_x": 6.8848,
+  "n": 8760,
+  "turnover": 0.026667
+ },
+ "base_H2_sharpe": 8.343,
+ "uniform_rows": [
+  {
+   "tp": null,
+   "trail": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0
+  },
+  {
+   "tp": null,
+   "trail": 0.03,
+   "FULL": {
+    "sharpe": 8.375,
+    "ann": 5.6816,
+    "mdd": 0.1891,
+    "cum": 5.6816,
+    "final_x": 6.6816,
+    "n": 8760,
+    "turnover": 0.04621
+   },
+   "H2_sharpe": 8.164,
+   "d_sharpe_vs_base": -0.139,
+   "d_mdd_vs_base": -0.0107
+  },
+  {
+   "tp": null,
+   "trail": 0.05,
+   "FULL": {
+    "sharpe": 8.416,
+    "ann": 5.74,
+    "mdd": 0.1982,
+    "cum": 5.74,
+    "final_x": 6.74,
+    "n": 8760,
+    "turnover": 0.035068
+   },
+   "H2_sharpe": 8.019,
+   "d_sharpe_vs_base": -0.098,
+   "d_mdd_vs_base": -0.0016
+  },
+  {
+   "tp": 0.05,
+   "trail": null,
+   "FULL": {
+    "sharpe": 8.713,
+    "ann": 5.8003,
+    "mdd": 0.1855,
+    "cum": 5.8003,
+    "final_x": 6.8003,
+    "n": 8760,
+    "turnover": 0.031324
+   },
+   "H2_sharpe": 8.444,
+   "d_sharpe_vs_base": 0.199,
+   "d_mdd_vs_base": -0.0143
+  },
+  {
+   "tp": 0.05,
+   "trail": 0.03,
+   "FULL": {
+    "sharpe": 8.598,
+    "ann": 5.6213,
+    "mdd": 0.1814,
+    "cum": 5.6213,
+    "final_x": 6.6213,
+    "n": 8760,
+    "turnover": 0.049224
+   },
+   "H2_sharpe": 8.308,
+   "d_sharpe_vs_base": 0.084,
+   "d_mdd_vs_base": -0.0184
+  },
+  {
+   "tp": 0.05,
+   "trail": 0.05,
+   "FULL": {
+    "sharpe": 8.644,
+    "ann": 5.6752,
+    "mdd": 0.1804,
+    "cum": 5.6752,
+    "final_x": 6.6752,
+    "n": 8760,
+    "turnover": 0.038995
+   },
+   "H2_sharpe": 8.102,
+   "d_sharpe_vs_base": 0.13,
+   "d_mdd_vs_base": -0.0194
+  },
+  {
+   "tp": 0.1,
+   "trail": null,
+   "FULL": {
+    "sharpe": 8.546,
+    "ann": 5.8909,
+    "mdd": 0.2079,
+    "cum": 5.8909,
+    "final_x": 6.8909,
+    "n": 8760,
+    "turnover": 0.027397
+   },
+   "H2_sharpe": 8.404,
+   "d_sharpe_vs_base": 0.032,
+   "d_mdd_vs_base": 0.0081
+  },
+  {
+   "tp": 0.1,
+   "trail": 0.03,
+   "FULL": {
+    "sharpe": 8.432,
+    "ann": 5.7043,
+    "mdd": 0.1891,
+    "cum": 5.7043,
+    "final_x": 6.7043,
+    "n": 8760,
+    "turnover": 0.046758
+   },
+   "H2_sharpe": 8.255,
+   "d_sharpe_vs_base": -0.082,
+   "d_mdd_vs_base": -0.0107
+  },
+  {
+   "tp": 0.1,
+   "trail": 0.05,
+   "FULL": {
+    "sharpe": 8.462,
+    "ann": 5.7559,
+    "mdd": 0.1982,
+    "cum": 5.7559,
+    "final_x": 6.7559,
+    "n": 8760,
+    "turnover": 0.035662
+   },
+   "H2_sharpe": 8.086,
+   "d_sharpe_vs_base": -0.052,
+   "d_mdd_vs_base": -0.0016
+  },
+  {
+   "tp": 0.2,
+   "trail": null,
+   "FULL": {
+    "sharpe": 8.534,
+    "ann": 5.8888,
+    "mdd": 0.2079,
+    "cum": 5.8888,
+    "final_x": 6.8888,
+    "n": 8760,
+    "turnover": 0.026986
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.02,
+   "d_mdd_vs_base": 0.0081
+  },
+  {
+   "tp": 0.2,
+   "trail": 0.03,
+   "FULL": {
+    "sharpe": 8.455,
+    "ann": 5.7339,
+    "mdd": 0.1891,
+    "cum": 5.7339,
+    "final_x": 6.7339,
+    "n": 8760,
+    "turnover": 0.046119
+   },
+   "H2_sharpe": 8.164,
+   "d_sharpe_vs_base": -0.059,
+   "d_mdd_vs_base": -0.0107
+  },
+  {
+   "tp": 0.2,
+   "trail": 0.05,
+   "FULL": {
+    "sharpe": 8.463,
+    "ann": 5.7667,
+    "mdd": 0.1982,
+    "cum": 5.7667,
+    "final_x": 6.7667,
+    "n": 8760,
+    "turnover": 0.035114
+   },
+   "H2_sharpe": 8.019,
+   "d_sharpe_vs_base": -0.051,
+   "d_mdd_vs_base": -0.0016
+  }
+ ],
+ "best_no_drop_dd_min": {
+  "tp": 0.05,
+  "trail": 0.05,
+  "FULL": {
+   "sharpe": 8.644,
+   "ann": 5.6752,
+   "mdd": 0.1804,
+   "cum": 5.6752,
+   "final_x": 6.6752,
+   "n": 8760,
+   "turnover": 0.038995
+  },
+  "H2_sharpe": 8.102,
+  "d_sharpe_vs_base": 0.13,
+  "d_mdd_vs_base": -0.0194
+ },
+ "best_note": "min FULL mdd among uniform cells with sharpe>=base: tp=0.05 trail=0.05",
+ "verdict": "PENDING",
+ "conclusion": "PENDING (P0-3 FAIL): H21 1h take-profit sweep diagnostic only; no-drop dd-min selection is shelf value, no adoption, no live change, live untouched."
+}
