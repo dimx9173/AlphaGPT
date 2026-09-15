@@ -1,0 +1,236 @@
+{
+ "status": "final",
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fee": 0.0004,
+  "fund": 0.0005,
+  "assumed_slip_bp": 5.0,
+  "assumed_slip": 0.0005,
+  "fills_src": "results/y1b_hourly.jsonl",
+  "min_fills": 10,
+  "slip_def": "adverse bp vs plan quote: buy (fill-plan)/plan*1e4, sell/short (plan-fill)/plan*1e4; positive = worse",
+  "drag_def": "slip drag/yr (cum units) = turnover * slip * LEV * BPY (H5 symmetric accounting)",
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4,
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "note": "E10 FORMULA untouched; offline read-only; P0-3 FAIL => PENDING"
+ },
+ "basket": {
+  "sharpe": 8.514,
+  "ann": 5.8848,
+  "mdd": 0.1998,
+  "cum": 5.8848,
+  "final_x": 6.8848,
+  "n": 8760,
+  "turnover": 0.026667
+ },
+ "per_coin": {
+  "ETC": {
+   "sharpe": 5.156,
+   "ann": 5.0031,
+   "mdd": 0.5391,
+   "cum": 5.0031,
+   "final_x": 6.0031,
+   "n": 8760,
+   "turnover": 0.015068
+  },
+  "TRX": {
+   "sharpe": 12.624,
+   "ann": 4.6577,
+   "mdd": 0.0789,
+   "cum": 4.6577,
+   "final_x": 5.6577,
+   "n": 8760,
+   "turnover": 0.031735
+  },
+  "ATOM": {
+   "sharpe": 5.692,
+   "ann": 6.4742,
+   "mdd": 0.5199,
+   "cum": 6.4742,
+   "final_x": 7.4742,
+   "n": 8760,
+   "turnover": 0.039726
+  },
+  "APT": {
+   "sharpe": 5.927,
+   "ann": 7.9179,
+   "mdd": 0.4548,
+   "cum": 7.9179,
+   "final_x": 8.9179,
+   "n": 8760,
+   "turnover": 0.015068
+  },
+  "KAS": {
+   "sharpe": 4.169,
+   "ann": 5.3711,
+   "mdd": 0.6402,
+   "cum": 5.3711,
+   "final_x": 6.3711,
+   "n": 8760,
+   "turnover": 0.031735
+  }
+ },
+ "realized": {
+  "n_fills": 2,
+  "fills": [
+   {
+    "ts": "2026-09-12T04:00:03.443504+00:00",
+    "symbol": "APTUSDT",
+    "coin": "APT",
+    "side_want": -1.0,
+    "plan": 0.6182,
+    "fill": 0.6181,
+    "slip_bp": 1.6176
+   },
+   {
+    "ts": "2026-09-12T04:00:03.443504+00:00",
+    "symbol": "KASUSDT",
+    "coin": "KAS",
+    "side_want": -1.0,
+    "plan": 0.03644,
+    "fill": 0.03644,
+    "slip_bp": 0.0
+   }
+  ],
+  "dist_bp": {
+   "n": 2,
+   "mean": 0.8088,
+   "median": 0.8088,
+   "stdev": 1.1438,
+   "min": 0.0,
+   "max": 1.6176,
+   "q25": 0.4044,
+   "q75": 1.2132,
+   "q90": 1.4558,
+   "share_adverse": 0.5,
+   "share_abs_gt5": 0.0
+  },
+  "by_coin_bp": {
+   "APT": {
+    "n": 1,
+    "mean": 1.6176,
+    "median": 1.6176,
+    "stdev": 0.0,
+    "min": 1.6176,
+    "max": 1.6176,
+    "q25": 1.6176,
+    "q75": 1.6176,
+    "q90": 1.6176,
+    "share_adverse": 1.0,
+    "share_abs_gt5": 0.0
+   },
+   "KAS": {
+    "n": 1,
+    "mean": 0.0,
+    "median": 0.0,
+    "stdev": 0.0,
+    "min": 0.0,
+    "max": 0.0,
+    "q25": 0.0,
+    "q75": 0.0,
+    "q90": 0.0,
+    "share_adverse": 0.0,
+    "share_abs_gt5": 0.0
+   }
+  },
+  "skipped": {
+   "rows_no_plans": 0,
+   "results_skipped": 431,
+   "no_matching_plan": 0,
+   "bad_price": 0
+  }
+ },
+ "compare": {
+  "turnover": 0.026667,
+  "assumed_bp": 5.0,
+  "realized_mean_bp": 0.8088,
+  "realized_q90_bp": 1.4558,
+  "drag_assumed_yr": 0.2336,
+  "drag_realized_mean_yr": 0.0378,
+  "drag_realized_q90_yr": 0.068,
+  "fee_drag_yr": 0.1869,
+  "drag_ratio_mean_over_assumed": 0.1618,
+  "conservative_covers_q90": true,
+  "n_fills": 2,
+  "sample_adequate": false
+ },
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "P0-3 permutation FAIL => H13 verdict PENDING; realized sample n=2 (< 10 => descriptive only); no adoption, live untouched.",
+ "conclusion": "H13 1h Top5 slip-real: assumed 5bp drag/yr=0.2336 vs realized mean 0.81bp drag/yr=0.0378 (q90 1.46bp drag/yr=0.0680); fills n=2. PENDING; no live change."
+}
