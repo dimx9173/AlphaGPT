@@ -261,6 +261,12 @@ async def preflight(broker, risk: RiskEngine) -> tuple[bool, str]:
         return False, f"deadman err: {e}"
     if ok is False:
         return False, "deadman FAILED"
+    try:
+        from loguru import logger as _lg
+        _lg.info("[deadman] drill ok venue={} timeout=60".format(
+            getattr(getattr(broker, "venue", ""), "value", broker)))
+    except Exception:
+        pass
     return True, ""
 
 
