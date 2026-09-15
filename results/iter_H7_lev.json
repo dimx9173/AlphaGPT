@@ -1,0 +1,152 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "levs": [
+   1,
+   2,
+   3
+  ],
+  "venue": "aster",
+  "lev_locked": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4,
+  "note": "LEV sweep only, read-only; live LEV untouched (stays 2.0)"
+ },
+ "rows": {
+  "1": {
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 2.9424,
+    "mdd": 0.0999,
+    "cum": 2.9424,
+    "final_x": 3.9424,
+    "n": 8760,
+    "turnover": 0.026667
+   }
+  },
+  "2": {
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   }
+  },
+  "3": {
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 8.8272,
+    "mdd": 0.2997,
+    "cum": 8.8272,
+    "final_x": 9.8272,
+    "n": 8760,
+    "turnover": 0.026667
+   }
+  }
+ },
+ "compare": {
+  "sharpe_by_lev": {
+   "1": 8.514,
+   "2": 8.514,
+   "3": 8.514
+  },
+  "mdd_by_lev": {
+   "1": 0.0999,
+   "2": 0.1998,
+   "3": 0.2997
+  },
+  "final_x_by_lev": {
+   "1": 3.9424,
+   "2": 6.8848,
+   "3": 9.8272
+  },
+  "sharpe_spread": 0.0,
+  "sharpe_invariant": true,
+  "dd_2v1": 2.0,
+  "dd_3v2": 1.5,
+  "dd_3x_uncontrolled": false
+ },
+ "verdict": "PENDING",
+ "decision": "KEEP_LEV_2.0",
+ "decision_note": "P0-3 FAIL待定，不動LEV。sharpe在{1,2,3}x下不變(線性縮放)，收益/dd同比似放大。1h原生格子。"
+}
