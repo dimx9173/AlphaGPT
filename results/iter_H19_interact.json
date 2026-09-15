@@ -1,0 +1,357 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile long-mask + cooldown + stops + vol_scale(vt None->1.0) + roll1; 1h native, cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "sl_grid": [
+   null,
+   0.03
+  ],
+  "q_grid": [
+   0.2,
+   0.3
+  ],
+  "cd_grid": [
+   6,
+   12
+  ],
+  "ts_grid": [
+   12,
+   24
+  ],
+  "ts_unit": "4h-bar, engine x4 internally",
+  "grid": "sl_x_q + cd_x_ts 2-way interactions",
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 8760.0,
+  "scale": 4,
+  "grid_bars": 8760,
+  "h2_start": 4380,
+  "smoke": false,
+  "partial": false,
+  "note": "sl 2 x q 2 + cd 2 x ts 2 = 8 uniform cells. E10 FORMULA untouched; live chain untouched; offline read-only."
+ },
+ "base_FULL": {
+  "sharpe": 8.514,
+  "ann": 5.8848,
+  "mdd": 0.1998,
+  "cum": 5.8848,
+  "final_x": 6.8848,
+  "n": 8760,
+  "turnover": 0.026667
+ },
+ "base_H2_sharpe": 8.343,
+ "sl_x_q_rows": [
+  {
+   "r": null,
+   "c": 0.2,
+   "FULL": {
+    "sharpe": 8.183,
+    "ann": 5.6965,
+    "mdd": 0.2731,
+    "cum": 5.6965,
+    "final_x": 6.6965,
+    "n": 8760,
+    "turnover": 0.024977
+   },
+   "H2_sharpe": 8.461,
+   "d_sharpe_vs_base": -0.331,
+   "d_mdd_vs_base": 0.0733,
+   "sl": null,
+   "q": 0.2
+  },
+  {
+   "r": null,
+   "c": 0.3,
+   "FULL": {
+    "sharpe": 8.494,
+    "ann": 5.904,
+    "mdd": 0.2005,
+    "cum": 5.904,
+    "final_x": 6.904,
+    "n": 8760,
+    "turnover": 0.025023
+   },
+   "H2_sharpe": 8.452,
+   "d_sharpe_vs_base": -0.02,
+   "d_mdd_vs_base": 0.0007,
+   "sl": null,
+   "q": 0.3
+  },
+  {
+   "r": 0.03,
+   "c": 0.2,
+   "FULL": {
+    "sharpe": 8.317,
+    "ann": 5.642,
+    "mdd": 0.2139,
+    "cum": 5.642,
+    "final_x": 6.642,
+    "n": 8760,
+    "turnover": 0.037397
+   },
+   "H2_sharpe": 8.285,
+   "d_sharpe_vs_base": -0.197,
+   "d_mdd_vs_base": 0.0141,
+   "sl": 0.03,
+   "q": 0.2
+  },
+  {
+   "r": 0.03,
+   "c": 0.3,
+   "FULL": {
+    "sharpe": 8.662,
+    "ann": 5.8721,
+    "mdd": 0.1809,
+    "cum": 5.8721,
+    "final_x": 6.8721,
+    "n": 8760,
+    "turnover": 0.036941
+   },
+   "H2_sharpe": 8.232,
+   "d_sharpe_vs_base": 0.148,
+   "d_mdd_vs_base": -0.0189,
+   "sl": 0.03,
+   "q": 0.3
+  }
+ ],
+ "cd_x_ts_rows": [
+  {
+   "r": 6,
+   "c": 12,
+   "FULL": {
+    "sharpe": 7.739,
+    "ann": 5.6705,
+    "mdd": 0.3636,
+    "cum": 5.6705,
+    "final_x": 6.6705,
+    "n": 8760,
+    "turnover": 0.039178
+   },
+   "H2_sharpe": 7.889,
+   "d_sharpe_vs_base": -0.775,
+   "d_mdd_vs_base": 0.1638,
+   "cd": 6,
+   "ts": 12
+  },
+  {
+   "r": 6,
+   "c": 24,
+   "FULL": {
+    "sharpe": 7.84,
+    "ann": 5.7642,
+    "mdd": 0.3727,
+    "cum": 5.7642,
+    "final_x": 6.7642,
+    "n": 8760,
+    "turnover": 0.033196
+   },
+   "H2_sharpe": 7.965,
+   "d_sharpe_vs_base": -0.674,
+   "d_mdd_vs_base": 0.1729,
+   "cd": 6,
+   "ts": 24
+  },
+  {
+   "r": 12,
+   "c": 12,
+   "FULL": {
+    "sharpe": 7.468,
+    "ann": 5.6025,
+    "mdd": 0.3022,
+    "cum": 5.6025,
+    "final_x": 6.6025,
+    "n": 8760,
+    "turnover": 0.037443
+   },
+   "H2_sharpe": 7.127,
+   "d_sharpe_vs_base": -1.046,
+   "d_mdd_vs_base": 0.1024,
+   "cd": 12,
+   "ts": 12
+  },
+  {
+   "r": 12,
+   "c": 24,
+   "FULL": {
+    "sharpe": 7.517,
+    "ann": 5.7021,
+    "mdd": 0.3248,
+    "cum": 5.7021,
+    "final_x": 6.7021,
+    "n": 8760,
+    "turnover": 0.020228
+   },
+   "H2_sharpe": 7.234,
+   "d_sharpe_vs_base": -0.997,
+   "d_mdd_vs_base": 0.125,
+   "cd": 12,
+   "ts": 24
+  }
+ ],
+ "verdict": "PENDING",
+ "heatmap_sl_x_q": {
+  "rows": [
+   null,
+   0.03
+  ],
+  "cols": [
+   0.2,
+   0.3
+  ],
+  "sharpe": [
+   [
+    8.183,
+    8.494
+   ],
+   [
+    8.317,
+    8.662
+   ]
+  ],
+  "mdd": [
+   [
+    0.2731,
+    0.2005
+   ],
+   [
+    0.2139,
+    0.1809
+   ]
+  ],
+  "turnover": [
+   [
+    0.024977,
+    0.025023
+   ],
+   [
+    0.037397,
+    0.036941
+   ]
+  ]
+ },
+ "heatmap_cd_x_ts": {
+  "rows": [
+   6,
+   12
+  ],
+  "cols": [
+   12,
+   24
+  ],
+  "sharpe": [
+   [
+    7.739,
+    7.84
+   ],
+   [
+    7.468,
+    7.517
+   ]
+  ],
+  "mdd": [
+   [
+    0.3636,
+    0.3727
+   ],
+   [
+    0.3022,
+    0.3248
+   ]
+  ],
+  "turnover": [
+   [
+    0.039178,
+    0.033196
+   ],
+   [
+    0.037443,
+    0.020228
+   ]
+  ]
+ },
+ "interaction_sl_x_q": 0.034,
+ "interaction_cd_x_ts": -0.052,
+ "best_sl_x_q": {
+  "sl": 0.03,
+  "q": 0.3
+ },
+ "best_cd_x_ts": {
+  "cd": 6,
+  "ts": 24
+ },
+ "conclusion": "\u5f85\u5b9a (P0-3 FAIL): H19 1h slxq/cdxts 2-way interaction heatmaps diagnostic only; best cells are shelf values, no adoption, no live change, live untouched."
+}
