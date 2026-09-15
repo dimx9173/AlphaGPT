@@ -1,0 +1,715 @@
+{
+ "status": "final",
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "scaled_specs_1h": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   }
+  },
+  "scale_4h_to_1h": 4,
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "sessions": {
+   "asia": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+   ],
+   "eu": [
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+   ],
+   "us": [
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23
+   ]
+  },
+  "session_hours": "asia 00-07 / eu 08-15 / us 16-23 UTC (8h blocks)",
+  "session_bars": {
+   "asia": 2920,
+   "eu": 2920,
+   "us": 2920
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "fee2x": 0.0008,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "bpy_session": 2920.0,
+  "data_dir": "data/data_1y/1h",
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "smoke": false,
+  "trades_def": "trades = entries (flat->non-zero) + flips (long<->short); exits reported separately; session-slice trades attributed by transition bar so sessions sum to FULL",
+  "arms_def": "session-only arm = per-coin positions gated to session hours (zero outside), leg economics recomputed with fee+funding, equal-weight basket mix",
+  "note": "H39 1h Asia/EU/US session split; E10 FORMULA untouched; offline read-only"
+ },
+ "per_coin": {
+  "ETC": {
+   "FULL": {
+    "sharpe": 5.156,
+    "ann": 5.0031,
+    "mdd": 0.5391,
+    "cum": 5.0031,
+    "final_x": 6.0031,
+    "n": 8760,
+    "turnover": 0.015068,
+    "trades": 66,
+    "entries": 66,
+    "flips": 0,
+    "exits": 65
+   },
+   "asia": {
+    "sharpe": 3.623,
+    "ann": 1.9348,
+    "mdd": 0.2109,
+    "cum": 1.9348,
+    "final_x": 2.9348,
+    "n": 2920,
+    "turnover": 0.013014,
+    "trades": 18,
+    "entries": 18,
+    "flips": 0,
+    "exits": 19
+   },
+   "eu": {
+    "sharpe": 2.077,
+    "ann": 1.272,
+    "mdd": 0.5576,
+    "cum": 1.272,
+    "final_x": 2.272,
+    "n": 2920,
+    "turnover": 0.017123,
+    "trades": 23,
+    "entries": 23,
+    "flips": 0,
+    "exits": 27
+   },
+   "us": {
+    "sharpe": 3.388,
+    "ann": 1.7963,
+    "mdd": 0.2119,
+    "cum": 1.7963,
+    "final_x": 2.7963,
+    "n": 2920,
+    "turnover": 0.015068,
+    "trades": 25,
+    "entries": 25,
+    "flips": 0,
+    "exits": 19
+   }
+  },
+  "TRX": {
+   "FULL": {
+    "sharpe": 12.624,
+    "ann": 4.6577,
+    "mdd": 0.0789,
+    "cum": 4.6577,
+    "final_x": 5.6577,
+    "n": 8760,
+    "turnover": 0.031735,
+    "trades": 139,
+    "entries": 137,
+    "flips": 2,
+    "exits": 137
+   },
+   "asia": {
+    "sharpe": 8.58,
+    "ann": 1.8641,
+    "mdd": 0.0706,
+    "cum": 1.8641,
+    "final_x": 2.8641,
+    "n": 2920,
+    "turnover": 0.028082,
+    "trades": 40,
+    "entries": 40,
+    "flips": 0,
+    "exits": 42
+   },
+   "eu": {
+    "sharpe": 6.776,
+    "ann": 1.5667,
+    "mdd": 0.0704,
+    "cum": 1.5667,
+    "final_x": 2.5667,
+    "n": 2920,
+    "turnover": 0.038014,
+    "trades": 55,
+    "entries": 55,
+    "flips": 0,
+    "exits": 56
+   },
+   "us": {
+    "sharpe": 6.517,
+    "ann": 1.2269,
+    "mdd": 0.0982,
+    "cum": 1.2269,
+    "final_x": 2.2269,
+    "n": 2920,
+    "turnover": 0.02911,
+    "trades": 44,
+    "entries": 42,
+    "flips": 2,
+    "exits": 39
+   }
+  },
+  "ATOM": {
+   "FULL": {
+    "sharpe": 5.692,
+    "ann": 6.4742,
+    "mdd": 0.5199,
+    "cum": 6.4742,
+    "final_x": 7.4742,
+    "n": 8760,
+    "turnover": 0.039726,
+    "trades": 174,
+    "entries": 173,
+    "flips": 1,
+    "exits": 172
+   },
+   "asia": {
+    "sharpe": 0.994,
+    "ann": 0.5939,
+    "mdd": 0.4092,
+    "cum": 0.5939,
+    "final_x": 1.5939,
+    "n": 2920,
+    "turnover": 0.039384,
+    "trades": 62,
+    "entries": 62,
+    "flips": 0,
+    "exits": 52
+   },
+   "eu": {
+    "sharpe": 4.227,
+    "ann": 2.78,
+    "mdd": 0.2412,
+    "cum": 2.78,
+    "final_x": 3.78,
+    "n": 2920,
+    "turnover": 0.040068,
+    "trades": 54,
+    "entries": 54,
+    "flips": 0,
+    "exits": 63
+   },
+   "us": {
+    "sharpe": 4.37,
+    "ann": 3.1003,
+    "mdd": 0.2107,
+    "cum": 3.1003,
+    "final_x": 4.1003,
+    "n": 2920,
+    "turnover": 0.039726,
+    "trades": 58,
+    "entries": 57,
+    "flips": 1,
+    "exits": 57
+   }
+  },
+  "APT": {
+   "FULL": {
+    "sharpe": 5.927,
+    "ann": 7.9179,
+    "mdd": 0.4548,
+    "cum": 7.9179,
+    "final_x": 8.9179,
+    "n": 8760,
+    "turnover": 0.015068,
+    "trades": 66,
+    "entries": 65,
+    "flips": 1,
+    "exits": 64
+   },
+   "asia": {
+    "sharpe": 3.588,
+    "ann": 2.5431,
+    "mdd": 0.3371,
+    "cum": 2.5431,
+    "final_x": 3.5431,
+    "n": 2920,
+    "turnover": 0.019521,
+    "trades": 30,
+    "entries": 30,
+    "flips": 0,
+    "exits": 26
+   },
+   "eu": {
+    "sharpe": 2.403,
+    "ann": 1.9303,
+    "mdd": 0.4735,
+    "cum": 1.9303,
+    "final_x": 2.9303,
+    "n": 2920,
+    "turnover": 0.012671,
+    "trades": 17,
+    "entries": 16,
+    "flips": 1,
+    "exits": 19
+   },
+   "us": {
+    "sharpe": 4.315,
+    "ann": 3.4444,
+    "mdd": 0.2887,
+    "cum": 3.4444,
+    "final_x": 4.4444,
+    "n": 2920,
+    "turnover": 0.013014,
+    "trades": 19,
+    "entries": 19,
+    "flips": 0,
+    "exits": 19
+   }
+  },
+  "KAS": {
+   "FULL": {
+    "sharpe": 4.169,
+    "ann": 5.3711,
+    "mdd": 0.6402,
+    "cum": 5.3711,
+    "final_x": 6.3711,
+    "n": 8760,
+    "turnover": 0.031735,
+    "trades": 139,
+    "entries": 139,
+    "flips": 0,
+    "exits": 138
+   },
+   "asia": {
+    "sharpe": 1.891,
+    "ann": 1.3375,
+    "mdd": 0.628,
+    "cum": 1.3375,
+    "final_x": 2.3375,
+    "n": 2920,
+    "turnover": 0.028082,
+    "trades": 41,
+    "entries": 41,
+    "flips": 0,
+    "exits": 40
+   },
+   "eu": {
+    "sharpe": 3.169,
+    "ann": 2.5579,
+    "mdd": 0.3226,
+    "cum": 2.5579,
+    "final_x": 3.5579,
+    "n": 2920,
+    "turnover": 0.034247,
+    "trades": 50,
+    "entries": 50,
+    "flips": 0,
+    "exits": 50
+   },
+   "us": {
+    "sharpe": 2.07,
+    "ann": 1.4757,
+    "mdd": 0.2848,
+    "cum": 1.4757,
+    "final_x": 2.4757,
+    "n": 2920,
+    "turnover": 0.032877,
+    "trades": 48,
+    "entries": 48,
+    "flips": 0,
+    "exits": 48
+   }
+  }
+ },
+ "arms": {
+  "asia": {
+   "basket": {
+    "sharpe": 3.546,
+    "ann": 1.3181,
+    "mdd": 0.1664,
+    "cum": 1.3181,
+    "final_x": 2.3181,
+    "n": 8760,
+    "turnover": 0.056575,
+    "trades": 1241,
+    "entries": 1241,
+    "flips": 0,
+    "exits": 1237
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.032,
+     "ann": 1.622,
+     "mdd": 0.2225,
+     "cum": 1.622,
+     "final_x": 2.622,
+     "n": 8760,
+     "turnover": 0.048973,
+     "trades": 215,
+     "entries": 215,
+     "flips": 0,
+     "exits": 214
+    },
+    "TRX": {
+     "sharpe": 6.864,
+     "ann": 1.5057,
+     "mdd": 0.0754,
+     "cum": 1.5057,
+     "final_x": 2.5057,
+     "n": 8760,
+     "turnover": 0.060502,
+     "trades": 265,
+     "entries": 265,
+     "flips": 0,
+     "exits": 265
+    },
+    "ATOM": {
+     "sharpe": 0.41,
+     "ann": 0.2451,
+     "mdd": 0.4604,
+     "cum": 0.2451,
+     "final_x": 1.2451,
+     "n": 8760,
+     "turnover": 0.0629,
+     "trades": 276,
+     "entries": 276,
+     "flips": 0,
+     "exits": 275
+    },
+    "APT": {
+     "sharpe": 3.136,
+     "ann": 2.2247,
+     "mdd": 0.3387,
+     "cum": 2.2247,
+     "final_x": 3.2247,
+     "n": 8760,
+     "turnover": 0.051941,
+     "trades": 228,
+     "entries": 228,
+     "flips": 0,
+     "exits": 227
+    },
+    "KAS": {
+     "sharpe": 1.404,
+     "ann": 0.9927,
+     "mdd": 0.652,
+     "cum": 0.9927,
+     "final_x": 1.9927,
+     "n": 8760,
+     "turnover": 0.058562,
+     "trades": 257,
+     "entries": 257,
+     "flips": 0,
+     "exits": 256
+    }
+   }
+  },
+  "eu": {
+   "basket": {
+    "sharpe": 3.99,
+    "ann": 1.6936,
+    "mdd": 0.1763,
+    "cum": 1.6936,
+    "final_x": 2.6936,
+    "n": 8760,
+    "turnover": 0.056256,
+    "trades": 1232,
+    "entries": 1231,
+    "flips": 1,
+    "exits": 1231
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 1.59,
+     "ann": 0.9744,
+     "mdd": 0.5824,
+     "cum": 0.9744,
+     "final_x": 1.9744,
+     "n": 8760,
+     "turnover": 0.048174,
+     "trades": 211,
+     "entries": 211,
+     "flips": 0,
+     "exits": 211
+    },
+    "TRX": {
+     "sharpe": 5.253,
+     "ann": 1.2235,
+     "mdd": 0.0824,
+     "cum": 1.2235,
+     "final_x": 2.2235,
+     "n": 8760,
+     "turnover": 0.061644,
+     "trades": 270,
+     "entries": 270,
+     "flips": 0,
+     "exits": 270
+    },
+    "ATOM": {
+     "sharpe": 3.703,
+     "ann": 2.44,
+     "mdd": 0.2444,
+     "cum": 2.44,
+     "final_x": 3.44,
+     "n": 8760,
+     "turnover": 0.061872,
+     "trades": 271,
+     "entries": 271,
+     "flips": 0,
+     "exits": 271
+    },
+    "APT": {
+     "sharpe": 2.006,
+     "ann": 1.6127,
+     "mdd": 0.4943,
+     "cum": 1.6127,
+     "final_x": 2.6127,
+     "n": 8760,
+     "turnover": 0.049543,
+     "trades": 217,
+     "entries": 216,
+     "flips": 1,
+     "exits": 216
+    },
+    "KAS": {
+     "sharpe": 2.744,
+     "ann": 2.2171,
+     "mdd": 0.3312,
+     "cum": 2.2171,
+     "final_x": 3.2171,
+     "n": 8760,
+     "turnover": 0.060046,
+     "trades": 263,
+     "entries": 263,
+     "flips": 0,
+     "exits": 263
+    }
+   }
+  },
+  "us": {
+   "basket": {
+    "sharpe": 4.663,
+    "ann": 1.8786,
+    "mdd": 0.0999,
+    "cum": 1.8786,
+    "final_x": 2.8786,
+    "n": 8760,
+    "turnover": 0.055753,
+    "trades": 1221,
+    "entries": 1218,
+    "flips": 3,
+    "exits": 1218
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 2.806,
+     "ann": 1.4891,
+     "mdd": 0.2175,
+     "cum": 1.4891,
+     "final_x": 2.4891,
+     "n": 8760,
+     "turnover": 0.048858,
+     "trades": 214,
+     "entries": 214,
+     "flips": 0,
+     "exits": 214
+    },
+    "TRX": {
+     "sharpe": 4.596,
+     "ann": 0.8725,
+     "mdd": 0.1275,
+     "cum": 0.8725,
+     "final_x": 1.8725,
+     "n": 8760,
+     "turnover": 0.060274,
+     "trades": 264,
+     "entries": 262,
+     "flips": 2,
+     "exits": 262
+    },
+    "ATOM": {
+     "sharpe": 3.89,
+     "ann": 2.7643,
+     "mdd": 0.2267,
+     "cum": 2.7643,
+     "final_x": 3.7643,
+     "n": 8760,
+     "turnover": 0.061187,
+     "trades": 268,
+     "entries": 267,
+     "flips": 1,
+     "exits": 267
+    },
+    "APT": {
+     "sharpe": 3.912,
+     "ann": 3.1292,
+     "mdd": 0.2919,
+     "cum": 3.1292,
+     "final_x": 4.1292,
+     "n": 8760,
+     "turnover": 0.049315,
+     "trades": 216,
+     "entries": 216,
+     "flips": 0,
+     "exits": 216
+    },
+    "KAS": {
+     "sharpe": 1.596,
+     "ann": 1.1381,
+     "mdd": 0.3024,
+     "cum": 1.1381,
+     "final_x": 2.1381,
+     "n": 8760,
+     "turnover": 0.059132,
+     "trades": 259,
+     "entries": 259,
+     "flips": 0,
+     "exits": 259
+    }
+   }
+  }
+ },
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "NO_ADOPTION_KEEP_EQUAL",
+ "decision_note": "P0-3 permutation FAIL (per-coin p>=0.05) => H39 verdict PENDING; session split descriptive only, no adoption, live untouched.",
+ "conclusion": "H39 1h Top5 session split FULL-grid session-only arms: asia sh=3.546 eu sh=3.990 us sh=4.663 (best us). PENDING; no live change."
+}
