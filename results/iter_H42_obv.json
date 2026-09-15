@@ -1,0 +1,581 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; legs gated by OBV slope sign (48-bar) v2",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "q": 0.3,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4,
+  "obv_win": 48,
+  "gate_rule": "OBV[t]-OBV[t-48]>0 else flat; warmup first 48 bars pass-through (gate=1)",
+  "smoke": false,
+  "note": "E10 FORMULA untouched; live chain untouched; offline read-only; PENDING (P0-3 FAIL), not demo evidence"
+ },
+ "per_coin": {
+  "ETC": {
+   "baseline": {
+    "FULL": {
+     "sharpe": 5.156,
+     "ann": 5.0031,
+     "mdd": 0.5391,
+     "cum": 5.0031,
+     "final_x": 6.0031,
+     "n": 8760,
+     "turnover": 0.015068
+    },
+    "LONG": {
+     "sharpe": 0.0,
+     "ann": 0.0,
+     "mdd": 0.0,
+     "cum": 0.0,
+     "final_x": 1.0,
+     "n": 8760,
+     "turnover": 0.0,
+     "trades": 0,
+     "pnl_share": 0.0
+    },
+    "SHORT": {
+     "sharpe": 5.156,
+     "ann": 5.0031,
+     "mdd": 0.5391,
+     "cum": 5.0031,
+     "final_x": 6.0031,
+     "n": 8760,
+     "turnover": 0.015068,
+     "trades": 66,
+     "pnl_share": 1.0
+    },
+    "additivity_err": 0.0
+   },
+   "gated": {
+    "FULL": {
+     "sharpe": 4.377,
+     "ann": 2.9779,
+     "mdd": 0.4208,
+     "cum": 2.9779,
+     "final_x": 3.9779,
+     "n": 8760,
+     "turnover": 0.039269
+    },
+    "LONG": {
+     "sharpe": 0.0,
+     "ann": 0.0,
+     "mdd": 0.0,
+     "cum": 0.0,
+     "final_x": 1.0,
+     "n": 8760,
+     "turnover": 0.0,
+     "trades": 0,
+     "pnl_share": 0.0
+    },
+    "SHORT": {
+     "sharpe": 4.377,
+     "ann": 2.9779,
+     "mdd": 0.4208,
+     "cum": 2.9779,
+     "final_x": 3.9779,
+     "n": 8760,
+     "turnover": 0.039269,
+     "trades": 172,
+     "pnl_share": 1.0
+    },
+    "additivity_err": 0.0
+   },
+   "gate": {
+    "win": 48,
+    "pass_bars": 3611,
+    "pass_rate": 0.4122,
+    "warmup": 48
+   },
+   "delta": {
+    "d_sharpe_full": -0.779,
+    "d_cum_full": -2.0252,
+    "d_turnover_full": 0.024201
+   }
+  },
+  "TRX": {
+   "baseline": {
+    "FULL": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735
+    },
+    "LONG": {
+     "sharpe": -1.599,
+     "ann": -0.0991,
+     "mdd": 0.1102,
+     "cum": -0.0991,
+     "final_x": 0.9009,
+     "n": 8760,
+     "turnover": 0.000457,
+     "trades": 2,
+     "pnl_share": -0.0213
+    },
+    "SHORT": {
+     "sharpe": 13.083,
+     "ann": 4.7568,
+     "mdd": 0.0662,
+     "cum": 4.7568,
+     "final_x": 5.7568,
+     "n": 8760,
+     "turnover": 0.031279,
+     "trades": 137,
+     "pnl_share": 1.0213
+    },
+    "additivity_err": 0.0
+   },
+   "gated": {
+    "FULL": {
+     "sharpe": 8.529,
+     "ann": 2.1659,
+     "mdd": 0.0694,
+     "cum": 2.1659,
+     "final_x": 3.1659,
+     "n": 8760,
+     "turnover": 0.05
+    },
+    "LONG": {
+     "sharpe": 0.0,
+     "ann": 0.0,
+     "mdd": 0.0,
+     "cum": 0.0,
+     "final_x": 1.0,
+     "n": 8760,
+     "turnover": 0.0,
+     "trades": 0,
+     "pnl_share": 0.0
+    },
+    "SHORT": {
+     "sharpe": 8.529,
+     "ann": 2.1659,
+     "mdd": 0.0694,
+     "cum": 2.1659,
+     "final_x": 3.1659,
+     "n": 8760,
+     "turnover": 0.05,
+     "trades": 219,
+     "pnl_share": 1.0
+    },
+    "additivity_err": 0.0
+   },
+   "gate": {
+    "win": 48,
+    "pass_bars": 4539,
+    "pass_rate": 0.5182,
+    "warmup": 48
+   },
+   "delta": {
+    "d_sharpe_full": -4.095,
+    "d_cum_full": -2.4918,
+    "d_turnover_full": 0.018265
+   }
+  },
+  "ATOM": {
+   "baseline": {
+    "FULL": {
+     "sharpe": 5.692,
+     "ann": 6.4742,
+     "mdd": 0.5199,
+     "cum": 6.4742,
+     "final_x": 7.4742,
+     "n": 8760,
+     "turnover": 0.039726
+    },
+    "LONG": {
+     "sharpe": -0.197,
+     "ann": -0.0222,
+     "mdd": 0.1313,
+     "cum": -0.0222,
+     "final_x": 0.9778,
+     "n": 8760,
+     "turnover": 0.000228,
+     "trades": 1,
+     "pnl_share": -0.0034
+    },
+    "SHORT": {
+     "sharpe": 5.739,
+     "ann": 6.4963,
+     "mdd": 0.467,
+     "cum": 6.4963,
+     "final_x": 7.4963,
+     "n": 8760,
+     "turnover": 0.039498,
+     "trades": 173,
+     "pnl_share": 1.0034
+    },
+    "additivity_err": 0.0
+   },
+   "gated": {
+    "FULL": {
+     "sharpe": 2.433,
+     "ann": 1.8116,
+     "mdd": 0.6332,
+     "cum": 1.8116,
+     "final_x": 2.8116,
+     "n": 8760,
+     "turnover": 0.051598
+    },
+    "LONG": {
+     "sharpe": 0.0,
+     "ann": 0.0,
+     "mdd": 0.0,
+     "cum": 0.0,
+     "final_x": 1.0,
+     "n": 8760,
+     "turnover": 0.0,
+     "trades": 0,
+     "pnl_share": 0.0
+    },
+    "SHORT": {
+     "sharpe": 2.433,
+     "ann": 1.8116,
+     "mdd": 0.6332,
+     "cum": 1.8116,
+     "final_x": 2.8116,
+     "n": 8760,
+     "turnover": 0.051598,
+     "trades": 226,
+     "pnl_share": 1.0
+    },
+    "additivity_err": 0.0
+   },
+   "gate": {
+    "win": 48,
+    "pass_bars": 3716,
+    "pass_rate": 0.4242,
+    "warmup": 48
+   },
+   "delta": {
+    "d_sharpe_full": -3.259,
+    "d_cum_full": -4.6626,
+    "d_turnover_full": 0.011872
+   }
+  },
+  "APT": {
+   "baseline": {
+    "FULL": {
+     "sharpe": 5.927,
+     "ann": 7.9179,
+     "mdd": 0.4548,
+     "cum": 7.9179,
+     "final_x": 8.9179,
+     "n": 8760,
+     "turnover": 0.015068
+    },
+    "LONG": {
+     "sharpe": 0.378,
+     "ann": 0.0511,
+     "mdd": 0.0807,
+     "cum": 0.0511,
+     "final_x": 1.0511,
+     "n": 8760,
+     "turnover": 0.000228,
+     "trades": 1,
+     "pnl_share": 0.0065
+    },
+    "SHORT": {
+     "sharpe": 5.919,
+     "ann": 7.8667,
+     "mdd": 0.4548,
+     "cum": 7.8667,
+     "final_x": 8.8667,
+     "n": 8760,
+     "turnover": 0.01484,
+     "trades": 65,
+     "pnl_share": 0.9935
+    },
+    "additivity_err": 0.0
+   },
+   "gated": {
+    "FULL": {
+     "sharpe": 3.037,
+     "ann": 2.2092,
+     "mdd": 0.3204,
+     "cum": 2.2092,
+     "final_x": 3.2092,
+     "n": 8760,
+     "turnover": 0.042466
+    },
+    "LONG": {
+     "sharpe": 0.092,
+     "ann": 0.0045,
+     "mdd": 0.0588,
+     "cum": 0.0045,
+     "final_x": 1.0045,
+     "n": 8760,
+     "turnover": 0.000913,
+     "trades": 4,
+     "pnl_share": 0.002
+    },
+    "SHORT": {
+     "sharpe": 3.038,
+     "ann": 2.2047,
+     "mdd": 0.3204,
+     "cum": 2.2047,
+     "final_x": 3.2047,
+     "n": 8760,
+     "turnover": 0.041553,
+     "trades": 182,
+     "pnl_share": 0.998
+    },
+    "additivity_err": 0.0
+   },
+   "gate": {
+    "win": 48,
+    "pass_bars": 2980,
+    "pass_rate": 0.3402,
+    "warmup": 48
+   },
+   "delta": {
+    "d_sharpe_full": -2.89,
+    "d_cum_full": -5.7087,
+    "d_turnover_full": 0.027398
+   }
+  },
+  "KAS": {
+   "baseline": {
+    "FULL": {
+     "sharpe": 4.169,
+     "ann": 5.3711,
+     "mdd": 0.6402,
+     "cum": 5.3711,
+     "final_x": 6.3711,
+     "n": 8760,
+     "turnover": 0.031735
+    },
+    "LONG": {
+     "sharpe": 0.0,
+     "ann": 0.0,
+     "mdd": 0.0,
+     "cum": 0.0,
+     "final_x": 1.0,
+     "n": 8760,
+     "turnover": 0.0,
+     "trades": 0,
+     "pnl_share": 0.0
+    },
+    "SHORT": {
+     "sharpe": 4.169,
+     "ann": 5.3711,
+     "mdd": 0.6402,
+     "cum": 5.3711,
+     "final_x": 6.3711,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 139,
+     "pnl_share": 1.0
+    },
+    "additivity_err": 0.0
+   },
+   "gated": {
+    "FULL": {
+     "sharpe": 2.469,
+     "ann": 2.1536,
+     "mdd": 0.5649,
+     "cum": 2.1536,
+     "final_x": 3.1536,
+     "n": 8760,
+     "turnover": 0.050228
+    },
+    "LONG": {
+     "sharpe": 0.0,
+     "ann": 0.0,
+     "mdd": 0.0,
+     "cum": 0.0,
+     "final_x": 1.0,
+     "n": 8760,
+     "turnover": 0.0,
+     "trades": 0,
+     "pnl_share": 0.0
+    },
+    "SHORT": {
+     "sharpe": 2.469,
+     "ann": 2.1536,
+     "mdd": 0.5649,
+     "cum": 2.1536,
+     "final_x": 3.1536,
+     "n": 8760,
+     "turnover": 0.050228,
+     "trades": 220,
+     "pnl_share": 1.0
+    },
+    "additivity_err": 0.0
+   },
+   "gate": {
+    "win": 48,
+    "pass_bars": 3400,
+    "pass_rate": 0.3881,
+    "warmup": 48
+   },
+   "delta": {
+    "d_sharpe_full": -1.7,
+    "d_cum_full": -3.2175,
+    "d_turnover_full": 0.018493
+   }
+  }
+ },
+ "status": "done",
+ "basket": {
+  "baseline": {
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "LONG": {
+    "sharpe": -0.376,
+    "ann": -0.014,
+    "mdd": 0.0277,
+    "cum": -0.014,
+    "final_x": 0.986,
+    "n": 8760,
+    "turnover": 0.000183,
+    "pnl_share": -0.0024
+   },
+   "SHORT": {
+    "sharpe": 8.51,
+    "ann": 5.8988,
+    "mdd": 0.1998,
+    "cum": 5.8988,
+    "final_x": 6.8988,
+    "n": 8760,
+    "turnover": 0.026484,
+    "pnl_share": 1.0024
+   },
+   "additivity_err": 1.734723475976807e-18
+  },
+  "gated": {
+   "FULL": {
+    "sharpe": 5.847,
+    "ann": 2.2636,
+    "mdd": 0.1487,
+    "cum": 2.2636,
+    "final_x": 3.2636,
+    "n": 8760,
+    "turnover": 0.046712
+   },
+   "LONG": {
+    "sharpe": 0.092,
+    "ann": 0.0009,
+    "mdd": 0.0118,
+    "cum": 0.0009,
+    "final_x": 1.0009,
+    "n": 8760,
+    "turnover": 0.000183,
+    "pnl_share": 0.0004
+   },
+   "SHORT": {
+    "sharpe": 5.845,
+    "ann": 2.2627,
+    "mdd": 0.1487,
+    "cum": 2.2627,
+    "final_x": 3.2627,
+    "n": 8760,
+    "turnover": 0.04653,
+    "pnl_share": 0.9996
+   },
+   "additivity_err": 4.336808689942018e-19
+  },
+  "delta": {
+   "d_sharpe_full": -2.667,
+   "d_cum_full": -3.6212
+  }
+ },
+ "verdict": "PENDING",
+ "verdict_detail": "PENDING_P03_FAIL",
+ "decision": "NO_ADOPTION",
+ "decision_note": "P0-3 permutation FAIL => V8 verdict PENDING; OBV-gate attribution only (basket dsh=-2.667), nothing promoted, live untouched.",
+ "conclusion": "PENDING: H42 1h OBV-slope(48) gate v2 Top5; basket base sh=8.514 gated sh=5.847; no live change"
+}
