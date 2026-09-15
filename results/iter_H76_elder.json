@@ -1,0 +1,454 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; Elder-ray(13) sign gate on legs pre-cooldown (long bull-power>0 / short bear-power<0); static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 8760.0,
+  "grid": "1h",
+  "scale": 4,
+  "elder": {
+   "window": 13,
+   "window_hours": 13.0,
+   "method": "Elder-ray",
+   "ema": "causal EMA(13) on 1h closes, k=2/(13+1), seeded ema[0]=close[0]",
+   "bull_power": "high[t]-EMA[t]",
+   "bear_power": "low[t]-EMA[t]",
+   "long_gate": "bull-power>0",
+   "short_gate": "bear-power<0",
+   "threshold": 0.0,
+   "tie": "blocks both",
+   "warmup_value": 0.0,
+   "warmup_bars": 13,
+   "applied": "on legs pre-cooldown (post quantile mask)"
+  },
+  "data_dir": "data/data_1y/1h",
+  "smoke": false,
+  "note": "E10 FORMULA untouched; live default untouched; offline read-only",
+  "grid_bars": 8760,
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ]
+ },
+ "coins": {
+  "ETC": {
+   "FULL": {
+    "sharpe": 4.74,
+    "ann": 5.2258,
+    "mdd": 0.5606,
+    "cum": 5.2258,
+    "final_x": 6.2258,
+    "n": 8760,
+    "turnover": 0.01347
+   },
+   "LONG": {
+    "sharpe": 0.0,
+    "ann": 0.0,
+    "mdd": 0.0,
+    "cum": 0.0,
+    "final_x": 1.0,
+    "n": 8760,
+    "turnover": 0.0,
+    "trades": 0,
+    "active_bars": 0,
+    "pnl_share": 0.0
+   },
+   "SHORT": {
+    "sharpe": 4.74,
+    "ann": 5.2258,
+    "mdd": 0.5606,
+    "cum": 5.2258,
+    "final_x": 6.2258,
+    "n": 8760,
+    "turnover": 0.01347,
+    "trades": 59,
+    "active_bars": 4413,
+    "pnl_share": 1.0
+   },
+   "BASE_FULL": {
+    "sharpe": 5.156,
+    "ann": 5.0031,
+    "mdd": 0.5391,
+    "cum": 5.0031,
+    "final_x": 6.0031,
+    "n": 8760,
+    "turnover": 0.015068
+   },
+   "elder": {
+    "bull_mean": 0.044801,
+    "bull_min": -3.805075,
+    "bull_max": 2.532376,
+    "bear_mean": -0.066014,
+    "bear_min": -10.376421,
+    "bear_max": 1.218751,
+    "n_long_open": 5861,
+    "n_short_open": 6449,
+    "frac_long_open": 0.6691,
+    "frac_short_open": 0.7362
+   }
+  },
+  "TRX": {
+   "FULL": {
+    "sharpe": 12.05,
+    "ann": 4.0078,
+    "mdd": 0.1126,
+    "cum": 4.0078,
+    "final_x": 5.0078,
+    "n": 8760,
+    "turnover": 0.03653
+   },
+   "LONG": {
+    "sharpe": 0.0,
+    "ann": 0.0,
+    "mdd": 0.0,
+    "cum": 0.0,
+    "final_x": 1.0,
+    "n": 8760,
+    "turnover": 0.0,
+    "trades": 0,
+    "active_bars": 0,
+    "pnl_share": 0.0
+   },
+   "SHORT": {
+    "sharpe": 12.05,
+    "ann": 4.0078,
+    "mdd": 0.1126,
+    "cum": 4.0078,
+    "final_x": 5.0078,
+    "n": 8760,
+    "turnover": 0.03653,
+    "trades": 160,
+    "active_bars": 4253,
+    "pnl_share": 1.0
+   },
+   "BASE_FULL": {
+    "sharpe": 12.624,
+    "ann": 4.6577,
+    "mdd": 0.0789,
+    "cum": 4.6577,
+    "final_x": 5.6577,
+    "n": 8760,
+    "turnover": 0.031735
+   },
+   "elder": {
+    "bull_mean": 0.000521,
+    "bull_min": -0.008934,
+    "bull_max": 0.012101,
+    "bear_mean": -0.000565,
+    "bear_min": -0.033377,
+    "bear_max": 0.004944,
+    "n_long_open": 6149,
+    "n_short_open": 5764,
+    "frac_long_open": 0.7019,
+    "frac_short_open": 0.658
+   }
+  },
+  "ATOM": {
+   "FULL": {
+    "sharpe": 5.493,
+    "ann": 6.0302,
+    "mdd": 0.409,
+    "cum": 6.0302,
+    "final_x": 7.0302,
+    "n": 8760,
+    "turnover": 0.041096
+   },
+   "LONG": {
+    "sharpe": 0.0,
+    "ann": 0.0,
+    "mdd": 0.0,
+    "cum": 0.0,
+    "final_x": 1.0,
+    "n": 8760,
+    "turnover": 0.0,
+    "trades": 0,
+    "active_bars": 0,
+    "pnl_share": 0.0
+   },
+   "SHORT": {
+    "sharpe": 5.493,
+    "ann": 6.0302,
+    "mdd": 0.409,
+    "cum": 6.0302,
+    "final_x": 7.0302,
+    "n": 8760,
+    "turnover": 0.041096,
+    "trades": 180,
+    "active_bars": 4305,
+    "pnl_share": 1.0
+   },
+   "BASE_FULL": {
+    "sharpe": 5.692,
+    "ann": 6.4742,
+    "mdd": 0.5199,
+    "cum": 6.4742,
+    "final_x": 7.4742,
+    "n": 8760,
+    "turnover": 0.039726
+   },
+   "elder": {
+    "bull_mean": 0.009997,
+    "bull_min": -0.724573,
+    "bull_max": 0.312382,
+    "bear_mean": -0.014461,
+    "bear_min": -2.357002,
+    "bear_max": 0.183756,
+    "n_long_open": 5831,
+    "n_short_open": 6431,
+    "frac_long_open": 0.6656,
+    "frac_short_open": 0.7341
+   }
+  },
+  "APT": {
+   "FULL": {
+    "sharpe": 3.796,
+    "ann": 5.0126,
+    "mdd": 0.5162,
+    "cum": 5.0126,
+    "final_x": 6.0126,
+    "n": 8760,
+    "turnover": 0.01347
+   },
+   "LONG": {
+    "sharpe": 0.0,
+    "ann": 0.0,
+    "mdd": 0.0,
+    "cum": 0.0,
+    "final_x": 1.0,
+    "n": 8760,
+    "turnover": 0.0,
+    "trades": 0,
+    "active_bars": 0,
+    "pnl_share": 0.0
+   },
+   "SHORT": {
+    "sharpe": 3.796,
+    "ann": 5.0126,
+    "mdd": 0.5162,
+    "cum": 5.0126,
+    "final_x": 6.0126,
+    "n": 8760,
+    "turnover": 0.01347,
+    "trades": 59,
+    "active_bars": 4411,
+    "pnl_share": 1.0
+   },
+   "BASE_FULL": {
+    "sharpe": 5.927,
+    "ann": 7.9179,
+    "mdd": 0.4548,
+    "cum": 7.9179,
+    "final_x": 8.9179,
+    "n": 8760,
+    "turnover": 0.015068
+   },
+   "elder": {
+    "bull_mean": 0.008239,
+    "bull_min": -0.753348,
+    "bull_max": 0.305858,
+    "bear_mean": -0.013998,
+    "bear_min": -2.959205,
+    "bear_max": 0.153401,
+    "n_long_open": 5806,
+    "n_short_open": 6495,
+    "frac_long_open": 0.6628,
+    "frac_short_open": 0.7414
+   }
+  },
+  "KAS": {
+   "FULL": {
+    "sharpe": 3.223,
+    "ann": 3.8652,
+    "mdd": 0.9037,
+    "cum": 3.8652,
+    "final_x": 4.8652,
+    "n": 8760,
+    "turnover": 0.03653
+   },
+   "LONG": {
+    "sharpe": -0.73,
+    "ann": -0.117,
+    "mdd": 0.2797,
+    "cum": -0.117,
+    "final_x": 0.883,
+    "n": 8760,
+    "turnover": 0.000228,
+    "trades": 1,
+    "active_bars": 25,
+    "pnl_share": -0.0303
+   },
+   "SHORT": {
+    "sharpe": 3.351,
+    "ann": 3.9823,
+    "mdd": 0.9037,
+    "cum": 3.9823,
+    "final_x": 4.9823,
+    "n": 8760,
+    "turnover": 0.036301,
+    "trades": 159,
+    "active_bars": 4407,
+    "pnl_share": 1.0303
+   },
+   "BASE_FULL": {
+    "sharpe": 4.169,
+    "ann": 5.3711,
+    "mdd": 0.6402,
+    "cum": 5.3711,
+    "final_x": 6.3711,
+    "n": 8760,
+    "turnover": 0.031735
+   },
+   "elder": {
+    "bull_mean": 0.000227,
+    "bull_min": -0.01384,
+    "bull_max": 0.006578,
+    "bear_mean": -0.000308,
+    "bear_min": -0.059357,
+    "bear_max": 0.003924,
+    "n_long_open": 5814,
+    "n_short_open": 6546,
+    "frac_long_open": 0.6637,
+    "frac_short_open": 0.7473
+   }
+  }
+ },
+ "basket": {
+  "FULL": {
+   "sharpe": 6.902,
+   "ann": 4.8283,
+   "mdd": 0.2765,
+   "cum": 4.8283,
+   "final_x": 5.8283,
+   "n": 8760,
+   "turnover": 0.028219
+  },
+  "LONG": {
+   "sharpe": -0.73,
+   "ann": -0.0234,
+   "mdd": 0.0559,
+   "cum": -0.0234,
+   "final_x": 0.9766,
+   "n": 8760,
+   "turnover": 4.6e-05,
+   "pnl_share": -0.0048
+  },
+  "SHORT": {
+   "sharpe": 6.924,
+   "ann": 4.8517,
+   "mdd": 0.2765,
+   "cum": 4.8517,
+   "final_x": 5.8517,
+   "n": 8760,
+   "turnover": 0.028174,
+   "pnl_share": 1.0048
+  },
+  "coin_pnl_share": {
+   "ETC": 0.2165,
+   "TRX": 0.166,
+   "ATOM": 0.2498,
+   "APT": 0.2076,
+   "KAS": 0.1601
+  }
+ },
+ "baseline": {
+  "basket_FULL": {
+   "sharpe": 8.514,
+   "ann": 5.8848,
+   "mdd": 0.1998,
+   "cum": 5.8848,
+   "final_x": 6.8848,
+   "n": 8760,
+   "turnover": 0.026667
+  },
+  "coin_FULL": {
+   "ETC": 5.0031,
+   "TRX": 4.6577,
+   "ATOM": 6.4742,
+   "APT": 7.9179,
+   "KAS": 5.3711
+  }
+ },
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "P0-3 permutation FAIL => H76 verdict PENDING; Elder-ray(13)-sign gate attribution only, nothing promoted, live untouched.",
+ "conclusion": "PENDING (P0-3 FAIL): 1h Elder-ray(13) bull/bear-power gate diagnostic only, no adoption, no live change, live untouched.",
+ "status": "COMPLETE"
+}
