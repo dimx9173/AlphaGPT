@@ -1,0 +1,279 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-mask + cooldown + stops + vol_scale(vt None->1.0) + roll1; 1h native, cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "vw_grid": [
+   6,
+   12,
+   24
+  ],
+  "vt_grid": [
+   null,
+   0.006,
+   0.012
+  ],
+  "vw_unit": "4h-bar, engine x4 internally",
+  "vt_unit": "per-bar vol target fraction (None = no targeting, scale 1.0)",
+  "uniform_cells": 9,
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 8760.0,
+  "scale": 4,
+  "grid_bars": 8760,
+  "h2_start": 4380,
+  "smoke": false,
+  "partial": false,
+  "note": "vw 3 x vt 3 = 9 uniform cells. E10 FORMULA untouched; live chain untouched; offline read-only."
+ },
+ "base_FULL": {
+  "sharpe": 8.514,
+  "ann": 5.8848,
+  "mdd": 0.1998,
+  "cum": 5.8848,
+  "final_x": 6.8848,
+  "n": 8760,
+  "turnover": 0.026667
+ },
+ "base_H2_sharpe": 8.343,
+ "uniform_rows": [
+  {
+   "vw": 6,
+   "vt": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0
+  },
+  {
+   "vw": 6,
+   "vt": 0.006,
+   "FULL": {
+    "sharpe": 10.591,
+    "ann": 6.4925,
+    "mdd": 0.143,
+    "cum": 6.4925,
+    "final_x": 7.4925,
+    "n": 8760,
+    "turnover": 0.046859
+   },
+   "H2_sharpe": 10.484,
+   "d_sharpe_vs_base": 2.077,
+   "d_mdd_vs_base": -0.0568
+  },
+  {
+   "vw": 6,
+   "vt": 0.012,
+   "FULL": {
+    "sharpe": 9.462,
+    "ann": 9.8907,
+    "mdd": 0.2385,
+    "cum": 9.8907,
+    "final_x": 10.8907,
+    "n": 8760,
+    "turnover": 0.057342
+   },
+   "H2_sharpe": 9.093,
+   "d_sharpe_vs_base": 0.948,
+   "d_mdd_vs_base": 0.0387
+  },
+  {
+   "vw": 12,
+   "vt": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0
+  },
+  {
+   "vw": 12,
+   "vt": 0.006,
+   "FULL": {
+    "sharpe": 10.578,
+    "ann": 6.2286,
+    "mdd": 0.1456,
+    "cum": 6.2286,
+    "final_x": 7.2286,
+    "n": 8760,
+    "turnover": 0.038077
+   },
+   "H2_sharpe": 10.355,
+   "d_sharpe_vs_base": 2.064,
+   "d_mdd_vs_base": -0.0542
+  },
+  {
+   "vw": 12,
+   "vt": 0.012,
+   "FULL": {
+    "sharpe": 9.488,
+    "ann": 9.7278,
+    "mdd": 0.259,
+    "cum": 9.7278,
+    "final_x": 10.7278,
+    "n": 8760,
+    "turnover": 0.051549
+   },
+   "H2_sharpe": 9.048,
+   "d_sharpe_vs_base": 0.974,
+   "d_mdd_vs_base": 0.0592
+  },
+  {
+   "vw": 24,
+   "vt": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0
+  },
+  {
+   "vw": 24,
+   "vt": 0.006,
+   "FULL": {
+    "sharpe": 10.644,
+    "ann": 6.1241,
+    "mdd": 0.1498,
+    "cum": 6.1241,
+    "final_x": 7.1241,
+    "n": 8760,
+    "turnover": 0.033415
+   },
+   "H2_sharpe": 10.343,
+   "d_sharpe_vs_base": 2.13,
+   "d_mdd_vs_base": -0.05
+  },
+  {
+   "vw": 24,
+   "vt": 0.012,
+   "FULL": {
+    "sharpe": 9.522,
+    "ann": 9.7005,
+    "mdd": 0.2748,
+    "cum": 9.7005,
+    "final_x": 10.7005,
+    "n": 8760,
+    "turnover": 0.048147
+   },
+   "H2_sharpe": 8.966,
+   "d_sharpe_vs_base": 1.008,
+   "d_mdd_vs_base": 0.075
+  }
+ ],
+ "best_sharpe": {
+  "vw": 24,
+  "vt": 0.006,
+  "FULL": {
+   "sharpe": 10.644,
+   "ann": 6.1241,
+   "mdd": 0.1498,
+   "cum": 6.1241,
+   "final_x": 7.1241,
+   "n": 8760,
+   "turnover": 0.033415
+  },
+  "H2_sharpe": 10.343,
+  "d_sharpe_vs_base": 2.13,
+  "d_mdd_vs_base": -0.05
+ },
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "NO_ADOPTION_KEEP_EQUAL",
+ "best_note": "max FULL sharpe among uniform cells (tie-break min mdd): vw=24 vt=0.006",
+ "decision_note": "P0-3 FAIL, no adoption: vol-window contrast is shelf value only; equal 0.2 weights and locked specs stay, live untouched.",
+ "conclusion": "PENDING (P0-3 FAIL): H23 1h vol-window sweep diagnostic only; vw x vt uniform contrast is shelf value, no adoption, no live change, live untouched."
+}
