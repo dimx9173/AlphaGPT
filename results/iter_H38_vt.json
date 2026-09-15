@@ -1,0 +1,444 @@
+{
+ "status": "final",
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "scaled_specs_1h": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   }
+  },
+  "scale_4h_to_1h": 4,
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "data_dir": "data/data_1y/1h",
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "smoke": false,
+  "vt_grid": [
+   "None",
+   "0.003",
+   "0.006",
+   "0.012",
+   "0.024"
+  ],
+  "vt_note": "vol_target passed to MemeBacktest (clamp 0.2-2.0 on trailing price-vol, vol_window=scaled vw); None->scale 1.0",
+  "note": "H38 1h vol-target sweep; E10 FORMULA untouched; offline read-only"
+ },
+ "rows": {
+  "None": {
+   "vt": null,
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.156,
+     "ann": 5.0031,
+     "mdd": 0.5391,
+     "cum": 5.0031,
+     "n": 8760,
+     "turnover": 0.015068
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "n": 8760,
+     "turnover": 0.031735
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.4742,
+     "mdd": 0.5199,
+     "cum": 6.4742,
+     "n": 8760,
+     "turnover": 0.039726
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9179,
+     "mdd": 0.4548,
+     "cum": 7.9179,
+     "n": 8760,
+     "turnover": 0.015068
+    },
+    "KAS": {
+     "sharpe": 4.169,
+     "ann": 5.3711,
+     "mdd": 0.6402,
+     "cum": 5.3711,
+     "n": 8760,
+     "turnover": 0.031735
+    }
+   },
+   "basket": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "gap_vs_none_sharpe": 0.0,
+   "gap_vs_none_mdd": 0.0,
+   "gap_vs_none_turnover": 0.0
+  },
+  "0.003": {
+   "vt": 0.003,
+   "per_coin": {
+    "ETC": {
+     "sharpe": 6.06,
+     "ann": 2.8645,
+     "mdd": 0.2001,
+     "cum": 2.8645,
+     "n": 8760,
+     "turnover": 0.013457
+    },
+    "TRX": {
+     "sharpe": 13.412,
+     "ann": 6.3995,
+     "mdd": 0.0947,
+     "cum": 6.3995,
+     "n": 8760,
+     "turnover": 0.055491
+    },
+    "ATOM": {
+     "sharpe": 6.549,
+     "ann": 3.2453,
+     "mdd": 0.1804,
+     "cum": 3.2453,
+     "n": 8760,
+     "turnover": 0.023301
+    },
+    "APT": {
+     "sharpe": 6.261,
+     "ann": 2.9706,
+     "mdd": 0.1928,
+     "cum": 2.9706,
+     "n": 8760,
+     "turnover": 0.009672
+    },
+    "KAS": {
+     "sharpe": 4.426,
+     "ann": 2.1967,
+     "mdd": 0.2057,
+     "cum": 2.1967,
+     "n": 8760,
+     "turnover": 0.018283
+    }
+   },
+   "basket": {
+    "sharpe": 11.348,
+    "ann": 3.5353,
+    "mdd": 0.0739,
+    "cum": 3.5353,
+    "n": 8760,
+    "turnover": 0.024041
+   },
+   "gap_vs_none_sharpe": 2.834,
+   "gap_vs_none_mdd": -0.1259,
+   "gap_vs_none_turnover": -0.002626
+  },
+  "0.006": {
+   "vt": 0.006,
+   "per_coin": {
+    "ETC": {
+     "sharpe": 6.008,
+     "ann": 5.6054,
+     "mdd": 0.4003,
+     "cum": 5.6054,
+     "n": 8760,
+     "turnover": 0.025815
+    },
+    "TRX": {
+     "sharpe": 13.019,
+     "ann": 8.8794,
+     "mdd": 0.1324,
+     "cum": 8.8794,
+     "n": 8760,
+     "turnover": 0.063721
+    },
+    "ATOM": {
+     "sharpe": 6.593,
+     "ann": 6.4716,
+     "mdd": 0.3609,
+     "cum": 6.4716,
+     "n": 8760,
+     "turnover": 0.046021
+    },
+    "APT": {
+     "sharpe": 6.303,
+     "ann": 5.8935,
+     "mdd": 0.3857,
+     "cum": 5.8935,
+     "n": 8760,
+     "turnover": 0.019016
+    },
+    "KAS": {
+     "sharpe": 4.399,
+     "ann": 4.2933,
+     "mdd": 0.4113,
+     "cum": 4.2933,
+     "n": 8760,
+     "turnover": 0.035811
+    }
+   },
+   "basket": {
+    "sharpe": 10.578,
+    "ann": 6.2286,
+    "mdd": 0.1456,
+    "cum": 6.2286,
+    "n": 8760,
+    "turnover": 0.038077
+   },
+   "gap_vs_none_sharpe": 2.064,
+   "gap_vs_none_mdd": -0.0542,
+   "gap_vs_none_turnover": 0.01141
+  },
+  "0.012": {
+   "vt": 0.012,
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.657,
+     "ann": 8.9147,
+     "mdd": 0.7567,
+     "cum": 8.9147,
+     "n": 8760,
+     "turnover": 0.032492
+    },
+    "TRX": {
+     "sharpe": 12.633,
+     "ann": 9.3209,
+     "mdd": 0.1578,
+     "cum": 9.3209,
+     "n": 8760,
+     "turnover": 0.06347
+    },
+    "ATOM": {
+     "sharpe": 6.273,
+     "ann": 11.2021,
+     "mdd": 0.6851,
+     "cum": 11.2021,
+     "n": 8760,
+     "turnover": 0.07283
+    },
+    "APT": {
+     "sharpe": 6.226,
+     "ann": 11.1821,
+     "mdd": 0.7685,
+     "cum": 11.1821,
+     "n": 8760,
+     "turnover": 0.032001
+    },
+    "KAS": {
+     "sharpe": 4.533,
+     "ann": 8.0195,
+     "mdd": 0.6944,
+     "cum": 8.0195,
+     "n": 8760,
+     "turnover": 0.056953
+    }
+   },
+   "basket": {
+    "sharpe": 9.488,
+    "ann": 9.7278,
+    "mdd": 0.259,
+    "cum": 9.7278,
+    "n": 8760,
+    "turnover": 0.051549
+   },
+   "gap_vs_none_sharpe": 0.974,
+   "gap_vs_none_mdd": 0.0592,
+   "gap_vs_none_turnover": 0.024882
+  },
+  "0.024": {
+   "vt": 0.024,
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.279,
+     "ann": 10.0084,
+     "mdd": 1.0403,
+     "cum": 10.0084,
+     "n": 8760,
+     "turnover": 0.03034
+    },
+    "TRX": {
+     "sharpe": 12.633,
+     "ann": 9.3209,
+     "mdd": 0.1578,
+     "cum": 9.3209,
+     "n": 8760,
+     "turnover": 0.06347
+    },
+    "ATOM": {
+     "sharpe": 5.937,
+     "ann": 13.1481,
+     "mdd": 0.996,
+     "cum": 13.1481,
+     "n": 8760,
+     "turnover": 0.079345
+    },
+    "APT": {
+     "sharpe": 6.122,
+     "ann": 15.3957,
+     "mdd": 0.9056,
+     "cum": 15.3957,
+     "n": 8760,
+     "turnover": 0.03123
+    },
+    "KAS": {
+     "sharpe": 4.266,
+     "ann": 10.4605,
+     "mdd": 1.2544,
+     "cum": 10.4605,
+     "n": 8760,
+     "turnover": 0.063687
+    }
+   },
+   "basket": {
+    "sharpe": 8.808,
+    "ann": 11.6667,
+    "mdd": 0.3666,
+    "cum": 11.6667,
+    "n": 8760,
+    "turnover": 0.053615
+   },
+   "gap_vs_none_sharpe": 0.294,
+   "gap_vs_none_mdd": 0.1668,
+   "gap_vs_none_turnover": 0.026948
+  }
+ },
+ "base_vt": "None",
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "NO_ADOPTION_KEEP_EQUAL",
+ "decision_note": "P0-3 permutation FAIL (per-coin p>=0.05) => H38 verdict PENDING; vol-target sweep read-only, no adoption, live untouched.",
+ "conclusion": "H38 PENDING (P0-3 FAIL): 1h vol-target sweep recorded; no live change."
+}
