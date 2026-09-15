@@ -1,0 +1,11 @@
+IS n=6598 cut=6580 obs combo sharpe=2.064
+block=1 BOTH null_mean=1.346 std=0.373 max=2.651 obs=2.064 p=0.0295 => PASS
+block=1 DIAG ETC null_mean=1.598 p=0.0580 (not gated)
+block=1 DIAG TRX null_mean=1.872 p=0.1784 (not gated)
+block=24 BOTH null_mean=1.528 std=0.328 max=2.664 obs=2.064 p=0.0505 => FAIL
+block=24 DIAG ETC null_mean=1.643 p=0.0625 (not gated)
+block=24 DIAG TRX null_mean=1.965 p=0.3088 (not gated)
+block=96 BOTH null_mean=1.524 std=0.325 max=2.709 obs=2.064 p=0.0425 => PASS
+block=96 DIAG ETC null_mean=1.662 p=0.0655 (not gated)
+block=96 DIAG TRX null_mean=1.937 p=0.2574 (not gated)
+saved results/permutation2_n2000.json verdict={"combo_block24_pass": false, "all_blocks_pass": false, "reversal_obs_gt_rev": true}
