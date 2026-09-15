@@ -1,0 +1,613 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-mask + cooldown + stops + vol_scale(vt None->1.0) + roll1; 1h native, cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "atr_grid": [
+   null,
+   1.5,
+   2.0,
+   3.0
+  ],
+  "atr_window": 24,
+  "atr_unit": "mult of close-normalized Wilder ATR(24x1h); unscaled",
+  "uniform_cells": 4,
+  "percoin_runs": 20,
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "bpy": 8760.0,
+  "scale": 4,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "h2_start": 4380,
+  "smoke": false,
+  "atr_spec": "post-stop ATR adverse-excursion exit on binary positions pre-vol_scale: flat when excursion <= -mult*atr_norm(t); None reproduces locked config",
+  "note": "uniform atr_mult {None,1.5,2.0,3.0} + per-coin atr sensitivity; sl/cd/ts locked. E10 FORMULA untouched; live chain untouched; offline read-only."
+ },
+ "status": "done",
+ "base_FULL": {
+  "sharpe": 8.514,
+  "ann": 5.8848,
+  "mdd": 0.1998,
+  "cum": 5.8848,
+  "final_x": 6.8848,
+  "n": 8760,
+  "turnover": 0.026667
+ },
+ "base_H2_sharpe": 8.343,
+ "uniform_rows": [
+  {
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "atr_mult": 1.5,
+   "FULL": {
+    "sharpe": 8.174,
+    "ann": 5.5055,
+    "mdd": 0.1923,
+    "cum": 5.5055,
+    "final_x": 6.5055,
+    "n": 8760,
+    "turnover": 0.057443
+   },
+   "H2_sharpe": 7.342,
+   "d_sharpe_vs_base": -0.34,
+   "d_mdd_vs_base": -0.0075,
+   "d_turnover_vs_base": 0.030776
+  },
+  {
+   "atr_mult": 2.0,
+   "FULL": {
+    "sharpe": 8.185,
+    "ann": 5.5544,
+    "mdd": 0.1951,
+    "cum": 5.5544,
+    "final_x": 6.5544,
+    "n": 8760,
+    "turnover": 0.050457
+   },
+   "H2_sharpe": 7.425,
+   "d_sharpe_vs_base": -0.329,
+   "d_mdd_vs_base": -0.0047,
+   "d_turnover_vs_base": 0.02379
+  },
+  {
+   "atr_mult": 3.0,
+   "FULL": {
+    "sharpe": 8.436,
+    "ann": 5.7521,
+    "mdd": 0.2038,
+    "cum": 5.7521,
+    "final_x": 6.7521,
+    "n": 8760,
+    "turnover": 0.040868
+   },
+   "H2_sharpe": 8.054,
+   "d_sharpe_vs_base": -0.078,
+   "d_mdd_vs_base": 0.004,
+   "d_turnover_vs_base": 0.014201
+  }
+ ],
+ "percoin_rows": [
+  {
+   "coin": "ETC",
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "coin": "ETC",
+   "atr_mult": 1.5,
+   "FULL": {
+    "sharpe": 8.668,
+    "ann": 5.9431,
+    "mdd": 0.1973,
+    "cum": 5.9431,
+    "final_x": 6.9431,
+    "n": 8760,
+    "turnover": 0.030868
+   },
+   "H2_sharpe": 8.226,
+   "d_sharpe_vs_base": 0.154,
+   "d_mdd_vs_base": -0.0025,
+   "d_turnover_vs_base": 0.004201
+  },
+  {
+   "coin": "ETC",
+   "atr_mult": 2.0,
+   "FULL": {
+    "sharpe": 8.552,
+    "ann": 5.8761,
+    "mdd": 0.2034,
+    "cum": 5.8761,
+    "final_x": 6.8761,
+    "n": 8760,
+    "turnover": 0.030091
+   },
+   "H2_sharpe": 8.261,
+   "d_sharpe_vs_base": 0.038,
+   "d_mdd_vs_base": 0.0036,
+   "d_turnover_vs_base": 0.003424
+  },
+  {
+   "coin": "ETC",
+   "atr_mult": 3.0,
+   "FULL": {
+    "sharpe": 8.589,
+    "ann": 5.9029,
+    "mdd": 0.1991,
+    "cum": 5.9029,
+    "final_x": 6.9029,
+    "n": 8760,
+    "turnover": 0.028858
+   },
+   "H2_sharpe": 8.255,
+   "d_sharpe_vs_base": 0.075,
+   "d_mdd_vs_base": -0.0007,
+   "d_turnover_vs_base": 0.002191
+  },
+  {
+   "coin": "TRX",
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "coin": "TRX",
+   "atr_mult": 1.5,
+   "FULL": {
+    "sharpe": 8.375,
+    "ann": 5.7829,
+    "mdd": 0.1998,
+    "cum": 5.7829,
+    "final_x": 6.7829,
+    "n": 8760,
+    "turnover": 0.037032
+   },
+   "H2_sharpe": 8.116,
+   "d_sharpe_vs_base": -0.139,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.010365
+  },
+  {
+   "coin": "TRX",
+   "atr_mult": 2.0,
+   "FULL": {
+    "sharpe": 8.408,
+    "ann": 5.8078,
+    "mdd": 0.1998,
+    "cum": 5.8078,
+    "final_x": 6.8078,
+    "n": 8760,
+    "turnover": 0.034566
+   },
+   "H2_sharpe": 8.163,
+   "d_sharpe_vs_base": -0.106,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.007899
+  },
+  {
+   "coin": "TRX",
+   "atr_mult": 3.0,
+   "FULL": {
+    "sharpe": 8.444,
+    "ann": 5.8351,
+    "mdd": 0.1998,
+    "cum": 5.8351,
+    "final_x": 6.8351,
+    "n": 8760,
+    "turnover": 0.031644
+   },
+   "H2_sharpe": 8.24,
+   "d_sharpe_vs_base": -0.07,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.004977
+  },
+  {
+   "coin": "ATOM",
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "coin": "ATOM",
+   "atr_mult": 1.5,
+   "FULL": {
+    "sharpe": 8.345,
+    "ann": 5.736,
+    "mdd": 0.1885,
+    "cum": 5.736,
+    "final_x": 6.736,
+    "n": 8760,
+    "turnover": 0.032374
+   },
+   "H2_sharpe": 8.049,
+   "d_sharpe_vs_base": -0.169,
+   "d_mdd_vs_base": -0.0113,
+   "d_turnover_vs_base": 0.005707
+  },
+  {
+   "coin": "ATOM",
+   "atr_mult": 2.0,
+   "FULL": {
+    "sharpe": 8.377,
+    "ann": 5.7762,
+    "mdd": 0.2039,
+    "cum": 5.7762,
+    "final_x": 6.7762,
+    "n": 8760,
+    "turnover": 0.030822
+   },
+   "H2_sharpe": 8.136,
+   "d_sharpe_vs_base": -0.137,
+   "d_mdd_vs_base": 0.0041,
+   "d_turnover_vs_base": 0.004155
+  },
+  {
+   "coin": "ATOM",
+   "atr_mult": 3.0,
+   "FULL": {
+    "sharpe": 8.489,
+    "ann": 5.857,
+    "mdd": 0.1998,
+    "cum": 5.857,
+    "final_x": 6.857,
+    "n": 8760,
+    "turnover": 0.028676
+   },
+   "H2_sharpe": 8.277,
+   "d_sharpe_vs_base": -0.025,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.002009
+  },
+  {
+   "coin": "APT",
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "coin": "APT",
+   "atr_mult": 1.5,
+   "FULL": {
+    "sharpe": 8.462,
+    "ann": 5.8244,
+    "mdd": 0.1998,
+    "cum": 5.8244,
+    "final_x": 6.8244,
+    "n": 8760,
+    "turnover": 0.03
+   },
+   "H2_sharpe": 8.208,
+   "d_sharpe_vs_base": -0.052,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.003333
+  },
+  {
+   "coin": "APT",
+   "atr_mult": 2.0,
+   "FULL": {
+    "sharpe": 8.51,
+    "ann": 5.8584,
+    "mdd": 0.1998,
+    "cum": 5.8584,
+    "final_x": 6.8584,
+    "n": 8760,
+    "turnover": 0.029361
+   },
+   "H2_sharpe": 8.215,
+   "d_sharpe_vs_base": -0.004,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.002694
+  },
+  {
+   "coin": "APT",
+   "atr_mult": 3.0,
+   "FULL": {
+    "sharpe": 8.548,
+    "ann": 5.8922,
+    "mdd": 0.1998,
+    "cum": 5.8922,
+    "final_x": 6.8922,
+    "n": 8760,
+    "turnover": 0.028265
+   },
+   "H2_sharpe": 8.298,
+   "d_sharpe_vs_base": 0.034,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.001598
+  },
+  {
+   "coin": "KAS",
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343,
+   "d_sharpe_vs_base": 0.0,
+   "d_mdd_vs_base": 0.0,
+   "d_turnover_vs_base": 0.0
+  },
+  {
+   "coin": "KAS",
+   "atr_mult": 1.5,
+   "FULL": {
+    "sharpe": 8.405,
+    "ann": 5.7582,
+    "mdd": 0.206,
+    "cum": 5.7582,
+    "final_x": 6.7582,
+    "n": 8760,
+    "turnover": 0.033836
+   },
+   "H2_sharpe": 8.143,
+   "d_sharpe_vs_base": -0.109,
+   "d_mdd_vs_base": 0.0062,
+   "d_turnover_vs_base": 0.007169
+  },
+  {
+   "coin": "KAS",
+   "atr_mult": 2.0,
+   "FULL": {
+    "sharpe": 8.415,
+    "ann": 5.7751,
+    "mdd": 0.1874,
+    "cum": 5.7751,
+    "final_x": 6.7751,
+    "n": 8760,
+    "turnover": 0.032283
+   },
+   "H2_sharpe": 8.039,
+   "d_sharpe_vs_base": -0.099,
+   "d_mdd_vs_base": -0.0124,
+   "d_turnover_vs_base": 0.005616
+  },
+  {
+   "coin": "KAS",
+   "atr_mult": 3.0,
+   "FULL": {
+    "sharpe": 8.427,
+    "ann": 5.8041,
+    "mdd": 0.2045,
+    "cum": 5.8041,
+    "final_x": 6.8041,
+    "n": 8760,
+    "turnover": 0.030091
+   },
+   "H2_sharpe": 8.363,
+   "d_sharpe_vs_base": -0.087,
+   "d_mdd_vs_base": 0.0047,
+   "d_turnover_vs_base": 0.003424
+  }
+ ],
+ "percoin_best": {
+  "ETC": {
+   "atr_mult": 1.5,
+   "FULL": {
+    "sharpe": 8.668,
+    "ann": 5.9431,
+    "mdd": 0.1973,
+    "cum": 5.9431,
+    "final_x": 6.9431,
+    "n": 8760,
+    "turnover": 0.030868
+   },
+   "H2_sharpe": 8.226
+  },
+  "TRX": {
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343
+  },
+  "ATOM": {
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343
+  },
+  "APT": {
+   "atr_mult": 3.0,
+   "FULL": {
+    "sharpe": 8.548,
+    "ann": 5.8922,
+    "mdd": 0.1998,
+    "cum": 5.8922,
+    "final_x": 6.8922,
+    "n": 8760,
+    "turnover": 0.028265
+   },
+   "H2_sharpe": 8.298
+  },
+  "KAS": {
+   "atr_mult": null,
+   "FULL": {
+    "sharpe": 8.514,
+    "ann": 5.8848,
+    "mdd": 0.1998,
+    "cum": 5.8848,
+    "final_x": 6.8848,
+    "n": 8760,
+    "turnover": 0.026667
+   },
+   "H2_sharpe": 8.343
+  }
+ },
+ "best_no_drop_dd_min": {
+  "atr_mult": null,
+  "FULL": {
+   "sharpe": 8.514,
+   "ann": 5.8848,
+   "mdd": 0.1998,
+   "cum": 5.8848,
+   "final_x": 6.8848,
+   "n": 8760,
+   "turnover": 0.026667
+  },
+  "H2_sharpe": 8.343,
+  "d_sharpe_vs_base": 0.0,
+  "d_mdd_vs_base": 0.0,
+  "d_turnover_vs_base": 0.0
+ },
+ "best_note": "min FULL mdd among uniform cells with sharpe>=base: atr_mult=None",
+ "verdict": "PENDING",
+ "decision": "PENDING",
+ "conclusion": "PENDING (P0-3 FAIL): H26 1h ATR-stop sweep diagnostic only; no-drop dd-min selection is shelf value, no adoption, no live change, live untouched."
+}
