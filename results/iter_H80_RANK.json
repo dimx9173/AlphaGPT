@@ -1,0 +1,400 @@
+{
+ "meta": {
+  "iter": "H80",
+  "scope": "Top5 1h-native (ETC/TRX/ATOM/APT/KAS) batch H71-H79",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "rounds": [
+  {
+   "round": "H71",
+   "file": "results/iter_H71_kelt.json",
+   "topic": "1h Keltner(24,2xATR) outside-channel entry gate (both legs pre-cooldown, H2 check)",
+   "sharpe_gain": -2.454,
+   "dd_cut_pct": -26.58,
+   "robustness": 6,
+   "detail": "gated basket sh=6.060(-2.454) mdd=0.2529(dd+26.6%) to=0.020411 H2 7.213 LONG share -0.009; per-coin gated all below base (TRX 9.034 closest); NO_ADOPTION",
+   "conclusion_zh": "H71 Keltner门组合-2.45且dd+26.6%，全币低于基线，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  },
+  {
+   "round": "H72",
+   "file": "results/iter_H72_cci.json",
+   "topic": "1h CCI(24) entry gate (long CCI>+100 / short CCI<-100, legs pre-cooldown)",
+   "sharpe_gain": -2.395,
+   "dd_cut_pct": 20.07,
+   "robustness": 6,
+   "detail": "gated basket sh=6.119(-2.395) mdd=0.1597(-20.1%) to=0.021826 LONG share 0.0; per-coin gated all below base (TRX 11.17 closest); NO_ADOPTION",
+   "conclusion_zh": "H72 CCI门组合-2.40、dd纸面-20.1%但sharpe大降，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  },
+  {
+   "round": "H73",
+   "file": "results/iter_H73_willr.json",
+   "topic": "1h Williams %R(28) entry gate (long R>-20 / short R<-80, legs pre-cooldown)",
+   "sharpe_gain": -2.949,
+   "dd_cut_pct": 26.33,
+   "robustness": 6,
+   "detail": "gated basket sh=5.565(-2.949) mdd=0.1472(-26.3%) to=0.02 trades=438 LONG share 0.0; per-coin gated all below base; NO_ADOPTION",
+   "conclusion_zh": "H73 WillR门组合-2.95、dd纸面-26.3%但sharpe大降，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  },
+  {
+   "round": "H74",
+   "file": "results/iter_H74_mfi.json",
+   "topic": "1h MFI(24) gate (long MFI>50 / short MFI<50, legs pre-cooldown)",
+   "sharpe_gain": -1.571,
+   "dd_cut_pct": -9.31,
+   "robustness": 6,
+   "detail": "gated basket sh=6.943(-1.571) mdd=0.2184(dd+9.3%) to=0.025571 LONG share -0.0112; per-coin KAS 4.22(+0.051 sole paper gain) rest lose; NO_ADOPTION",
+   "conclusion_zh": "H74 MFI门组合-1.57且dd+9.3%，仅KAS纸面小增，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  },
+  {
+   "round": "H75",
+   "file": "results/iter_H75_cmf.json",
+   "topic": "1h CMF(24) sign gate (long CMF>0 / short CMF<0, legs pre-cooldown)",
+   "sharpe_gain": -2.169,
+   "dd_cut_pct": -23.17,
+   "robustness": 6,
+   "detail": "gated basket sh=6.345(-2.169) mdd=0.2461(dd+23.2%) to=0.025205 LONG share -0.0135; per-coin gated all below base; NO_ADOPTION",
+   "conclusion_zh": "H75 CMF门组合-2.17且dd+23.2%，全币低于基线，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  },
+  {
+   "round": "H76",
+   "file": "results/iter_H76_elder.json",
+   "topic": "1h Elder-ray(13) bull/bear-power sign gate (legs pre-cooldown)",
+   "sharpe_gain": -1.612,
+   "dd_cut_pct": -38.39,
+   "robustness": 6,
+   "detail": "gated basket sh=6.902(-1.612) mdd=0.2765(dd+38.4%) to=0.028219 LONG share -0.0048; per-coin gated all below base; NO_ADOPTION",
+   "conclusion_zh": "H76 Elder门组合-1.61且dd+38.4%，全币低于基线，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  },
+  {
+   "round": "H77",
+   "file": "results/iter_H77_ichi.json",
+   "topic": "1h Ichimoku(9,26,52,disp26) directional gate (long-above/short-below cloud; long/short/both arms)",
+   "sharpe_gain": -0.004,
+   "dd_cut_pct": 0.0,
+   "robustness": 7,
+   "detail": "best arm ichi_long sh=8.51(-0.004) mdd=0.1998(dd0.0%) to=0.026484 trades=581; per-coin TRX 13.083(+0.459)/ATOM 5.74(+0.048) paper, ETC/KAS flat, APT -0.018; ichi_short/both -3.78; NO_ADOPTION",
+   "conclusion_zh": "H77 Ichimoku长臂-0.005基本持平，仅TRX/ATOM纸面小增，shelf备选，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  },
+  {
+   "round": "H78",
+   "file": "results/iter_H78_sar.json",
+   "topic": "1h Parabolic SAR directional gate (af/max {0.01/0.1, 0.02/0.2, 0.04/0.2})",
+   "sharpe_gain": -3.044,
+   "dd_cut_pct": 6.56,
+   "robustness": 7,
+   "detail": "best arm sar(0.04,0.2) sh=5.47(-3.044) mdd=0.1867(-6.6%) to=0.088516 trades=1940; all arms lose; per-coin all below base; turnover +66-233%; NO_ADOPTION",
+   "conclusion_zh": "H78 SAR最优臂-3.05、dd纸面-6.6%但换手+233%，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  },
+  {
+   "round": "H79",
+   "file": "results/iter_H79_st.json",
+   "topic": "1h Supertrend(12,3) direction gate (long dir>0 / short dir<0, legs pre-cooldown)",
+   "sharpe_gain": -2.046,
+   "dd_cut_pct": -28.33,
+   "robustness": 6,
+   "detail": "gated basket sh=6.468(-2.046) mdd=0.2564(dd+28.3%) to=0.022785 LONG share 0.0; per-coin gated all below base; NO_ADOPTION",
+   "conclusion_zh": "H79 Supertrend门组合-2.05且dd+28.3%，全币低于基线，不进demo。",
+   "status": "done",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change",
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "H71",
+   "rank": 7,
+   "value": -2.454
+  },
+  {
+   "round": "H72",
+   "rank": 6,
+   "value": -2.395
+  },
+  {
+   "round": "H73",
+   "rank": 8,
+   "value": -2.949
+  },
+  {
+   "round": "H74",
+   "rank": 2,
+   "value": -1.571
+  },
+  {
+   "round": "H75",
+   "rank": 5,
+   "value": -2.169
+  },
+  {
+   "round": "H76",
+   "rank": 3,
+   "value": -1.612
+  },
+  {
+   "round": "H77",
+   "rank": 1,
+   "value": -0.004
+  },
+  {
+   "round": "H78",
+   "rank": 9,
+   "value": -3.044
+  },
+  {
+   "round": "H79",
+   "rank": 4,
+   "value": -2.046
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "H71",
+   "rank": 7,
+   "value": -26.58
+  },
+  {
+   "round": "H72",
+   "rank": 2,
+   "value": 20.07
+  },
+  {
+   "round": "H73",
+   "rank": 1,
+   "value": 26.33
+  },
+  {
+   "round": "H74",
+   "rank": 5,
+   "value": -9.31
+  },
+  {
+   "round": "H75",
+   "rank": 6,
+   "value": -23.17
+  },
+  {
+   "round": "H76",
+   "rank": 9,
+   "value": -38.39
+  },
+  {
+   "round": "H77",
+   "rank": 4,
+   "value": 0.0
+  },
+  {
+   "round": "H78",
+   "rank": 3,
+   "value": 6.56
+  },
+  {
+   "round": "H79",
+   "rank": 8,
+   "value": -28.33
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "H71",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H72",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H73",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H74",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H75",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H76",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H77",
+   "rank": 1,
+   "value": 7
+  },
+  {
+   "round": "H78",
+   "rank": 1,
+   "value": 7
+  },
+  {
+   "round": "H79",
+   "rank": 3,
+   "value": 6
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "H77",
+   "rank_sum": 6,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 4,
+    "robust": 1
+   },
+   "rank": 1
+  },
+  {
+   "round": "H74",
+   "rank_sum": 10,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 5,
+    "robust": 3
+   },
+   "rank": 2
+  },
+  {
+   "round": "H72",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 2,
+    "robust": 3
+   },
+   "rank": 3
+  },
+  {
+   "round": "H73",
+   "rank_sum": 12,
+   "ranks": {
+    "sharpe": 8,
+    "dd": 1,
+    "robust": 3
+   },
+   "rank": 4
+  },
+  {
+   "round": "H78",
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 9,
+    "dd": 3,
+    "robust": 1
+   },
+   "rank": 5
+  },
+  {
+   "round": "H75",
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 6,
+    "robust": 3
+   },
+   "rank": 6
+  },
+  {
+   "round": "H76",
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 9,
+    "robust": 3
+   },
+   "rank": 7
+  },
+  {
+   "round": "H79",
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 8,
+    "robust": 3
+   },
+   "rank": 7
+  },
+  {
+   "round": "H71",
+   "rank_sum": 17,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 7,
+    "robust": 3
+   },
+   "rank": 9
+  }
+ ],
+ "baseline": {
+  "FULL_sharpe": 8.514,
+  "FULL_mdd": 0.1998,
+  "source": "H1 base FULL (Top5 1h-native, lev2, q0.3)"
+ },
+ "caveats": [
+  "H77 best arm ichi_long is basket-flat (-0.004/dd0.0%) with per-coin TRX +0.459 / ATOM +0.048 paper only; ichi_short/both lose -3.78.",
+  "H72/H73 dd-cut positives (+20.1%/+26.3%) both lose >2.3 sharpe points; H78 dd +6.6% loses -3.04 with turnover +66-233%.",
+  "H71/H75/H76/H79 gates all lose on sharpe AND worsen dd (H76 dd +38.4% worst, H79 +28.3%, H71 +26.6%, H75 +23.2%).",
+  "Sole per-coin paper gain outside H77 is KAS MFI +0.051 (H74); all 9 PENDING(P0-3 FAIL)."
+ ],
+ "conclusions": [
+  "Composite: H77(6), H74(10), H72(11), H73(12), H78(13), H75(14), H76(15), H79(15), H71(17).",
+  "Basket-flat leader H77 (-0.004/0.0%) and dd leader H73 (+26.3%, sharpe -2.95) are shelf-only or paper; least-loss arms shelved under P0-3 FAIL.",
+  "No adopted gain arm in any of H71-H79; per-coin bests shelf-only; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
