@@ -1,0 +1,384 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "ADX(56) gate: trade only bars with ADX > thr (causal Wilder, seed=0->filtered)",
+  "adx_period": 56,
+  "thresholds": [
+   20,
+   25,
+   30
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "thr": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 1.0
+    }
+   }
+  },
+  {
+   "unit": "adx_gt_20",
+   "thr": 20,
+   "FULL": {
+    "sharpe": 3.737,
+    "ann": 1.2268,
+    "mdd": 0.1853,
+    "cum": 1.2268,
+    "final_x": 2.2268,
+    "n": 8760,
+    "turnover": 0.008584,
+    "trades": 185,
+    "coverage_all": 0.032763
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 1.291,
+     "ann": 0.6048,
+     "mdd": 0.328,
+     "cum": 0.6048,
+     "final_x": 1.6048,
+     "n": 8760,
+     "turnover": 0.003196,
+     "trades": 14,
+     "coverage": 0.153539
+    },
+    "TRX": {
+     "sharpe": 4.19,
+     "ann": 0.7357,
+     "mdd": 0.0662,
+     "cum": 0.7357,
+     "final_x": 1.7357,
+     "n": 8760,
+     "turnover": 0.009589,
+     "trades": 41,
+     "coverage": 0.193037
+    },
+    "ATOM": {
+     "sharpe": 3.068,
+     "ann": 1.7521,
+     "mdd": 0.2819,
+     "cum": 1.7521,
+     "final_x": 2.7521,
+     "n": 8760,
+     "turnover": 0.014384,
+     "trades": 62,
+     "coverage": 0.270434
+    },
+    "APT": {
+     "sharpe": 2.426,
+     "ann": 1.8368,
+     "mdd": 0.2859,
+     "cum": 1.8368,
+     "final_x": 2.8368,
+     "n": 8760,
+     "turnover": 0.006621,
+     "trades": 28,
+     "coverage": 0.236986
+    },
+    "KAS": {
+     "sharpe": 1.645,
+     "ann": 1.2047,
+     "mdd": 0.3413,
+     "cum": 1.2047,
+     "final_x": 2.2047,
+     "n": 8760,
+     "turnover": 0.009132,
+     "trades": 40,
+     "coverage": 0.196804
+    }
+   }
+  },
+  {
+   "unit": "adx_gt_25",
+   "thr": 25,
+   "FULL": {
+    "sharpe": 2.934,
+    "ann": 0.7385,
+    "mdd": 0.1699,
+    "cum": 0.7385,
+    "final_x": 1.7385,
+    "n": 8760,
+    "turnover": 0.004384,
+    "trades": 93,
+    "coverage_all": 0.006849
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 1.042,
+     "ann": 0.3895,
+     "mdd": 0.2509,
+     "cum": 0.3895,
+     "final_x": 1.3895,
+     "n": 8760,
+     "turnover": 0.002055,
+     "trades": 9,
+     "coverage": 0.086301
+    },
+    "TRX": {
+     "sharpe": 1.832,
+     "ann": 0.1998,
+     "mdd": 0.0827,
+     "cum": 0.1998,
+     "final_x": 1.1998,
+     "n": 8760,
+     "turnover": 0.004338,
+     "trades": 18,
+     "coverage": 0.069635
+    },
+    "ATOM": {
+     "sharpe": 2.418,
+     "ann": 1.0125,
+     "mdd": 0.2526,
+     "cum": 1.0125,
+     "final_x": 2.0125,
+     "n": 8760,
+     "turnover": 0.006849,
+     "trades": 29,
+     "coverage": 0.125685
+    },
+    "APT": {
+     "sharpe": 2.092,
+     "ann": 1.2269,
+     "mdd": 0.2459,
+     "cum": 1.2269,
+     "final_x": 2.2269,
+     "n": 8760,
+     "turnover": 0.003881,
+     "trades": 16,
+     "coverage": 0.115297
+    },
+    "KAS": {
+     "sharpe": 1.432,
+     "ann": 0.8636,
+     "mdd": 0.3165,
+     "cum": 0.8636,
+     "final_x": 1.8636,
+     "n": 8760,
+     "turnover": 0.004795,
+     "trades": 21,
+     "coverage": 0.103767
+    }
+   }
+  },
+  {
+   "unit": "adx_gt_30",
+   "thr": 30,
+   "FULL": {
+    "sharpe": 0.012,
+    "ann": 0.0021,
+    "mdd": 0.1231,
+    "cum": 0.0021,
+    "final_x": 1.0021,
+    "n": 8760,
+    "turnover": 0.002055,
+    "trades": 43,
+    "coverage_all": 0.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 0.837,
+     "ann": 0.2566,
+     "mdd": 0.2382,
+     "cum": 0.2566,
+     "final_x": 1.2566,
+     "n": 8760,
+     "turnover": 0.001142,
+     "trades": 5,
+     "coverage": 0.053995
+    },
+    "TRX": {
+     "sharpe": 0.808,
+     "ann": 0.0285,
+     "mdd": 0.018,
+     "cum": 0.0285,
+     "final_x": 1.0285,
+     "n": 8760,
+     "turnover": 0.001142,
+     "trades": 5,
+     "coverage": 0.012671
+    },
+    "ATOM": {
+     "sharpe": -0.954,
+     "ann": -0.2638,
+     "mdd": 0.4266,
+     "cum": -0.2638,
+     "final_x": 0.7362,
+     "n": 8760,
+     "turnover": 0.003653,
+     "trades": 15,
+     "coverage": 0.053653
+    },
+    "APT": {
+     "sharpe": 0.424,
+     "ann": 0.1682,
+     "mdd": 0.3146,
+     "cum": 0.1682,
+     "final_x": 1.1682,
+     "n": 8760,
+     "turnover": 0.002055,
+     "trades": 8,
+     "coverage": 0.047945
+    },
+    "KAS": {
+     "sharpe": -0.412,
+     "ann": -0.1791,
+     "mdd": 0.3533,
+     "cum": -0.1791,
+     "final_x": 0.8209,
+     "n": 8760,
+     "turnover": 0.002283,
+     "trades": 10,
+     "coverage": 0.046233
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "adx_gt_20",
+  "adx_gt_25",
+  "adx_gt_30"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): ADX过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; ADX filter diagnostic only, no adoption, no live change."
+}
