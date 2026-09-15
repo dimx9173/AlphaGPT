@@ -1,0 +1,401 @@
+{
+ "meta": {
+  "iter": "H100",
+  "scope": "Top5 1h-native (ETC/TRX/ATOM/APT/KAS) batch H91-H99",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "rounds": [
+  {
+   "round": "H91",
+   "file": "results/iter_H91_kelt.json",
+   "topic": "1h Keltner(48,2xATR) outside-channel entry gate (both legs pre-cooldown)",
+   "status": "done",
+   "sharpe_gain": -2.676,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -45.9,
+   "robustness": 6,
+   "detail": "gated basket sh=5.839(-2.676) mdd=0.2915(dd+45.9%) to=0.023744 H2 5.318 LONG share -0.0008; per-coin gated all below base (TRX 10.634 closest); NO_ADOPTION",
+   "conclusion_zh": "H91 Keltner\u95e8\u7ec4\u5408-2.68\u4e14dd+45.9%\uff0c\u5168\u5e01\u4f4e\u4e8e\u57fa\u7ebf\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H92",
+   "file": "results/iter_H92_cci.json",
+   "topic": "1h CCI(48) entry gate (long CCI>+100 / short CCI<-100, legs pre-cooldown)",
+   "status": "done",
+   "sharpe_gain": -0.67,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 39.99,
+   "robustness": 6,
+   "detail": "gated basket sh=7.845(-0.670) mdd=0.1199(-40.0%) to=0.018995 H2 7.881 LONG share 0.0; per-coin KAS 4.192(+0.023 sole paper gain) rest lose; NO_ADOPTION",
+   "conclusion_zh": "H92 CCI\u95e8\u7ec4\u5408-0.67\u3001dd\u7eb8\u9762-40.0%\u4f46sharpe\u5927\u964d\uff0c\u4ec5KAS\u7eb8\u9762\u5c0f\u589e\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H93",
+   "file": "results/iter_H93_willr.json",
+   "topic": "1h Williams %R(56) entry gate (long R>-20 / short R<-80, legs pre-cooldown)",
+   "status": "done",
+   "sharpe_gain": -2.878,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 16.72,
+   "robustness": 6,
+   "detail": "gated basket sh=5.637(-2.878) mdd=0.1664(-16.7%) to=0.016575 trades=363 LONG share 0.0; per-coin gated all below base (TRX 8.094 closest); NO_ADOPTION",
+   "conclusion_zh": "H93 WillR\u95e8\u7ec4\u5408-2.88\u3001dd\u7eb8\u9762-16.7%\u4f46sharpe\u5927\u964d\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H94",
+   "file": "results/iter_H94_mfi.json",
+   "topic": "1h MFI(48) gate (long MFI>50 / short MFI<50, legs pre-cooldown)",
+   "status": "done",
+   "sharpe_gain": -2.146,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -37.34,
+   "robustness": 6,
+   "detail": "gated basket sh=6.369(-2.146) mdd=0.2744(dd+37.3%) to=0.022831 LONG share -0.0006; per-coin gated all below base; NO_ADOPTION",
+   "conclusion_zh": "H94 MFI\u95e8\u7ec4\u5408-2.15\u4e14dd+37.3%\uff0c\u5168\u5e01\u4f4e\u4e8e\u57fa\u7ebf\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H95",
+   "file": "results/iter_H95_cmf.json",
+   "topic": "1h CMF(48) sign gate (long CMF>0 / short CMF<0, legs pre-cooldown)",
+   "status": "done",
+   "sharpe_gain": -1.57,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 0.4,
+   "robustness": 6,
+   "detail": "gated basket sh=6.945(-1.570) mdd=0.199(-0.4%) to=0.021142 LONG share -0.0128; per-coin gated all below base (TRX 8.234 closest); NO_ADOPTION",
+   "conclusion_zh": "H95 CMF\u95e8\u7ec4\u5408-1.57\u3001dd\u57fa\u672c\u6301\u5e73(-0.4%)\uff0c\u5168\u5e01\u4f4e\u4e8e\u57fa\u7ebf\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H96",
+   "file": "results/iter_H96_elder.json",
+   "topic": "1h Elder-ray(26) bull/bear-power sign gate (legs pre-cooldown)",
+   "status": "done",
+   "sharpe_gain": -2.431,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -1.7,
+   "robustness": 6,
+   "detail": "gated basket sh=6.084(-2.431) mdd=0.2032(dd+1.7%) to=0.027169 LONG share 0.0; per-coin ETC 5.334(+0.178 sole paper gain) rest lose; NO_ADOPTION",
+   "conclusion_zh": "H96 Elder\u95e8\u7ec4\u5408-2.43\u4e14dd+1.7%\uff0c\u4ec5ETC\u7eb8\u9762\u5c0f\u589e\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H97",
+   "file": "results/iter_H97_ichi.json",
+   "topic": "1h Ichimoku(18,52,104,disp52) directional gate (long-above/short-below cloud; long/short/both arms)",
+   "status": "done",
+   "sharpe_gain": -0.004,
+   "sharpe_gain_note": "best-arm FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 0.0,
+   "robustness": 7,
+   "detail": "best arm ichi_long sh=8.511(-0.004) mdd=0.1998(dd0.0%) to=0.026393 trades=580; per-coin TRX 13.083(+0.459)/ATOM 5.74(+0.048) paper, ETC/KAS flat, APT -0.008; ichi_short/both -3.2; NO_ADOPTION",
+   "conclusion_zh": "H97 Ichimoku\u957f\u81c2-0.004\u57fa\u672c\u6301\u5e73\uff0c\u4ec5TRX/ATOM\u7eb8\u9762\u5c0f\u589e\uff0cshelf\u5907\u9009\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H98",
+   "file": "results/iter_H98_sar.json",
+   "topic": "1h Parabolic SAR(0.02,0.2) directional gate (single param)",
+   "status": "done",
+   "sharpe_gain": -3.893,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 12.61,
+   "robustness": 6,
+   "detail": "sar(0.02,0.2) sh=4.622(-3.893) mdd=0.1746(-12.6%) to=0.064384 trades=1412; single param, all coins below base (KAS 0.461 worst); turnover +142%; NO_ADOPTION",
+   "conclusion_zh": "H98 SAR\u5355\u53c2-3.89\u3001dd\u7eb8\u9762-12.6%\u4f46\u6362\u624b+142%\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H99",
+   "file": "results/iter_H99_st.json",
+   "topic": "1h Supertrend(24,3) direction gate (long dir>0 / short dir<0, legs pre-cooldown)",
+   "status": "done",
+   "sharpe_gain": -2.112,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -15.22,
+   "robustness": 6,
+   "detail": "gated basket sh=6.403(-2.112) mdd=0.2302(dd+15.2%) to=0.023014 LONG share 0.0; per-coin gated all below base (TRX 10.138 closest); NO_ADOPTION",
+   "conclusion_zh": "H99 Supertrend\u95e8\u7ec4\u5408-2.11\u4e14dd+15.2%\uff0c\u5168\u5e01\u4f4e\u4e8e\u57fa\u7ebf\uff0c\u4e0d\u8fdbdemo\u3002",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "H97",
+   "rank": 1,
+   "value": -0.004
+  },
+  {
+   "round": "H92",
+   "rank": 2,
+   "value": -0.67
+  },
+  {
+   "round": "H95",
+   "rank": 3,
+   "value": -1.57
+  },
+  {
+   "round": "H99",
+   "rank": 4,
+   "value": -2.112
+  },
+  {
+   "round": "H94",
+   "rank": 5,
+   "value": -2.146
+  },
+  {
+   "round": "H96",
+   "rank": 6,
+   "value": -2.431
+  },
+  {
+   "round": "H91",
+   "rank": 7,
+   "value": -2.676
+  },
+  {
+   "round": "H93",
+   "rank": 8,
+   "value": -2.878
+  },
+  {
+   "round": "H98",
+   "rank": 9,
+   "value": -3.893
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "H92",
+   "rank": 1,
+   "value": 39.99
+  },
+  {
+   "round": "H93",
+   "rank": 2,
+   "value": 16.72
+  },
+  {
+   "round": "H98",
+   "rank": 3,
+   "value": 12.61
+  },
+  {
+   "round": "H95",
+   "rank": 4,
+   "value": 0.4
+  },
+  {
+   "round": "H97",
+   "rank": 5,
+   "value": 0.0
+  },
+  {
+   "round": "H96",
+   "rank": 6,
+   "value": -1.7
+  },
+  {
+   "round": "H99",
+   "rank": 7,
+   "value": -15.22
+  },
+  {
+   "round": "H94",
+   "rank": 8,
+   "value": -37.34
+  },
+  {
+   "round": "H91",
+   "rank": 9,
+   "value": -45.9
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "H97",
+   "rank": 1,
+   "value": 7
+  },
+  {
+   "round": "H91",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H92",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H93",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H94",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H95",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H96",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H98",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H99",
+   "rank": 2,
+   "value": 6
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "H92",
+   "rank_sum": 5,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 1,
+    "robust": 2
+   },
+   "rank": 1
+  },
+  {
+   "round": "H97",
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 5,
+    "robust": 1
+   },
+   "rank": 2
+  },
+  {
+   "round": "H95",
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 4,
+    "robust": 2
+   },
+   "rank": 3
+  },
+  {
+   "round": "H93",
+   "rank_sum": 12,
+   "ranks": {
+    "sharpe": 8,
+    "dd": 2,
+    "robust": 2
+   },
+   "rank": 4
+  },
+  {
+   "round": "H99",
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 7,
+    "robust": 2
+   },
+   "rank": 5
+  },
+  {
+   "round": "H96",
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 6,
+    "robust": 2
+   },
+   "rank": 6
+  },
+  {
+   "round": "H98",
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 9,
+    "dd": 3,
+    "robust": 2
+   },
+   "rank": 6
+  },
+  {
+   "round": "H94",
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 8,
+    "robust": 2
+   },
+   "rank": 8
+  },
+  {
+   "round": "H91",
+   "rank_sum": 18,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 9,
+    "robust": 2
+   },
+   "rank": 9
+  }
+ ],
+ "baseline": {
+  "FULL_sharpe": 8.514,
+  "FULL_mdd": 0.1998,
+  "source": "H1 base FULL (Top5 1h-native, lev2, q0.3)"
+ },
+ "caveats": [
+  "H97 basket-flat leader (-0.004/0.0%, ichi_long) and dd leader H92 (+40.0% at -0.67 sharpe) are shelf-only paper under P0-3 FAIL.",
+  "H91 dd +45.9% worst real-dd with -2.68 sharpe; H94 dd +37.3%; H99 dd +15.2%; H96 dd +1.7%; all gates lose on sharpe.",
+  "H98 single-param SAR loses most sharpe (-3.89) with turnover +142% (0.064384 vs base 0.026575); dd paper -12.6%.",
+  "H93 baseline turnover reads 0.0 (artifact anomaly); gated turnover 0.016575 used for detail only, rank dims unaffected.",
+  "All 9 PENDING(P0-3 FAIL); no adopted gain arm."
+ ],
+ "conclusions": [
+  "Composite rank-sums: H92(5), H97(7), H95(9), H93(12), H99(13), H96(14), H98(14), H94(15), H91(18).",
+  "Sharpe leader H97 (-0.004, flat) and dd leader H92 (+40.0%) both lose vs base; least-loss arms shelved under P0-3 FAIL.",
+  "No adopted gain arm in any of H91-H99; per-coin bests (TRX/ATOM ichi_long, KAS CCI, ETC Elder) shelf-only; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
