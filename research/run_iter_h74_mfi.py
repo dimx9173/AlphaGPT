@@ -1,0 +1,340 @@
+"""H74 1h MFI filter (Top5): long MFI(24)>50 / short MFI(24)<50 gate.
+
+Engine mirrors research/run_weight_modes.py leg_net (E10 FORMULA
+[3,2,7,2,7,11,15,4,4,6,6,10] via StackVM+FeatureEngineer; MemeBacktest
+venue=aster lev2 short_enabled fund0.0005; quantile q0.3 long-only +
+cooldown + stops + vol_scale(vt None->1.0) + roll1). 1h native:
+cd/ts/vw x4 (4h-bar units -> 1h-bar units), BPY=8760. Data
+data/data_1y/1h/{COIN}.csv. Equal 0.2 weights. Top5 locked specs
+ETC(0.88/0.12/cd18/None/ts24) TRX(0.85/0.12/cd6/0.05/ts24)
+ATOM(0.85/0.15/cd6/0.05/ts24) APT(0.88/0.12/cd18/None/ts24)
+KAS(0.88/0.12/cd6/None/ts24), q0.3.
+
+H74 addition: per-coin Money Flow Index MFI(24) on 1h high/low/close/volume (24x1h = 24h). LONG leg gated to MFI>50, SHORT leg
+to MFI<50. Gate applied to lp/sp right after the quantile mask and BEFORE
+the joint cooldown+stops, so FULL == LONG + SHORT exactly. Warmup (first 24 bars): MFI=50.0 neutral => both legs closed.
+
+Baseline (ungated, identical pipeline minus the MFI gate) reported for
+contrast. Offline read-only; verdict PENDING (P0-3 FAIL), no adoption,
+live untouched. Incremental dump: results JSON rewritten after each coin
+(partial survives). Smoke: ITER_H74_SMOKE=1 -> coins {ETC,TRX}, first
+3000 bars. OUT/LOG overridable via ITER_H74_OUT / ITER_H74_LOG.
+Output: results/iter_H74_mfi.json.
+"""
+import csv
+import json
+import math
+import os
+import pathlib
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+os.chdir(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import torch
+from model_core.factors import FeatureEngineer
+from model_core.vm import StackVM
+from model_core.backtest import MemeBacktest
+from strategy_manager.config import (
+    FORMULA, LOCKED_ATOM, LOCKED_APT, LOCKED_ETC, LOCKED_KAS, LOCKED_TRX,
+    LEV, FUND, FEE,
+)
+
+assert LEV == 2.0, "LEV lock broken: %r" % LEV
+assert list(FORMULA) == [3, 2, 7, 2, 7, 11, 15, 4, 4, 6, 6, 10], "E10 FORMULA lock broken"
+
+COINS = ["ETC", "TRX", "ATOM", "APT", "KAS"]
+SPECS = {"ETC": LOCKED_ETC, "TRX": LOCKED_TRX, "ATOM": LOCKED_ATOM,
+         "APT": LOCKED_APT, "KAS": LOCKED_KAS}
+W = {c: 0.2 for c in COINS}
+BPY = 8760.0
+SCALE = 4
+MFI_WINDOW = 24  # 24 x 1h = 24h
+MFI_TH = 50.0
+OUT = pathlib.Path(os.getenv("ITER_H74_OUT", "results/iter_H74_mfi.json"))
+LOG = pathlib.Path(os.getenv("ITER_H74_LOG", "logs/iter_h74_mfi.log"))
+SMOKE = os.getenv("ITER_H74_SMOKE") == "1"
+
+CONFIG = {
+    "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; MFI(24) gate on legs pre-cooldown (long MFI>50 / short MFI<50); static equal 0.2 Top5; 1h native cd/ts/vw x4",
+    "formula": list(FORMULA),
+    "basket": {c: dict(SPECS[c]) for c in COINS},
+    "weights": dict(W),
+    "venue": "aster",
+    "lev": LEV,
+    "fund": FUND,
+    "fee": FEE,
+    "bpy": BPY,
+    "grid": "1h",
+    "scale": SCALE,
+    "mfi": {
+        "window": MFI_WINDOW,
+        "window_hours": 24.0,
+        "method": "MoneyFlow",
+        "long_gate": "MFI>50",
+        "short_gate": "MFI<50",
+        "threshold": MFI_TH,
+        "warmup_value": 50.0,
+        "warmup_bars": MFI_WINDOW,
+        "applied": "on legs pre-cooldown (post quantile mask)",
+    },
+    "data_dir": "data/data_1y/1h",
+    "smoke": SMOKE,
+    "note": "E10 FORMULA untouched; live default untouched; offline read-only",
+}
+
+
+def log(m):
+    print(m, flush=True)
+    open(LOG, "a").write(m + "\n")
+
+
+def load1h(c):
+    rows = list(csv.DictReader(open("data/data_1y/1h/%s.csv" % c)))
+    return [(int(r["timestamp"]), float(r["open"]), float(r["high"]),
+             float(r["low"]), float(r["close"]), float(r["volume"])) for r in rows]
+
+
+def common1h(coins):
+    raw = {c: load1h(c) for c in coins}
+    s = max(r[0][0] for r in raw.values())
+    e = min(r[-1][0] for r in raw.values())
+    bars = {}
+    closes = {}
+    for c in coins:
+        rr = [r for r in raw[c] if s <= r[0] <= e]
+        bars[c] = [(r[1], r[2], r[3], r[4], r[5]) for r in rr]
+        closes[c] = [r[4] for r in rr]
+    n = min(len(b) for b in bars.values())
+    for c in coins:
+        bars[c] = bars[c][:n]
+        closes[c] = closes[c][:n]
+    return bars, closes
+
+
+def build_sig(bars):
+    n = len(bars)
+    raw = {"open": torch.tensor([[b[0] for b in bars]]),
+           "high": torch.tensor([[b[1] for b in bars]]),
+           "low": torch.tensor([[b[2] for b in bars]]),
+           "close": torch.tensor([[b[3] for b in bars]]),
+           "volume": torch.tensor([[b[4] for b in bars]]),
+           "liquidity": torch.full((1, n), 1e7),
+           "fdv": torch.full((1, n), 1e8)}
+    sig = StackVM().execute(FORMULA, FeatureEngineer.compute_features(raw))
+    rets = [(bars[i + 1][3] - bars[i][3]) / bars[i][3] for i in range(n - 1)] + [0.0]
+    return raw, torch.tensor([rets]), sig
+
+
+def qmask(sig, q):
+    if q is None or float(q) <= 0:
+        return None
+    a = sig.detach().float().abs().reshape(-1)
+    k = max(1, int(len(a) * float(q)))
+    thr = torch.topk(a, k).values.min()
+    return (sig.detach().float().abs() >= thr).float()
+
+
+def money_flow_index(highs, lows, closes, vols, window=MFI_WINDOW):
+    """Money Flow Index over typical price x volume.
+
+    TP = (H+L+C)/3; RMF = TP*V; positive flow when TP rises else negative.
+    MFI = 100 - 100/(1 + pos_sum/neg_sum) over `window` flows.
+    First `window` bars are 50.0 (neutral, both gates closed).
+    """
+    n = len(closes)
+    mfi = [50.0] * n
+    if n <= window:
+        return mfi
+    tp = [(highs[i] + lows[i] + closes[i]) / 3.0 for i in range(n)]
+    rmf = [tp[i] * vols[i] for i in range(n)]
+    pos = [0.0] * n
+    neg = [0.0] * n
+    for i in range(1, n):
+        if tp[i] > tp[i - 1]:
+            pos[i] = rmf[i]
+        elif tp[i] < tp[i - 1]:
+            neg[i] = rmf[i]
+
+    def _to_mfi(p, q):
+        if p == 0.0 and q == 0.0:
+            return 50.0
+        if q == 0.0:
+            return 100.0
+        if p == 0.0:
+            return 0.0
+        mr = p / q
+        return 100.0 - 100.0 / (1.0 + mr)
+
+    p = sum(pos[1:window + 1])
+    q = sum(neg[1:window + 1])
+    mfi[window] = _to_mfi(p, q)
+    for i in range(window + 1, n):
+        p = p - pos[i - window] + pos[i]
+        q = q - neg[i - window] + neg[i]
+        mfi[i] = _to_mfi(p, q)
+    return mfi
+
+
+def leg_split(raw, rt, sig, spec, fee, fund, lev, mfi=None):
+    """Joint lp/sp pipeline split into LONG/SHORT legs after shared cooldown+stops.
+
+    mfi=None -> ungated baseline. Otherwise LONG gated to MFI>50, SHORT to MFI<50
+    (masks applied post-quantile, pre-cooldown).
+    """
+    bt = MemeBacktest(venue="aster", leverage=lev, short_enabled=True,
+                      funding_override=fund, fee_override=fee,
+                      long_th=spec["lth"], short_th=spec["sth"],
+                      cooldown_bars=int(spec["cd"]) * SCALE, bars_per_year=BPY,
+                      stop_loss=spec["sl"], time_stop=int(spec["ts"]) * SCALE,
+                      vol_target=spec["vt"], vol_window=int(spec["vw"]) * SCALE)
+    sg = torch.sigmoid(sig)
+    safe = (raw["liquidity"] > bt.min_liq).float()
+    lp = (sg > bt.long_th).float() * safe
+    sp = (sg < bt.short_th).float() * safe
+    mk = qmask(sig, spec["q"])
+    if mk is not None:
+        lp = lp * mk
+    if mfi is not None:
+        r = torch.tensor([mfi])
+        lp = lp * (r > MFI_TH).float()
+        sp = sp * (r < MFI_TH).float()
+    lp, sp = bt._apply_cooldown(lp, sp)
+    lp, sp = bt._apply_stops(lp, sp, rt)
+    sc = bt._vol_scale(rt)
+    lp, sp = lp * sc, sp * sc
+    lp = lp.roll(1, dims=1)
+    lp[:, 0] = 0
+    sp = sp.roll(1, dims=1)
+    sp[:, 0] = 0
+    lt = (lp - lp.roll(1, dims=1)).abs()
+    st = (sp - sp.roll(1, dims=1)).abs()
+    lv = bt.leverage
+    lnet = (lp * rt * lv - lt * bt.base_fee * lv - lp * bt.default_funding_rate * lv)[0].tolist()
+    snet = (-sp * rt * lv - st * bt.base_fee * lv + sp * bt.default_funding_rate * lv)[0].tolist()
+    fnet = [a + b for a, b in zip(lnet, snet)]
+    return lnet, snet, fnet, lt[0].tolist(), st[0].tolist(), lp[0].tolist(), sp[0].tolist()
+
+
+def seg(net, turn, a, b):
+    s = net[a:b]
+    t = turn[a:b]
+    n = len(s)
+    m = sum(s) / n if n else 0
+    v = sum((x - m) ** 2 for x in s) / max(n - 1, 1) if n > 1 else 0
+    sh = m / math.sqrt(v) * math.sqrt(BPY) if v > 0 else 0.0
+    cs = 0.0
+    pk0 = -1e18
+    md = 0.0
+    for x in s:
+        cs += x
+        pk0 = max(pk0, cs)
+        md = max(md, pk0 - cs)
+    cum = sum(s)
+    return {"sharpe": round(sh, 3), "ann": round(cum / n * BPY, 4) if n else 0.0,
+            "mdd": round(md, 4), "cum": round(cum, 4),
+            "final_x": round(1.0 + cum, 4), "n": n,
+            "turnover": round(sum(t) / n, 6) if n else 0.0}
+
+
+def entries_of(pos):
+    n = 0
+    prev = 0.0
+    for x in pos:
+        cur = 1.0 if x > 0.5 else 0.0
+        if cur > 0.5 and prev <= 0.5:
+            n += 1
+        prev = cur
+    return n
+
+
+def active_of(pos):
+    return sum(1 for x in pos if x > 0.5)
+
+
+def dump(res):
+    tmp = OUT.with_suffix(".tmp")
+    tmp.write_text(json.dumps(res, indent=1, ensure_ascii=False))
+    os.replace(tmp, OUT)
+
+
+def main():
+    LOG.parent.mkdir(parents=True, exist_ok=True)
+    OUT.parent.mkdir(parents=True, exist_ok=True)
+    open(LOG, "w").write("iter_H74_mfi start smoke=%s\n" % SMOKE)
+    coins = ["ETC", "TRX"] if SMOKE else list(COINS)
+    w = {c: 1.0 / len(coins) for c in coins}
+    bars, closes = common1h(coins)
+    n = len(bars["ETC"])
+    if SMOKE:
+        n = min(n, 3000)
+        bars = {c: bars[c][:n] for c in coins}
+        closes = {c: closes[c][:n] for c in coins}
+    log("common 1h native n=%d coins=%s smoke=%s scale=x%d mfi=%d" % (n, coins, SMOKE, SCALE, MFI_WINDOW))
+    assert n > 2000, n
+    mfi_map = {c: money_flow_index([b[1] for b in bars[c]], [b[2] for b in bars[c]], closes[c], [b[4] for b in bars[c]], MFI_WINDOW) for c in coins}
+    mats = {c: build_sig(bars[c]) for c in coins}
+    log("signals built")
+    cfg = dict(CONFIG, grid_bars=n, coins=list(coins), weights=dict(w))
+    res = {"config": cfg, "coins": {}, "basket": {}, "baseline": {},
+           "verdict": "PENDING", "decision": "NO_ADOPTION",
+           "decision_note": "P0-3 permutation FAIL => H74 verdict PENDING; MFI-gate attribution only, nothing promoted, live untouched.",
+           "status": "PARTIAL"}
+    dump(res)
+    legs_g, legs_b = {}, {}
+    for c in coins:
+        raw, rt, sg = mats[c]
+        mfi = mfi_map[c]
+        lnet, snet, fnet, lt, st, lp, sp = leg_split(raw, rt, sg, SPECS[c], FEE, FUND, LEV, mfi)
+        bl_, bs_, bf_, blt_, bst_, _, _ = leg_split(raw, rt, sg, SPECS[c], FEE, FUND, LEV, None)
+        legs_g[c] = {"long": lnet, "short": snet, "full": fnet, "lt": lt, "st": st, "lp": lp, "sp": sp}
+        legs_b[c] = {"full": bf_, "lt": blt_, "st": bst_}
+        f = seg(fnet, [a + b for a, b in zip(lt, st)], 0, n)
+        ls = seg(lnet, lt, 0, n)
+        ss = seg(snet, st, 0, n)
+        cumF = sum(fnet)
+        ls["trades"] = entries_of(lp)
+        ls["active_bars"] = active_of(lp)
+        ss["trades"] = entries_of(sp)
+        ss["active_bars"] = active_of(sp)
+        ls["pnl_share"] = round(sum(lnet) / cumF, 4) if abs(cumF) > 1e-12 else 0.0
+        ss["pnl_share"] = round(sum(snet) / cumF, 4) if abs(cumF) > 1e-12 else 0.0
+        n_lo = sum(1 for v in mfi if v > MFI_TH)
+        n_so = sum(1 for v in mfi if v < MFI_TH)
+        res["coins"][c] = {
+            "FULL": f, "LONG": ls, "SHORT": ss,
+            "BASE_FULL": seg(bf_, [a + b for a, b in zip(blt_, bst_)], 0, n),
+            "mfi": {"mean": round(sum(mfi) / n, 3), "min": round(min(mfi), 3),
+                    "max": round(max(mfi), 3),
+                    "n_long_open": n_lo, "n_short_open": n_so,
+                    "frac_long_open": round(n_lo / n, 4),
+                    "frac_short_open": round(n_so / n, 4)},
+        }
+        log("%s gated cumF=%.4f cumL=%.4f cumS=%.4f baseF=%.4f tradesL=%d tradesS=%d mfiL=%.3f mfiS=%.3f" % (
+            c, sum(fnet), sum(lnet), sum(snet), sum(bf_), ls["trades"], ss["trades"], n_lo / n, n_so / n))
+        dump(res)  # incremental: partial survives interruption
+    bfull = [sum(legs_g[c]["full"][t] * w[c] for c in coins) for t in range(n)]
+    blong = [sum(legs_g[c]["long"][t] * w[c] for c in coins) for t in range(n)]
+    bshort = [sum(legs_g[c]["short"][t] * w[c] for c in coins) for t in range(n)]
+    bturn = [sum((legs_g[c]["lt"][t] + legs_g[c]["st"][t]) * w[c] for c in coins) for t in range(n)]
+    blt = [sum(legs_g[c]["lt"][t] * w[c] for c in coins) for t in range(n)]
+    bst = [sum(legs_g[c]["st"][t] * w[c] for c in coins) for t in range(n)]
+    bf = seg(bfull, bturn, 0, n)
+    bl = seg(blong, blt, 0, n)
+    bs = seg(bshort, bst, 0, n)
+    bl["pnl_share"] = round(sum(blong) / sum(bfull), 4) if abs(sum(bfull)) > 1e-12 else 0.0
+    bs["pnl_share"] = round(sum(bshort) / sum(bfull), 4) if abs(sum(bfull)) > 1e-12 else 0.0
+    res["basket"] = {"FULL": bf, "LONG": bl, "SHORT": bs,
+                     "coin_pnl_share": {c: round(sum(legs_g[c]["full"]) * w[c] / sum(bfull), 4) if abs(sum(bfull)) > 1e-12 else 0.0 for c in coins}}
+    bbase = [sum(legs_b[c]["full"][t] * w[c] for c in coins) for t in range(n)]
+    bbaseturn = [sum((legs_b[c]["lt"][t] + legs_b[c]["st"][t]) * w[c] for c in coins) for t in range(n)]
+    res["baseline"] = {"basket_FULL": seg(bbase, bbaseturn, 0, n),
+                       "coin_FULL": {c: round(sum(legs_b[c]["full"]), 4) for c in coins}}
+    res["status"] = "COMPLETE"
+    dump(res)
+    log("wrote %s verdict=PENDING decision=NO_ADOPTION gated sh=%.3f (base %.3f) long_share=%.3f short_share=%.3f" % (
+        OUT, bf["sharpe"], res["baseline"]["basket_FULL"]["sharpe"], bl["pnl_share"], bs["pnl_share"]))
+
+
+if __name__ == "__main__":
+    main()
