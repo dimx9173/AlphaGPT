@@ -1,0 +1,324 @@
+{
+ "config": {
+  "engine": "mirror research/run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "specs_4h": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "specs_1h": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   }
+  },
+  "scale_1h": 4,
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "window": 240,
+  "thresholds": {
+   "high": 0.6,
+   "cut": 0.7,
+   "halt": 0.85
+  },
+  "n_bars": 8760,
+  "n_win": 8521,
+  "venue": "aster",
+  "lev": 2.0,
+  "fee": 0.0004,
+  "fund": 0.0005,
+  "data": "data/data_1y/1h/{COIN}.csv",
+  "brake_env": "Y1B_CORR_BRAKE",
+  "brake_default": "OFF",
+  "note": "E10 FORMULA untouched; equal 0.2 weights (corr scale-invariant); offline read-only; P0-3 FAIL => PENDING"
+ },
+ "legs": {
+  "ETC": {
+   "n": 8760,
+   "cum": 5.0031,
+   "sharpe": 5.156,
+   "ann": 5.0031,
+   "mdd": 0.5391
+  },
+  "TRX": {
+   "n": 8760,
+   "cum": 4.6577,
+   "sharpe": 12.624,
+   "ann": 4.6577,
+   "mdd": 0.0789
+  },
+  "ATOM": {
+   "n": 8760,
+   "cum": 6.4742,
+   "sharpe": 5.692,
+   "ann": 6.4742,
+   "mdd": 0.5199
+  },
+  "APT": {
+   "n": 8760,
+   "cum": 7.9179,
+   "sharpe": 5.927,
+   "ann": 7.9179,
+   "mdd": 0.4548
+  },
+  "KAS": {
+   "n": 8760,
+   "cum": 5.3711,
+   "sharpe": 4.169,
+   "ann": 5.3711,
+   "mdd": 0.6402
+  }
+ },
+ "engine_done": true,
+ "stats": {
+  "pairs": {
+   "ETC-TRX": {
+    "max": 0.4622,
+    "mean": 0.1298,
+    "q50": 0.1155,
+    "q95": 0.3295,
+    "share_gt_0.6": 0.0,
+    "n_win": 8521
+   },
+   "ETC-ATOM": {
+    "max": 0.7058,
+    "mean": 0.3298,
+    "q50": 0.305,
+    "q95": 0.5872,
+    "share_gt_0.6": 0.042,
+    "n_win": 8521
+   },
+   "ETC-APT": {
+    "max": 0.9109,
+    "mean": 0.4667,
+    "q50": 0.4694,
+    "q95": 0.8311,
+    "share_gt_0.6": 0.3358,
+    "n_win": 8521
+   },
+   "ETC-KAS": {
+    "max": 0.6712,
+    "mean": 0.2852,
+    "q50": 0.2815,
+    "q95": 0.5078,
+    "share_gt_0.6": 0.023,
+    "n_win": 8521
+   },
+   "TRX-ATOM": {
+    "max": 0.6413,
+    "mean": 0.1545,
+    "q50": 0.1261,
+    "q95": 0.5031,
+    "share_gt_0.6": 0.0133,
+    "n_win": 8521
+   },
+   "TRX-APT": {
+    "max": 0.5787,
+    "mean": 0.136,
+    "q50": 0.11,
+    "q95": 0.4607,
+    "share_gt_0.6": 0.0,
+    "n_win": 8521
+   },
+   "TRX-KAS": {
+    "max": 0.5741,
+    "mean": 0.1474,
+    "q50": 0.1261,
+    "q95": 0.4237,
+    "share_gt_0.6": 0.0,
+    "n_win": 8521
+   },
+   "ATOM-APT": {
+    "max": 0.8569,
+    "mean": 0.3185,
+    "q50": 0.2974,
+    "q95": 0.546,
+    "share_gt_0.6": 0.0388,
+    "n_win": 8521
+   },
+   "ATOM-KAS": {
+    "max": 0.7495,
+    "mean": 0.3015,
+    "q50": 0.2903,
+    "q95": 0.5878,
+    "share_gt_0.6": 0.0425,
+    "n_win": 8521
+   },
+   "APT-KAS": {
+    "max": 0.564,
+    "mean": 0.2835,
+    "q50": 0.2936,
+    "q95": 0.4661,
+    "share_gt_0.6": 0.0,
+    "n_win": 8521
+   }
+  },
+  "n_pairs": 10,
+  "window": 240,
+  "avg_max": 0.6715,
+  "max_max": 0.9109,
+  "q50_max": 0.6562,
+  "q75_max": 0.7386,
+  "q90_max": 0.8623,
+  "q95_max": 0.8866,
+  "q99_max": 0.906,
+  "share_max_gt_0.6": 0.6,
+  "share_max_gt_0.7": 0.4,
+  "share_max_gt_0.85": 0.2,
+  "avg_mean": 0.2553,
+  "max_mean": 0.4667,
+  "share_mean_gt_0.6": 0.0,
+  "share_mean_gt_0.4": 0.1,
+  "share_win_gt_0.6": 0.0495
+ },
+ "diversification": {
+  "verdict": "CONCENTRATED",
+  "rule": "CONCENTRATED if any max>0.85; WATCH if any max>0.7; DIVERSIFIED if avg_max<0.6"
+ },
+ "breaker": {
+  "rule": "max_corr>0.85 -> lev_scale 0.25 (halt new opens); max_corr>0.7 -> lev_scale 0.5; mean_corr>0.6 -> lev_scale 0.5; else 1.0",
+  "default": "OFF",
+  "env": "Y1B_CORR_BRAKE",
+  "enabled": false,
+  "halve_triggers": [
+   "ATOM-APT",
+   "ATOM-KAS",
+   "ETC-APT",
+   "ETC-ATOM"
+  ],
+  "quarter_triggers": [
+   "ATOM-APT",
+   "ETC-APT"
+  ],
+  "example": {
+   "max_corr>0.7": 0.5,
+   "max_corr>0.85": 0.25
+  }
+ },
+ "verdict": "PENDING",
+ "decision": "NO_CHANGE",
+ "decision_note": "P0-3 permutation FAIL => H9 verdict PENDING; breaker recommendation only, live default stays OFF.",
+ "conclusion": "待定 (P0-3 FAIL): Top5 1h rolling-240 leg-net corr monitor; breaker rec max>0.7 halve, max>0.85 quarter, default OFF"
+}
