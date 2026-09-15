@@ -1,0 +1,400 @@
+{
+ "meta": {
+  "iter": "H10",
+  "scope": "Top5 1h-native (ETC/TRX/ATOM/APT/KAS)",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "baseline": {
+  "FULL_sharpe": 8.514,
+  "FULL_mdd": 0.1998,
+  "source": "H1 base FULL (Top5 1h-native, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "H1",
+   "file": "results/iter_H1_base.json",
+   "topic": "1h baseline anchor (equal 0.2 FULL + fee2x + H2-window + per-coin legs)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "anchor itself (FULL sh=8.514); diagnostic",
+   "dd_cut_pct": 0.0,
+   "robustness": 9.0,
+   "detail": "equal-0.2 FULL sh=8.514 mdd=0.1998 final_x=6.8848 to=0.026667 trades=584; fee2x sh=8.242 (gap -0.272); H2(last730) sh=5.201; per-coin legs TRX 12.6 best, KAS 4.17 weakest",
+   "conclusion_zh": "H1 1h原生等权锚 FULL 8.514/mdd0.1998，fee2x -0.272，H2窗口5.201；仅作全批基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H2",
+   "file": "results/iter_H2_weights.json",
+   "topic": "1h weights (equal vs invvol/invvol_cap/meanvar/risk-parity)",
+   "status": "done",
+   "sharpe_gain": 2.238,
+   "sharpe_gain_note": "FULL-vs-base invvol_cap (beats equal on sharpe+mdd+turnover)",
+   "dd_cut_pct": 35.59,
+   "robustness": 7.0,
+   "detail": "invvol_cap FULL sh=10.752(+2.238) mdd=0.1287(-35.6%) to=0.026127 fold12-med=9.622 beats equal on all3; meanvar +4.909 paper but fails turnover; REVIEW_invvol_cap shelved",
+   "conclusion_zh": "H2 invvol_cap纸面+2.24/-35.6%且换手更低，但P0-3 FAIL下仅备选 REVIEW，不动等权，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H3",
+   "file": "results/iter_H3_stops.json",
+   "topic": "1h stops (uniform sl x ts, best no-drop dd-min)",
+   "status": "done",
+   "sharpe_gain": 0.148,
+   "sharpe_gain_note": "FULL-vs-base no-drop dd-min sl=0.03 ts=24",
+   "dd_cut_pct": 9.46,
+   "robustness": 6.0,
+   "detail": "12 cells sl{None,0.03,0.05,0.08}x ts{12,24,36}; best-no-drop sl=0.03 ts=24 sh=8.662(+0.148) mdd=0.1809(-9.5%) to=0.036941 turnover +38%; PENDING shelf",
+   "conclusion_zh": "H3 sl0.03+ts24纸面+0.15/-9.5%但换手+38%，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H4",
+   "file": "results/iter_H4_thresh.json",
+   "topic": "1h thresh robustness (per-coin lth/sth +/-0.02, 20 runs)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "robustness probe, not a gain arm (max|d|=0.524 sensitive)",
+   "dd_cut_pct": 0.0,
+   "robustness": 7.0,
+   "detail": "20 runs; flat iff max|d|<=0.15 -> sensitive (max|d|=0.524, sth-driven, ETC sth-0.02 +0.524 top); lth all 0.0; decision KEEP_LOCKED",
+   "conclusion_zh": "H4阈值敏感(sth主导，max|d|=0.524>0.15)，维持锁定阈值，诊断结论，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H5",
+   "file": "results/iter_H5_cost.json",
+   "topic": "1h cost-gate stress (5 cost cells x K{0,1,2,3,5}=25 runs)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "gate probe, no gain arm (rec_K=None)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6.0,
+   "detail": "25 runs; first-bite K base5/fee2x3/slip10,20 2/fundhi2; no K satisfies bite-top+noop-base jointly -> Y1B_COST_K rec None, GATE_OFF stays",
+   "conclusion_zh": "H5成本门无K同时满足，GATE_OFF维持，诊断结论，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H6",
+   "file": "results/iter_H6_freq.json",
+   "topic": "1h frequency experiment (1h-native vs 4h-thinned)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "contrast probe (dFULL=-0.155, native churn not paid)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6.0,
+   "detail": "native FULL sh=8.515 vs thinned dFULL=-0.155 turnover ratio 1.10 entries +51; fee2x gaps -0.271/-0.245; ALIGN=1 rec shelved, executor default unset",
+   "conclusion_zh": "H6原生1h相对4h细化无超额(d=-0.155，换手1.10x)，ALIGN=1备选搁置，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H7",
+   "file": "results/iter_H7_lev.json",
+   "topic": "1h leverage scan (lev{1,2,3})",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "invariant probe (sharpe spread 0.0)",
+   "dd_cut_pct": 0.0,
+   "robustness": 7.0,
+   "detail": "sharpe invariant 8.514 at 1/2/3x (linear scale); mdd 0.0999/0.1998/0.2997 dd_3v2=1.5x controlled; decision KEEP_LEV_2.0",
+   "conclusion_zh": "H7杠杆下sharpe不变，dd线性可控，维持LEV2.0，诊断结论，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H8",
+   "file": "results/iter_H8_fund.json",
+   "topic": "1h funding regime (fund sweep + downside bisect + 0.001 gate)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "regime probe (monotone funding curve, gate passes)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6.0,
+   "detail": "fee2x curve monotone up fund0.0001..0.005 sh2.43..69.66; 0.001 gate passes sh=15.481 margin 0.001063; failure only at fund=-0.000063; NO_ADOPTION PASS",
+   "conclusion_zh": "H8资金费率单调 Regime，0.001门通过但仅门检查，不动FUND/FEE/LEV，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H9",
+   "file": "results/iter_H9_corr.json",
+   "topic": "1h correlation monitor (rolling-240 leg-net + breaker OFF)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "monitor probe, no gain arm",
+   "dd_cut_pct": 0.0,
+   "robustness": 6.0,
+   "detail": "10 pairs avg_max=0.6715 max_max=0.9109(ETC-APT); CONCENTRATED verdict; breaker rec max>0.7 halve max>0.85 quarter default OFF NO_CHANGE",
+   "conclusion_zh": "H9 leg-net相关集中(ETC-APT峰0.91)，断路器仅备选默认OFF，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "H2",
+   "rank": 1,
+   "value": 2.238
+  },
+  {
+   "round": "H3",
+   "rank": 2,
+   "value": 0.148
+  },
+  {
+   "round": "H1",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H4",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H5",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H6",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H7",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H8",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H9",
+   "rank": 3,
+   "value": 0.0
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "H2",
+   "rank": 1,
+   "value": 35.59
+  },
+  {
+   "round": "H3",
+   "rank": 2,
+   "value": 9.46
+  },
+  {
+   "round": "H1",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H4",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H5",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H6",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H7",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H8",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H9",
+   "rank": 3,
+   "value": 0.0
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "H1",
+   "rank": 1,
+   "value": 9.0
+  },
+  {
+   "round": "H2",
+   "rank": 2,
+   "value": 7.0
+  },
+  {
+   "round": "H4",
+   "rank": 2,
+   "value": 7.0
+  },
+  {
+   "round": "H7",
+   "rank": 2,
+   "value": 7.0
+  },
+  {
+   "round": "H3",
+   "rank": 5,
+   "value": 6.0
+  },
+  {
+   "round": "H5",
+   "rank": 5,
+   "value": 6.0
+  },
+  {
+   "round": "H6",
+   "rank": 5,
+   "value": 6.0
+  },
+  {
+   "round": "H8",
+   "rank": 5,
+   "value": 6.0
+  },
+  {
+   "round": "H9",
+   "rank": 5,
+   "value": 6.0
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "H2",
+   "rank_sum": 4,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 1,
+    "robust": 2
+   },
+   "rank": 1
+  },
+  {
+   "round": "H1",
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 1
+   },
+   "rank": 2
+  },
+  {
+   "round": "H4",
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 2
+   },
+   "rank": 3
+  },
+  {
+   "round": "H7",
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 2
+   },
+   "rank": 3
+  },
+  {
+   "round": "H3",
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 2,
+    "robust": 5
+   },
+   "rank": 5
+  },
+  {
+   "round": "H5",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 5
+   },
+   "rank": 6
+  },
+  {
+   "round": "H6",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 5
+   },
+   "rank": 6
+  },
+  {
+   "round": "H8",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 5
+   },
+   "rank": 6
+  },
+  {
+   "round": "H9",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 5
+   },
+   "rank": 6
+  }
+ ],
+ "caveats": [
+  "H2 invvol_cap paper gain (+2.238/-35.6%) beats equal on all3 but stays REVIEW shelved under P0-3 FAIL; meanvar +4.909 fails turnover.",
+  "H3 stop gain (+0.148/-9.5%) costs +38% turnover; shelved.",
+  "H4 thresh sensitive via sth (max|d|=0.524); thresholds stay locked.",
+  "H1/H5/H6/H7/H8/H9 diagnostic only (anchor/gate/contrast/invariant/regime/monitor); all 9 PENDING(P0-3 FAIL)."
+ ],
+ "conclusions": [
+  "Composite: H2(4) > H1(7) > H4=H7(8) > H3(9) > H5=H6=H8=H9(11).",
+  "Paper sharpe leader H2 (+2.24) and dd leader H2 (-35.6%) are shelved under P0-3 FAIL.",
+  "Only actionable-leaning contrasts (H2 weights, H3 stops) fail adoption under P0-3 FAIL; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
