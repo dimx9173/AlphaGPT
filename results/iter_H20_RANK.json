@@ -1,0 +1,400 @@
+{
+ "meta": {
+  "iter": "H20",
+  "scope": "Top5 1h-native (ETC/TRX/ATOM/APT/KAS) batch H11-H19",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "baseline": {
+  "FULL_sharpe": 8.514,
+  "FULL_mdd": 0.1998,
+  "source": "H1 base FULL (Top5 1h-native, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "H11",
+   "file": "results/iter_H11_combo.json",
+   "topic": "1h per-coin best combo (sl x ts x cd-small grid + uniform compromise)",
+   "status": "done",
+   "sharpe_gain": -0.588,
+   "sharpe_gain_note": "uniform compromise FULL-vs-base sl=0.05 ts=24 cd=6 (no gain)",
+   "dd_cut_pct": -44.39,
+   "robustness": 6,
+   "detail": "per-coin cells ETC sl0.03/ts24/cd3 sh=8.721(+0.207) TRX None/24/3 sh=8.701(+0.187) KAS sl0.03/24/6 sh=8.590(+0.076) ATOM locked 0.0 APT -0.131; uniform compromise sh=7.926(-0.588) mdd=0.2885 dd+44.4% to=0.039543; shelf only",
+   "conclusion_zh": "H11逐币联合网格仅个别币纸面小增，统一折中反而-0.59/+44.4%dd，全部shelf，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H12",
+   "file": "results/iter_H12_costsplit.json",
+   "topic": "1h turnover decomposition (entry/exit/flip + fee/funding/slip attribution)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "accounting probe, no gain arm (fund_abs share 92.4% of cost)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6,
+   "detail": "FULL turn=233.6 (entry116/exit116/flip1.6, flip share 0.7%) cost_abs=5.5069 (fee0.1869/slip0.2336/fund_abs5.0864, fund share 92.4%); H2 sh=4.842; NO_ADOPTION_KEEP_EQUAL",
+   "conclusion_zh": "H12换手几乎全由进出场构成、资金费占成本九成以上，仅记账诊断，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H13",
+   "file": "results/iter_H13_slipreal.json",
+   "topic": "1h realized slip (5bp assumed vs demo fills)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "realized-vs-assumed probe, n=2 descriptive only",
+   "dd_cut_pct": 0.0,
+   "robustness": 5,
+   "detail": "assumed 5bp drag/yr=0.2336 vs realized mean 0.81bp drag/yr=0.0378 (q90 1.46bp drag 0.068, covers q90); fills n=2 <10 sample inadequate; NO_ADOPTION",
+   "conclusion_zh": "H13实测滑点低于假设但样本仅2笔，仅描述性结论，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H14",
+   "file": "results/iter_H14_fundreal.json",
+   "topic": "1h realized funding (bybit-demo public vs assumed 0.0005)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "regime contrast probe (realized sh=1.236 d=-7.278, no gain arm)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6,
+   "detail": "assumed sh=8.514 cum=5.8848 fund=-5.0272 vs realized sh=1.236 cum=0.8533 fund=+0.0043 (d_sh=-7.278); per-coin TRX realized negative; NO_ADOPTION, FUND/FEE/LEV untouched",
+   "conclusion_zh": "H14真实资金费率下纸面sharpe大降但仅属regime对照，不动费率假设，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H15",
+   "file": "results/iter_H15_volreg.json",
+   "topic": "1h vol regime terciles (trailing-60) + vol-target recheck",
+   "status": "done",
+   "sharpe_gain": 2.064,
+   "sharpe_gain_note": "vt=0.006 FULL-vs-base (paper, turnover +43%)",
+   "dd_cut_pct": 27.13,
+   "robustness": 7,
+   "detail": "basket regimes low9.89/mid9.779/high7.33; TRX leads all regimes; vt0.006 FULL sh=10.578(+2.064) mdd=0.1456(-27.1%) to=0.038077 vs vt0.012 +0.974/mdd0.259; NO_ADOPTION_KEEP_EQUAL shelved",
+   "conclusion_zh": "H15低波regime最强、vt0.006纸面+2.06/-27.1%但换手+43%，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H16",
+   "file": "results/iter_H16_tail.json",
+   "topic": "1h skew/kurtosis + FULL VaR/ES + worst-day attribution",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "tail-risk read-only probe, no gain arm",
+   "dd_cut_pct": 0.0,
+   "robustness": 7,
+   "detail": "FULL skew=1.171 kurt_ex=29.84 var5=-0.0103/es5=-0.0164 var1=-0.0197/es1=-0.0279; ATOM kurt165.7 fattest; worst-day d28 net=-0.106993 (ETC 28.7%/KAS 27%/APT 25.9%); NO_ADOPTION_KEEP_EQUAL",
+   "conclusion_zh": "H16尾部右偏厚尾、ATOM峰度最高、最差日-0.107分散四币，仅风控只读，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H17",
+   "file": "results/iter_H17_streak.json",
+   "topic": "1h max losing streak (per-coin + portfolio + recovery + streak-vs-vol)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "streak autopsy probe, no gain arm",
+   "dd_cut_pct": 0.0,
+   "robustness": 6,
+   "detail": "portfolio max 8 bars (0.33d) cum=-0.0129 recovery 28 bars; worst leg ATOM 11 bars cum=-0.2488; len-vs-vol corr +0.346 (ETC/ATOM streaks run hotter); NO_ADOPTION_KEEP_EQUAL",
+   "conclusion_zh": "H17组合最长连亏仅8根bar且快速修复，最差腿ATOM 11根bar，仅复盘，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H18",
+   "file": "results/iter_H18_persist.json",
+   "topic": "1h signal persistence (acf lag1-96 + median hold + flip clustering + persist-vs-PnL)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "persistence diagnostic probe, no gain arm",
+   "dd_cut_pct": 0.0,
+   "robustness": 6,
+   "detail": "acf1 ~0.97 slow-decay; median hold ETC75/APT79.5 vs ATOM26.5; corr(median_hold,sharpe)=-0.2731 (holding longer != better); KAS hold-PnL corr -0.48; NO_CHANGE",
+   "conclusion_zh": "H18信号高自相关但持仓久与sharpe弱负相关，仅诊断，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H19",
+   "file": "results/iter_H19_interact.json",
+   "topic": "1h parameter interaction (sl x q + cd x ts 2-way heatmaps)",
+   "status": "done",
+   "sharpe_gain": 0.148,
+   "sharpe_gain_note": "best slxq cell sl=0.03 q=0.3 FULL-vs-base (interaction +0.034)",
+   "dd_cut_pct": 9.46,
+   "robustness": 6,
+   "detail": "slxq best sl0.03/q0.3 sh=8.662(+0.148) mdd=0.1809(-9.5%) to=0.036941 interaction +0.034; cdxts best cd6/ts24 sh=7.84 interaction -0.052; cdxts cells all below base; shelf only",
+   "conclusion_zh": "H19仅slxq最优格纸面+0.15/-9.5%、交互微正，cdxts全低于基线，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "H15",
+   "rank": 1,
+   "value": 2.064
+  },
+  {
+   "round": "H19",
+   "rank": 2,
+   "value": 0.148
+  },
+  {
+   "round": "H12",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H13",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H14",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H16",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H17",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H18",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H11",
+   "rank": 9,
+   "value": -0.588
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "H15",
+   "rank": 1,
+   "value": 27.13
+  },
+  {
+   "round": "H19",
+   "rank": 2,
+   "value": 9.46
+  },
+  {
+   "round": "H12",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H13",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H14",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H16",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H17",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H18",
+   "rank": 3,
+   "value": 0.0
+  },
+  {
+   "round": "H11",
+   "rank": 9,
+   "value": -44.39
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "H15",
+   "rank": 1,
+   "value": 7
+  },
+  {
+   "round": "H16",
+   "rank": 1,
+   "value": 7
+  },
+  {
+   "round": "H11",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H12",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H14",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H17",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H18",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H19",
+   "rank": 3,
+   "value": 6
+  },
+  {
+   "round": "H13",
+   "rank": 9,
+   "value": 5
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "H15",
+   "rank_sum": 3,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 1,
+    "robust": 1
+   },
+   "rank": 1
+  },
+  {
+   "round": "H16",
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 1
+   },
+   "rank": 2
+  },
+  {
+   "round": "H19",
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 2,
+    "robust": 3
+   },
+   "rank": 2
+  },
+  {
+   "round": "H12",
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 3
+   },
+   "rank": 4
+  },
+  {
+   "round": "H14",
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 3
+   },
+   "rank": 4
+  },
+  {
+   "round": "H17",
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 3
+   },
+   "rank": 4
+  },
+  {
+   "round": "H18",
+   "rank_sum": 9,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 3
+   },
+   "rank": 4
+  },
+  {
+   "round": "H13",
+   "rank_sum": 15,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 9
+   },
+   "rank": 8
+  },
+  {
+   "round": "H11",
+   "rank_sum": 21,
+   "ranks": {
+    "sharpe": 9,
+    "dd": 9,
+    "robust": 3
+   },
+   "rank": 9
+  }
+ ],
+ "caveats": [
+  "H15 vt0.006 paper gain (+2.064/-27.1%) costs +43% turnover; shelved under P0-3 FAIL.",
+  "H19 slxq best (+0.148/-9.5%) costs +38% turnover; shelved.",
+  "H11 uniform compromise loses (-0.588/+44.4% dd); per-coin bests are shelf-only.",
+  "H12/H13/H14/H16/H17/H18 diagnostic only (cost-split/slip/funding/tail/streak/persist); all 9 PENDING(P0-3 FAIL)."
+ ],
+ "conclusions": [
+  "Composite: H15(3) > H16=H19(7) > H12=H14=H17=H18(9) > H13(15) > H11(21).",
+  "Paper sharpe leader H15 (+2.06) and dd leader H15 (-27.1%) are shelved under P0-3 FAIL.",
+  "Only actionable-leaning contrasts (H15 vt, H19 slxq, H11 per-coin) fail adoption under P0-3 FAIL; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
