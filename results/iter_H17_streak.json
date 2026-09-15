@@ -1,0 +1,364 @@
+{
+ "status": "final",
+ "config": {
+  "engine": "mirror run_weight_modes leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal Top5",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "scaled_specs_1h": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   }
+  },
+  "scale_4h_to_1h": 4,
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "data_dir": "data/data_1y/1h",
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "smoke": false,
+  "streak_def": "losing bar = leg/portfolio net < 0 (flat zero breaks run); longest = max bars, tie-break more negative cum",
+  "recovery_def": "bars from streak end to first cum-equity >= pre-streak peak (max cum before run start, floored at 0); else unrecovered",
+  "vol_def": "per-bar net std annualized x sqrt(BPY); vol_ratio = streak-window / full-sample; cross-coin Pearson(max_len vs full vol)",
+  "note": "H17 1h max losing streak autopsy; E10 FORMULA untouched; offline read-only"
+ },
+ "per_coin": {
+  "ETC": {
+   "FULL": {
+    "n": 8760,
+    "cum": 5.0031,
+    "sharpe": 5.156,
+    "mdd": 0.5391
+   },
+   "streak": {
+    "start": 3939,
+    "end": 3948,
+    "start_ts": 1771999200000,
+    "end_ts": 1772031600000,
+    "length_bars": 10,
+    "length_days": 0.4167,
+    "cum": -0.217745,
+    "recovered": true,
+    "recovery_bars": 62,
+    "recovery_days": 2.5833,
+    "n_runs": 1248,
+    "mean_run_len": 1.7204,
+    "runner_up_bars": 8,
+    "vol_full_ann": 0.97027,
+    "vol_streak_ann": 1.580313,
+    "vol_ratio": 1.6287
+   }
+  },
+  "TRX": {
+   "FULL": {
+    "n": 8760,
+    "cum": 4.6577,
+    "sharpe": 12.624,
+    "mdd": 0.0789
+   },
+   "streak": {
+    "start": 1305,
+    "end": 1313,
+    "start_ts": 1762516800000,
+    "end_ts": 1762545600000,
+    "length_bars": 9,
+    "length_days": 0.375,
+    "cum": -0.062495,
+    "recovered": true,
+    "recovery_bars": 139,
+    "recovery_days": 5.7917,
+    "n_runs": 1414,
+    "mean_run_len": 1.6337,
+    "runner_up_bars": 8,
+    "vol_full_ann": 0.368969,
+    "vol_streak_ann": 0.475111,
+    "vol_ratio": 1.2877
+   }
+  },
+  "ATOM": {
+   "FULL": {
+    "n": 8760,
+    "cum": 6.4742,
+    "sharpe": 5.692,
+    "mdd": 0.5199
+   },
+   "streak": {
+    "start": 1603,
+    "end": 1613,
+    "start_ts": 1763589600000,
+    "end_ts": 1763625600000,
+    "length_bars": 11,
+    "length_days": 0.4583,
+    "cum": -0.248845,
+    "recovered": true,
+    "recovery_bars": 37,
+    "recovery_days": 1.5417,
+    "n_runs": 1459,
+    "mean_run_len": 1.7786,
+    "runner_up_bars": 8,
+    "vol_full_ann": 1.137494,
+    "vol_streak_ann": 1.956617,
+    "vol_ratio": 1.7201
+   }
+  },
+  "APT": {
+   "FULL": {
+    "n": 8760,
+    "cum": 7.9179,
+    "sharpe": 5.927,
+    "mdd": 0.4548
+   },
+   "streak": {
+    "start": 6711,
+    "end": 6719,
+    "start_ts": 1781978400000,
+    "end_ts": 1782007200000,
+    "length_bars": 9,
+    "length_days": 0.375,
+    "cum": -0.061575,
+    "recovered": true,
+    "recovery_bars": 162,
+    "recovery_days": 6.75,
+    "n_runs": 1278,
+    "mean_run_len": 1.7496,
+    "runner_up_bars": 8,
+    "vol_full_ann": 1.335992,
+    "vol_streak_ann": 0.634599,
+    "vol_ratio": 0.475
+   }
+  },
+  "KAS": {
+   "FULL": {
+    "n": 8760,
+    "cum": 5.3711,
+    "sharpe": 4.169,
+    "mdd": 0.6402
+   },
+   "streak": {
+    "start": 6573,
+    "end": 6582,
+    "start_ts": 1781481600000,
+    "end_ts": 1781514000000,
+    "length_bars": 10,
+    "length_days": 0.4167,
+    "cum": -0.06453,
+    "recovered": true,
+    "recovery_bars": 77,
+    "recovery_days": 3.2083,
+    "n_runs": 1456,
+    "mean_run_len": 1.7115,
+    "runner_up_bars": 8,
+    "vol_full_ann": 1.28819,
+    "vol_streak_ann": 0.739273,
+    "vol_ratio": 0.5739
+   }
+  }
+ },
+ "portfolio": {
+  "FULL": {
+   "n": 8760,
+   "cum": 5.8848,
+   "sharpe": 8.514,
+   "mdd": 0.1998
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "streak": {
+   "start": 4049,
+   "end": 4056,
+   "start_ts": 1772395200000,
+   "end_ts": 1772420400000,
+   "length_bars": 8,
+   "length_days": 0.3333,
+   "cum": -0.012928,
+   "recovered": true,
+   "recovery_bars": 28,
+   "recovery_days": 1.1667,
+   "n_runs": 2251,
+   "mean_run_len": 1.6979,
+   "runner_up_bars": 8,
+   "vol_full_ann": 0.691178,
+   "vol_streak_ann": 0.070049,
+   "vol_ratio": 0.1013
+  }
+ },
+ "vol_contrast": {
+  "per_coin": {
+   "ETC": {
+    "vol_full_ann": 0.97027,
+    "vol_streak_ann": 1.580313,
+    "vol_ratio": 1.6287,
+    "max_len_bars": 10
+   },
+   "TRX": {
+    "vol_full_ann": 0.368969,
+    "vol_streak_ann": 0.475111,
+    "vol_ratio": 1.2877,
+    "max_len_bars": 9
+   },
+   "ATOM": {
+    "vol_full_ann": 1.137494,
+    "vol_streak_ann": 1.956617,
+    "vol_ratio": 1.7201,
+    "max_len_bars": 11
+   },
+   "APT": {
+    "vol_full_ann": 1.335992,
+    "vol_streak_ann": 0.634599,
+    "vol_ratio": 0.475,
+    "max_len_bars": 9
+   },
+   "KAS": {
+    "vol_full_ann": 1.28819,
+    "vol_streak_ann": 0.739273,
+    "vol_ratio": 0.5739,
+    "max_len_bars": 10
+   }
+  },
+  "portfolio": {
+   "vol_full_ann": 0.691178,
+   "vol_streak_ann": 0.070049,
+   "vol_ratio": 0.1013,
+   "max_len_bars": 8
+  },
+  "cross_coin_corr_len_vs_vol": 0.3459,
+  "rule": "ratio>1 means the worst streak ran hotter than average leg-net vol"
+ },
+ "worst_leg": "ATOM",
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "NO_ADOPTION_KEEP_EQUAL",
+ "decision_note": "P0-3 permutation FAIL (per-coin p>=0.05) => H17 verdict PENDING; streak autopsy only, no adoption, live untouched.",
+ "conclusion": "H17 1h Top5 max losing streak: portfolio 8 bars (0.33d) cum -0.0129 recovery 28; worst leg ATOM 11 bars cum -0.2488; len-vs-vol corr +0.346. PENDING; diagnostic only, no adoption, live untouched."
+}

@@ -1,0 +1,481 @@
+{
+ "status": "final",
+ "config": {
+  "engine": "mirror run_iter_h1_base leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "vt": null,
+    "vw": 12,
+    "q": 0.3
+   }
+  },
+  "scaled_specs_1h": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 24,
+    "sl": 0.05,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 72,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 24,
+    "sl": null,
+    "ts": 96,
+    "vt": null,
+    "vw": 48,
+    "q": 0.3
+   }
+  },
+  "scale_4h_to_1h": 4,
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "venue": "aster",
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "fee2x": 0.0008,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "data_dir": "data/data_1y/1h",
+  "coins": [
+   "ETC",
+   "TRX",
+   "ATOM",
+   "APT",
+   "KAS"
+  ],
+  "smoke": false,
+  "vol_window": 60,
+  "vol_bpy": 8760.0,
+  "regimes": [
+   "low",
+   "mid",
+   "high"
+  ],
+  "regime_def": "per-coin trailing-60 realized vol (annualized) terciles low/mid/high by 1/3-2/3 value quantiles; basket regime uses cross-coin mean trailing vol",
+  "vt_grid": [
+   0.006,
+   0.012
+  ],
+  "vt_vw_1h": 48,
+  "vt_note": "vol-target payoff recheck reruns legs with MemeBacktest vol_target=vt (clamp 0.2-2.0 on trailing price-vol) vs base vt None",
+  "note": "H15 1h vol-regime split; E10 FORMULA untouched; offline read-only"
+ },
+ "vol_bounds": {
+  "ETC": {
+   "t1": 0.495995,
+   "t2": 0.664409
+  },
+  "TRX": {
+   "t1": 0.171451,
+   "t2": 0.237131
+  },
+  "ATOM": {
+   "t1": 0.518199,
+   "t2": 0.686266
+  },
+  "APT": {
+   "t1": 0.678573,
+   "t2": 0.904026
+  },
+  "KAS": {
+   "t1": 0.59401,
+   "t2": 0.868881
+  }
+ },
+ "basket_vol_bounds": {
+  "t1": 0.517449,
+  "t2": 0.659509
+ },
+ "per_coin": {
+  "ETC": {
+   "low": {
+    "sharpe": 8.56,
+    "ann": 6.4543,
+    "mdd": 0.1819,
+    "cum": 2.1522,
+    "n": 2921,
+    "turnover": 0.015406
+   },
+   "mid": {
+    "sharpe": 4.153,
+    "ann": 3.7667,
+    "mdd": 0.4202,
+    "cum": 1.2556,
+    "n": 2920,
+    "turnover": 0.014041
+   },
+   "high": {
+    "sharpe": 3.998,
+    "ann": 4.7878,
+    "mdd": 0.6008,
+    "cum": 1.5954,
+    "n": 2919,
+    "turnover": 0.015759
+   },
+   "FULL": {
+    "sharpe": 5.156,
+    "ann": 5.0031,
+    "mdd": 0.5391,
+    "cum": 5.0031,
+    "final_x": 6.0031,
+    "n": 8760,
+    "turnover": 0.015068,
+    "trades": 66,
+    "entries": 66,
+    "flips": 0,
+    "exits": 65
+   }
+  },
+  "TRX": {
+   "low": {
+    "sharpe": 14.588,
+    "ann": 4.3039,
+    "mdd": 0.0676,
+    "cum": 1.4351,
+    "n": 2921,
+    "turnover": 0.029784
+   },
+   "mid": {
+    "sharpe": 13.475,
+    "ann": 4.3123,
+    "mdd": 0.0662,
+    "cum": 1.4374,
+    "n": 2920,
+    "turnover": 0.031164
+   },
+   "high": {
+    "sharpe": 11.448,
+    "ann": 5.3573,
+    "mdd": 0.0935,
+    "cum": 1.7852,
+    "n": 2919,
+    "turnover": 0.034258
+   },
+   "FULL": {
+    "sharpe": 12.624,
+    "ann": 4.6577,
+    "mdd": 0.0789,
+    "cum": 4.6577,
+    "final_x": 5.6577,
+    "n": 8760,
+    "turnover": 0.031735,
+    "trades": 139,
+    "entries": 137,
+    "flips": 2,
+    "exits": 137
+   }
+  },
+  "ATOM": {
+   "low": {
+    "sharpe": 8.138,
+    "ann": 6.2695,
+    "mdd": 0.2066,
+    "cum": 2.0905,
+    "n": 2921,
+    "turnover": 0.034235
+   },
+   "mid": {
+    "sharpe": 7.164,
+    "ann": 6.7065,
+    "mdd": 0.2562,
+    "cum": 2.2355,
+    "n": 2920,
+    "turnover": 0.038014
+   },
+   "high": {
+    "sharpe": 4.15,
+    "ann": 6.4466,
+    "mdd": 0.5662,
+    "cum": 2.1481,
+    "n": 2919,
+    "turnover": 0.046934
+   },
+   "FULL": {
+    "sharpe": 5.692,
+    "ann": 6.4742,
+    "mdd": 0.5199,
+    "cum": 6.4742,
+    "final_x": 7.4742,
+    "n": 8760,
+    "turnover": 0.039726,
+    "trades": 174,
+    "entries": 173,
+    "flips": 1,
+    "exits": 172
+   }
+  },
+  "APT": {
+   "low": {
+    "sharpe": 5.524,
+    "ann": 5.5294,
+    "mdd": 0.4968,
+    "cum": 1.8438,
+    "n": 2921,
+    "turnover": 0.01746
+   },
+   "mid": {
+    "sharpe": 7.396,
+    "ann": 9.0383,
+    "mdd": 0.3413,
+    "cum": 3.0128,
+    "n": 2920,
+    "turnover": 0.014041
+   },
+   "high": {
+    "sharpe": 5.432,
+    "ann": 9.1872,
+    "mdd": 0.5551,
+    "cum": 3.0613,
+    "n": 2919,
+    "turnover": 0.013703
+   },
+   "FULL": {
+    "sharpe": 5.927,
+    "ann": 7.9179,
+    "mdd": 0.4548,
+    "cum": 7.9179,
+    "final_x": 8.9179,
+    "n": 8760,
+    "turnover": 0.015068,
+    "trades": 66,
+    "entries": 65,
+    "flips": 1,
+    "exits": 64
+   }
+  },
+  "KAS": {
+   "low": {
+    "sharpe": 4.053,
+    "ann": 3.5459,
+    "mdd": 0.2464,
+    "cum": 1.1824,
+    "n": 2921,
+    "turnover": 0.029784
+   },
+   "mid": {
+    "sharpe": 5.274,
+    "ann": 6.3006,
+    "mdd": 0.4746,
+    "cum": 2.1002,
+    "n": 2920,
+    "turnover": 0.032534
+   },
+   "high": {
+    "sharpe": 3.755,
+    "ann": 6.2678,
+    "mdd": 0.6637,
+    "cum": 2.0885,
+    "n": 2919,
+    "turnover": 0.032888
+   },
+   "FULL": {
+    "sharpe": 4.169,
+    "ann": 5.3711,
+    "mdd": 0.6402,
+    "cum": 5.3711,
+    "final_x": 6.3711,
+    "n": 8760,
+    "turnover": 0.031735,
+    "trades": 139,
+    "entries": 139,
+    "flips": 0,
+    "exits": 138
+   }
+  }
+ },
+ "basket": {
+  "low": {
+   "sharpe": 9.89,
+   "ann": 5.1203,
+   "mdd": 0.1193,
+   "cum": 1.7074,
+   "n": 2921,
+   "turnover": 0.025882
+  },
+  "mid": {
+   "sharpe": 9.779,
+   "ann": 6.0481,
+   "mdd": 0.1052,
+   "cum": 2.016,
+   "n": 2920,
+   "turnover": 0.025548
+  },
+  "high": {
+   "sharpe": 7.33,
+   "ann": 6.4865,
+   "mdd": 0.1998,
+   "cum": 2.1614,
+   "n": 2919,
+   "turnover": 0.028571
+  },
+  "FULL": {
+   "sharpe": 8.514,
+   "ann": 5.8848,
+   "mdd": 0.1998,
+   "cum": 5.8848,
+   "final_x": 6.8848,
+   "n": 8760,
+   "turnover": 0.026667,
+   "trades": 36,
+   "entries": 35,
+   "flips": 1,
+   "exits": 34
+  }
+ },
+ "vt_recheck": {
+  "base_FULL_sharpe": 8.514,
+  "rows": {
+   "0.006": {
+    "FULL": {
+     "sharpe": 10.578,
+     "ann": 6.2286,
+     "mdd": 0.1456,
+     "cum": 6.2286,
+     "final_x": 7.2286,
+     "n": 8760,
+     "turnover": 0.038077,
+     "trades": 38,
+     "entries": 32,
+     "flips": 6,
+     "exits": 31
+    },
+    "gap_FULL_sharpe": 2.064,
+    "per_coin_FULL_sharpe": {
+     "ETC": 6.008,
+     "TRX": 13.019,
+     "ATOM": 6.593,
+     "APT": 6.303,
+     "KAS": 4.399
+    }
+   },
+   "0.012": {
+    "FULL": {
+     "sharpe": 9.488,
+     "ann": 9.7278,
+     "mdd": 0.259,
+     "cum": 9.7278,
+     "final_x": 10.7278,
+     "n": 8760,
+     "turnover": 0.051549,
+     "trades": 36,
+     "entries": 33,
+     "flips": 3,
+     "exits": 32
+    },
+    "gap_FULL_sharpe": 0.974,
+    "per_coin_FULL_sharpe": {
+     "ETC": 5.657,
+     "TRX": 12.633,
+     "ATOM": 6.273,
+     "APT": 6.226,
+     "KAS": 4.533
+    }
+   }
+  }
+ },
+ "verdict": "PENDING_P03_FAIL",
+ "decision": "NO_ADOPTION_KEEP_EQUAL",
+ "decision_note": "P0-3 permutation FAIL (per-coin p>=0.05) => H15 verdict PENDING; vol-regime contrast only, no adoption, live untouched.",
+ "conclusion": "H15 1h vol-tercile per-coin sharpe {'ETC': {'low': 8.56, 'mid': 4.153, 'high': 3.998}, 'TRX': {'low': 14.588, 'mid': 13.475, 'high': 11.448}, 'ATOM': {'low': 8.138, 'mid': 7.164, 'high': 4.15}, 'APT': {'low': 5.524, 'mid': 7.396, 'high': 5.432}, 'KAS': {'low': 4.053, 'mid': 5.274, 'high': 3.755}} | basket regimes {'low': 9.89, 'mid': 9.779, 'high': 7.33} | vt recheck gaps {'0.006': 2.064, '0.012': 0.974}. PENDING; no live change."
+}
