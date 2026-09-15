@@ -1,0 +1,425 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "Parabolic SAR directional gate: LONG only where SAR < close, SHORT only where SAR > close (causal, prior-bar clamp, reversal on bar high/low)",
+  "sar_params": [
+   [
+    0.01,
+    0.1
+   ],
+   [
+    0.02,
+    0.2
+   ],
+   [
+    0.04,
+    0.2
+   ]
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "sar": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 584,
+    "long_cov": 1.0,
+    "short_cov": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 139,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 174,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    }
+   }
+  },
+  {
+   "unit": "sar_af0.01_max0.10",
+   "sar": [
+    0.01,
+    0.1
+   ],
+   "FULL": {
+    "sharpe": 5.224,
+    "ann": 2.3123,
+    "mdd": 0.145,
+    "cum": 2.3123,
+    "final_x": 3.3123,
+    "n": 8760,
+    "turnover": 0.044064,
+    "trades": 967,
+    "long_cov": 0.483424,
+    "short_cov": 0.51653
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.925,
+     "ann": 2.4894,
+     "mdd": 0.2155,
+     "cum": 2.4894,
+     "final_x": 3.4894,
+     "n": 8760,
+     "turnover": 0.034817,
+     "trades": 153,
+     "long_cov": 0.482991,
+     "short_cov": 0.516895
+    },
+    "TRX": {
+     "sharpe": 6.488,
+     "ann": 1.6444,
+     "mdd": 0.112,
+     "cum": 1.6444,
+     "final_x": 2.6444,
+     "n": 8760,
+     "turnover": 0.048402,
+     "trades": 212,
+     "long_cov": 0.527511,
+     "short_cov": 0.472489
+    },
+    "ATOM": {
+     "sharpe": 3.446,
+     "ann": 2.7311,
+     "mdd": 0.2944,
+     "cum": 2.7311,
+     "final_x": 3.7311,
+     "n": 8760,
+     "turnover": 0.049429,
+     "trades": 217,
+     "long_cov": 0.472374,
+     "short_cov": 0.527511
+    },
+    "APT": {
+     "sharpe": 3.387,
+     "ann": 3.3472,
+     "mdd": 0.4753,
+     "cum": 3.3472,
+     "final_x": 4.3472,
+     "n": 8760,
+     "turnover": 0.038242,
+     "trades": 168,
+     "long_cov": 0.464954,
+     "short_cov": 0.535046
+    },
+    "KAS": {
+     "sharpe": 1.668,
+     "ann": 1.3495,
+     "mdd": 0.4874,
+     "cum": 1.3495,
+     "final_x": 2.3495,
+     "n": 8760,
+     "turnover": 0.049429,
+     "trades": 217,
+     "long_cov": 0.469292,
+     "short_cov": 0.530708
+    }
+   }
+  },
+  {
+   "unit": "sar_af0.02_max0.20",
+   "sar": [
+    0.02,
+    0.2
+   ],
+   "FULL": {
+    "sharpe": 4.622,
+    "ann": 2.0801,
+    "mdd": 0.1746,
+    "cum": 2.0801,
+    "final_x": 3.0801,
+    "n": 8760,
+    "turnover": 0.064384,
+    "trades": 1412,
+    "long_cov": 0.488288,
+    "short_cov": 0.511667
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.243,
+     "ann": 2.1114,
+     "mdd": 0.3871,
+     "cum": 2.1114,
+     "final_x": 3.1114,
+     "n": 8760,
+     "turnover": 0.052397,
+     "trades": 230,
+     "long_cov": 0.488128,
+     "short_cov": 0.511758
+    },
+    "TRX": {
+     "sharpe": 6.971,
+     "ann": 1.7546,
+     "mdd": 0.1235,
+     "cum": 1.7546,
+     "final_x": 2.7546,
+     "n": 8760,
+     "turnover": 0.069406,
+     "trades": 304,
+     "long_cov": 0.527283,
+     "short_cov": 0.472717
+    },
+    "ATOM": {
+     "sharpe": 3.542,
+     "ann": 2.9537,
+     "mdd": 0.2593,
+     "cum": 2.9537,
+     "final_x": 3.9537,
+     "n": 8760,
+     "turnover": 0.071804,
+     "trades": 315,
+     "long_cov": 0.477511,
+     "short_cov": 0.522489
+    },
+    "APT": {
+     "sharpe": 3.181,
+     "ann": 3.2012,
+     "mdd": 0.4981,
+     "cum": 3.2012,
+     "final_x": 4.2012,
+     "n": 8760,
+     "turnover": 0.057877,
+     "trades": 254,
+     "long_cov": 0.468265,
+     "short_cov": 0.531735
+    },
+    "KAS": {
+     "sharpe": 0.461,
+     "ann": 0.3794,
+     "mdd": 0.555,
+     "cum": 0.3794,
+     "final_x": 1.3794,
+     "n": 8760,
+     "turnover": 0.070434,
+     "trades": 309,
+     "long_cov": 0.480251,
+     "short_cov": 0.519635
+    }
+   }
+  },
+  {
+   "unit": "sar_af0.04_max0.20",
+   "sar": [
+    0.04,
+    0.2
+   ],
+   "FULL": {
+    "sharpe": 5.47,
+    "ann": 2.5447,
+    "mdd": 0.1867,
+    "cum": 2.5447,
+    "final_x": 3.5447,
+    "n": 8760,
+    "turnover": 0.088516,
+    "trades": 1940,
+    "long_cov": 0.490616,
+    "short_cov": 0.509224
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.361,
+     "ann": 2.2623,
+     "mdd": 0.2698,
+     "cum": 2.2623,
+     "final_x": 3.2623,
+     "n": 8760,
+     "turnover": 0.076826,
+     "trades": 337,
+     "long_cov": 0.492466,
+     "short_cov": 0.507534
+    },
+    "TRX": {
+     "sharpe": 7.286,
+     "ann": 1.9145,
+     "mdd": 0.1019,
+     "cum": 1.9145,
+     "final_x": 2.9145,
+     "n": 8760,
+     "turnover": 0.094749,
+     "trades": 415,
+     "long_cov": 0.516096,
+     "short_cov": 0.48379
+    },
+    "ATOM": {
+     "sharpe": 4.042,
+     "ann": 3.3909,
+     "mdd": 0.3155,
+     "cum": 3.3909,
+     "final_x": 4.3909,
+     "n": 8760,
+     "turnover": 0.096347,
+     "trades": 422,
+     "long_cov": 0.482192,
+     "short_cov": 0.51758
+    },
+    "APT": {
+     "sharpe": 3.957,
+     "ann": 3.9654,
+     "mdd": 0.5627,
+     "cum": 3.9654,
+     "final_x": 4.9654,
+     "n": 8760,
+     "turnover": 0.080479,
+     "trades": 353,
+     "long_cov": 0.47968,
+     "short_cov": 0.52032
+    },
+    "KAS": {
+     "sharpe": 1.388,
+     "ann": 1.1902,
+     "mdd": 0.4445,
+     "cum": 1.1902,
+     "final_x": 2.1902,
+     "n": 8760,
+     "turnover": 0.094178,
+     "trades": 413,
+     "long_cov": 0.482648,
+     "short_cov": 0.516895
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "sar_af0.01_max0.10",
+  "sar_af0.02_max0.20",
+  "sar_af0.04_max0.20"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): SAR过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; SAR filter diagnostic only, no adoption, no live change."
+}
