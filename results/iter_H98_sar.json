@@ -1,0 +1,253 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "Parabolic SAR v2 directional gate: LONG only where SAR < close, SHORT only where SAR > close (causal, prior-bar clamp, reversal on bar high/low)",
+  "sar_params": [
+   [
+    0.02,
+    0.2
+   ]
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "sar": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 584,
+    "long_cov": 1.0,
+    "short_cov": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 139,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 174,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "long_cov": 1.0,
+     "short_cov": 1.0
+    }
+   }
+  },
+  {
+   "unit": "sar_af0.02_max0.20",
+   "sar": [
+    0.02,
+    0.2
+   ],
+   "FULL": {
+    "sharpe": 4.622,
+    "ann": 2.0801,
+    "mdd": 0.1746,
+    "cum": 2.0801,
+    "final_x": 3.0801,
+    "n": 8760,
+    "turnover": 0.064384,
+    "trades": 1412,
+    "long_cov": 0.488288,
+    "short_cov": 0.511667
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.243,
+     "ann": 2.1114,
+     "mdd": 0.3871,
+     "cum": 2.1114,
+     "final_x": 3.1114,
+     "n": 8760,
+     "turnover": 0.052397,
+     "trades": 230,
+     "long_cov": 0.488128,
+     "short_cov": 0.511758
+    },
+    "TRX": {
+     "sharpe": 6.971,
+     "ann": 1.7546,
+     "mdd": 0.1235,
+     "cum": 1.7546,
+     "final_x": 2.7546,
+     "n": 8760,
+     "turnover": 0.069406,
+     "trades": 304,
+     "long_cov": 0.527283,
+     "short_cov": 0.472717
+    },
+    "ATOM": {
+     "sharpe": 3.542,
+     "ann": 2.9537,
+     "mdd": 0.2593,
+     "cum": 2.9537,
+     "final_x": 3.9537,
+     "n": 8760,
+     "turnover": 0.071804,
+     "trades": 315,
+     "long_cov": 0.477511,
+     "short_cov": 0.522489
+    },
+    "APT": {
+     "sharpe": 3.181,
+     "ann": 3.2012,
+     "mdd": 0.4981,
+     "cum": 3.2012,
+     "final_x": 4.2012,
+     "n": 8760,
+     "turnover": 0.057877,
+     "trades": 254,
+     "long_cov": 0.468265,
+     "short_cov": 0.531735
+    },
+    "KAS": {
+     "sharpe": 0.461,
+     "ann": 0.3794,
+     "mdd": 0.555,
+     "cum": 0.3794,
+     "final_x": 1.3794,
+     "n": 8760,
+     "turnover": 0.070434,
+     "trades": 309,
+     "long_cov": 0.480251,
+     "short_cov": 0.519635
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "sar_af0.02_max0.20"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): SAR过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; SAR filter diagnostic only, no adoption, no live change."
+}
