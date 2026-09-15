@@ -1,0 +1,400 @@
+{
+ "meta": {
+  "iter": "H70",
+  "scope": "Top5 1h-native (ETC/TRX/ATOM/APT/KAS) batch H61-H69",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "rounds": [
+  {
+   "round": "H61",
+   "file": "results/iter_H61_donch.json",
+   "topic": "1h Donchian(N) entry-only breakout filter v4 (N=24/48/96, holds/exits pass)",
+   "status": "done",
+   "sharpe_gain": -0.704,
+   "sharpe_gain_note": "best donch FULL-vs-base donch_24 (loses; no gain arm)",
+   "dd_cut_pct": 16.02,
+   "robustness": 6,
+   "detail": "base sh=8.515 mdd=0.1998 vs donch_24 7.811(-0.704/mdd0.1678/-16.0%) donch_48 6.582 donch_96 5.410(-3.105/mdd0.1104); wider N loses more; NO_ADOPTION",
+   "conclusion_zh": "H61 Donchian过滤全低于基线，N越大损失越大，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H62",
+   "file": "results/iter_H62_obv.json",
+   "topic": "1h OBV-slope(192) gate v4 (legs pass-through warmup 192 bars)",
+   "status": "done",
+   "sharpe_gain": -2.969,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": 20.82,
+   "robustness": 6,
+   "detail": "gated basket sh=5.545(-2.969) mdd=0.1582(-20.8%) to=0.023562 LONG share 0.0; per-coin gated ETC 3.49 TRX 8.753 all below base; NO_ADOPTION",
+   "conclusion_zh": "H62 OBV门组合-2.97、dd纸面-20.8%但sharpe大降，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H63",
+   "file": "results/iter_H63_vwap.json",
+   "topic": "1h VWAP(192) gate v4 (legs pre-cooldown, close>vwap long / below short)",
+   "status": "done",
+   "sharpe_gain": -1.818,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -5.71,
+   "robustness": 6,
+   "detail": "gated basket sh=6.696(-1.818) mdd=0.2112(dd+5.7%) to=0.019589 trades=429 LONG share -0.0032; per-coin gated ATOM 5.983(+0.291 sole gain) rest lose; NO_ADOPTION",
+   "conclusion_zh": "H63 VWAP门组合-1.82且dd+5.7%，仅ATOM纸面小增，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H64",
+   "file": "results/iter_H64_bb.json",
+   "topic": "1h BB(192,2) outside-band entry gate v4 (both legs pre-cooldown, H2 check)",
+   "status": "done",
+   "sharpe_gain": -4.083,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -38.59,
+   "robustness": 6,
+   "detail": "gated basket sh=4.431(-4.083) mdd=0.2769(dd+38.6%) to=0.012831 H2 4.574; per-coin gated TRX 6.102(-6.522) all coins lose; NO_ADOPTION",
+   "conclusion_zh": "H64 BB门组合-4.08且dd+38.6%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H65",
+   "file": "results/iter_H65_stoch.json",
+   "topic": "1h Stoch(112,3) entry gate v4 (legs pre-cooldown, K>D long / K<D short)",
+   "status": "done",
+   "sharpe_gain": 0.247,
+   "sharpe_gain_note": "gated basket FULL-vs-base (paper gain; shelf-only under P0-3 FAIL)",
+   "dd_cut_pct": 3.75,
+   "robustness": 6,
+   "detail": "gated basket sh=8.761(+0.247) mdd=0.1923(-3.8%) to=0.028037 trades=614 LONG share -0.0043; per-coin gated ETC 6.205(+1.049) APT 6.983(+1.056) above base, TRX/ATOM/KAS below; PENDING shelf",
+   "conclusion_zh": "H65 Stoch门组合纸面+0.25/-3.8%，ETC/APT纸面增益，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H66",
+   "file": "results/iter_H66_macd.json",
+   "topic": "1h MACD(96,192,36) sign-agreement gate v4 (H2 check)",
+   "status": "done",
+   "sharpe_gain": -2.252,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -41.39,
+   "robustness": 6,
+   "detail": "gated basket sh=6.262(-2.252) mdd=0.2825(dd+41.4%) to=0.016712 H2 6.538 LONG share -0.0054; per-coin gated all below base; NO_ADOPTION",
+   "conclusion_zh": "H66 MACD门组合-2.25且dd+41.4%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H67",
+   "file": "results/iter_H67_rsi.json",
+   "topic": "1h RSI(112) gate v4 (legs RSI>50/<50, basket LONG/SHORT split)",
+   "status": "done",
+   "sharpe_gain": -1.984,
+   "sharpe_gain_note": "gated basket FULL-vs-base (loses; no gain arm)",
+   "dd_cut_pct": -16.32,
+   "robustness": 6,
+   "detail": "gated basket sh=6.53(-1.984) mdd=0.2324(dd+16.3%) to=0.020091 LONG share 0.0; per-coin gated ATOM 5.673(-0.019 closest) rest lose; NO_ADOPTION",
+   "conclusion_zh": "H67 RSI门组合-1.98且dd+16.3%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H68",
+   "file": "results/iter_H68_adx.json",
+   "topic": "1h ADX(112) filter v4 (base + ADX>20/25/30 FULL/coverage)",
+   "status": "done",
+   "sharpe_gain": -6.42,
+   "sharpe_gain_note": "best-cell FULL-vs-base adx>25 (loses; coverage collapses)",
+   "dd_cut_pct": 68.02,
+   "robustness": 6,
+   "detail": "base sh=8.515 vs adx>25 2.095(-6.42/mdd0.0639/cov0.0%) adx>20 1.788 adx>30 0.201; coverage collapses; NO_ADOPTION",
+   "conclusion_zh": "H68 ADX过滤-6.42且覆盖坍缩至0.0%，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H69",
+   "file": "results/iter_H69_atr.json",
+   "topic": "1h ATR-stop sweep v4 (uniform atr + per-coin best + no-drop dd-min, H2)",
+   "status": "done",
+   "sharpe_gain": 0.0,
+   "sharpe_gain_note": "no-drop dd-min is base itself (atr=None; no gain arm)",
+   "dd_cut_pct": 0.0,
+   "robustness": 7,
+   "detail": "uniform atr{None,4.0,6.0,8.0} FULL sh 8.514/8.463/8.474/8.433 all <=base; per-coin best ETC atr6.0 +0.063 APT atr4.0 +0.002 KAS atr8.0 +0.011; shelf only",
+   "conclusion_zh": "H69统一ATR全不超基线，逐币最优ETC纸面+0.06，shelf备选，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "H61",
+   "rank": 3,
+   "value": -0.704
+  },
+  {
+   "round": "H62",
+   "rank": 7,
+   "value": -2.969
+  },
+  {
+   "round": "H63",
+   "rank": 4,
+   "value": -1.818
+  },
+  {
+   "round": "H64",
+   "rank": 8,
+   "value": -4.083
+  },
+  {
+   "round": "H65",
+   "rank": 1,
+   "value": 0.247
+  },
+  {
+   "round": "H66",
+   "rank": 6,
+   "value": -2.252
+  },
+  {
+   "round": "H67",
+   "rank": 5,
+   "value": -1.984
+  },
+  {
+   "round": "H68",
+   "rank": 9,
+   "value": -6.42
+  },
+  {
+   "round": "H69",
+   "rank": 2,
+   "value": 0.0
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "H61",
+   "rank": 3,
+   "value": 16.02
+  },
+  {
+   "round": "H62",
+   "rank": 2,
+   "value": 20.82
+  },
+  {
+   "round": "H63",
+   "rank": 6,
+   "value": -5.71
+  },
+  {
+   "round": "H64",
+   "rank": 8,
+   "value": -38.59
+  },
+  {
+   "round": "H65",
+   "rank": 4,
+   "value": 3.75
+  },
+  {
+   "round": "H66",
+   "rank": 9,
+   "value": -41.39
+  },
+  {
+   "round": "H67",
+   "rank": 7,
+   "value": -16.32
+  },
+  {
+   "round": "H68",
+   "rank": 1,
+   "value": 68.02
+  },
+  {
+   "round": "H69",
+   "rank": 5,
+   "value": 0.0
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "H61",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H62",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H63",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H64",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H65",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H66",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H67",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H68",
+   "rank": 2,
+   "value": 6
+  },
+  {
+   "round": "H69",
+   "rank": 1,
+   "value": 7
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "H65",
+   "rank_sum": 7,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 4,
+    "robust": 2
+   },
+   "rank": 1
+  },
+  {
+   "round": "H61",
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 3,
+    "robust": 2
+   },
+   "rank": 2
+  },
+  {
+   "round": "H69",
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 5,
+    "robust": 1
+   },
+   "rank": 2
+  },
+  {
+   "round": "H62",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 2,
+    "robust": 2
+   },
+   "rank": 3
+  },
+  {
+   "round": "H63",
+   "rank_sum": 12,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 6,
+    "robust": 2
+   },
+   "rank": 4
+  },
+  {
+   "round": "H68",
+   "rank_sum": 12,
+   "ranks": {
+    "sharpe": 9,
+    "dd": 1,
+    "robust": 2
+   },
+   "rank": 4
+  },
+  {
+   "round": "H67",
+   "rank_sum": 14,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 7,
+    "robust": 2
+   },
+   "rank": 5
+  },
+  {
+   "round": "H66",
+   "rank_sum": 17,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 9,
+    "robust": 2
+   },
+   "rank": 6
+  },
+  {
+   "round": "H64",
+   "rank_sum": 18,
+   "ranks": {
+    "sharpe": 8,
+    "dd": 8,
+    "robust": 2
+   },
+   "rank": 7
+  }
+ ],
+ "baseline": {
+  "FULL_sharpe": 8.514,
+  "FULL_mdd": 0.1998,
+  "source": "H1 base FULL (Top5 1h-native, lev2, q0.3)"
+ },
+ "caveats": [
+  "H61/H68 overlays never beat base (H61 wider-N loses more; H68 coverage collapses to 0.0% at adx>25).",
+  "H62/H63/H64/H66/H67 gates all lose on sharpe (H64 -4.083 worst gate, H62 -2.969; H66 dd +41.4% worst, H64 +38.6%, H67 +16.3%).",
+  "Only paper dd-cut positives with real coverage: H62 +20.8% (sharpe -2.97), H61 +16.0% (sharpe -0.70), H65 +3.8% (sharpe +0.25 shelf-only); H68 +68.0% is coverage-collapse paper.",
+  "H65 sole paper sharpe gain (+0.247, turnover +5.1%, per-coin ETC +1.049 / APT +1.056) is shelf-only under P0-3 FAIL; H69 no-drop dd-min is base itself (per-coin ETC +0.063 / KAS +0.011 shelf-only). All 9 PENDING(P0-3 FAIL)."
+ ],
+ "conclusions": [
+  "Composite: H65(7), H61(8), H69(8), H62(11), H63(12), H68(12), H67(14), H66(17), H64(18).",
+  "Paper-gain leader H65 (+0.247/-3.8%) and dd leader H68 (+68.0%, coverage collapse) are shelf-only or paper; least-loss base-itself H69 shelved under P0-3 FAIL.",
+  "No adopted gain arm in any of H61-H69; per-coin bests shelf-only; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": [],
+  "reason": "9 rounds all PENDING under P0-3 FAIL, none recommended for demo."
+ },
+ "verdict": "ALL_PENDING_P03_FAIL"
+}
