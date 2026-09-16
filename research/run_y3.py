@@ -60,7 +60,7 @@ def leg_net_pos(bars, lth, sth, cd, sl, q=None, side='both', ts=0):
            'volume': torch.tensor([[x[4] for x in bars]]),
            'liquidity': torch.full((1, n), 1e7),
            'fdv': torch.full((1, n), 1e8)}
-    sig = StackVM().execute(FORMULA, FeatureEngineer.compute_features(raw))
+    sig = StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
     rets = [(bars[i + 1][3] - bars[i][3]) / bars[i][3] if i < n - 1 else 0.0 for i in range(n)]
     bt = MemeBacktest(venue='aster', leverage=LEV, short_enabled=True, long_th=lth,
                       short_th=sth, cooldown_bars=cd, bars_per_year=2190.0,

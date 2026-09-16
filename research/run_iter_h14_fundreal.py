@@ -124,7 +124,7 @@ def build_sig(bars):
         'liquidity': torch.full((1, n), 1e7),
         'fdv': torch.full((1, n), 1e8),
     }
-    sig = StackVM().execute(FORMULA, FeatureEngineer.compute_features(raw))
+    sig = StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
     rets = [(bars[i + 1][3] - bars[i][3]) / bars[i][3] for i in range(n - 1)] + [0.0]
     return raw, torch.tensor([rets]), sig
 

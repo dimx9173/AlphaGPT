@@ -17,7 +17,7 @@ for i in range(0,len(rows),16):
     bars.append({"close":float(blk[-1]["close"]),"open":float(blk[0]["open"]),"high":max(float(x["high"]) for x in blk),"low":min(float(x["low"]) for x in blk),"volume":sum(float(x["volume"]) for x in blk)})
 n=len(bars)
 raw={"open":torch.tensor([[b["open"] for b in bars]]),"high":torch.tensor([[b["high"] for b in bars]]),"low":torch.tensor([[b["low"] for b in bars]]),"close":torch.tensor([[b["close"] for b in bars]]),"volume":torch.tensor([[b["volume"] for b in bars]]),"liquidity":torch.full((1,n),1e7),"fdv":torch.full((1,n),1e8)}
-sig=StackVM().execute(FORMULA,FeatureEngineer.compute_features(raw))
+sig=StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
 rets=[(bars[i+1]["close"]-bars[i]["close"])/bars[i]["close"] for i in range(n-1)]+[0.0]
 target=torch.tensor([rets])
 for lth,sth in [(0.85,0.15),(0.88,0.12),(0.90,0.10),(0.92,0.08)]:

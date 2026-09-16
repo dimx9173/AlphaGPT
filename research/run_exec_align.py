@@ -38,7 +38,7 @@ def qmask(sig):
 def leg(coin,bars,spec,fee):
     n=len(bars)
     raw={"open":torch.tensor([[b[0] for b in bars]]),"high":torch.tensor([[b[1] for b in bars]]),"low":torch.tensor([[b[2] for b in bars]]),"close":torch.tensor([[b[3] for b in bars]]),"volume":torch.tensor([[b[4] for b in bars]]),"liquidity":torch.full((1,n),1e7),"fdv":torch.full((1,n),1e8)}
-    sig=StackVM().execute(FORMULA,FeatureEngineer.compute_features(raw))
+    sig=StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
     rets=[(bars[i+1][3]-bars[i][3])/bars[i][3] if i<n-1 else 0.0 for i in range(n)]
     rt=torch.tensor([rets])
     bt=MemeBacktest(venue="aster",leverage=2.0,short_enabled=True,long_th=spec["lth"],short_th=spec["sth"],cooldown_bars=spec["cd"],bars_per_year=BPY,stop_loss=spec["sl"],time_stop=spec["ts"],fee_override=fee,funding_override=FUND)

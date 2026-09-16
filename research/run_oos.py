@@ -30,7 +30,7 @@ def run_coin(coin):
            "close": torch.tensor([[b["close"] for b in bars]]),
            "volume": torch.tensor([[b["volume"] for b in bars]]),
            "liquidity": torch.full((1, n), 1e7), "fdv": torch.full((1, n), 1e8)}
-    sig = StackVM().execute(FORMULA, FeatureEngineer.compute_features(raw))
+    sig = StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
     rets = [(bars[i+1]["close"]-bars[i]["close"])/bars[i]["close"] for i in range(n-1)] + [0.0]
     bt = MemeBacktest(**KW)
     fit, cum = bt.evaluate(sig, raw, torch.tensor([rets]))

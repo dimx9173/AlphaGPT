@@ -33,7 +33,7 @@ for b in range(NB):
            "close": torch.tensor([[x["close"] for x in bb]]),
            "volume": torch.tensor([[x["volume"] for x in bb]]),
            "liquidity": torch.full((1, m), 1e7), "fdv": torch.full((1, m), 1e8)}
-    sig = StackVM().execute(FORMULA, FeatureEngineer.compute_features(raw))
+    sig = StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
     rets = [(bb[i+1]["close"]-bb[i]["close"])/bb[i]["close"] for i in range(m-1)] + [0.0]
     bt = MemeBacktest(venue="aster", leverage=2.0, short_enabled=True,
                       funding_override=0.0005, long_th=0.88, short_th=0.12,

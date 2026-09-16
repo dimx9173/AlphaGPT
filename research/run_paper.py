@@ -35,7 +35,7 @@ def run_paper():
     for c in coins:
         b = bars[c][:n]
         raw = {'open': torch.tensor([[x[0] for x in b]]), 'high': torch.tensor([[x[1] for x in b]]), 'low': torch.tensor([[x[2] for x in b]]), 'close': torch.tensor([[x[3] for x in b]]), 'volume': torch.tensor([[x[4] for x in b]]), 'liquidity': torch.full((1, n), 1e7), 'fdv': torch.full((1, n), 1e8)}
-        sig = StackVM().execute(FORMULA, FeatureEngineer.compute_features(raw))
+        sig = StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
         px = torch.tensor([x[3] for x in b])
         lth, sth, cd, sl = BEST[c]
         bt = MemeBacktest(venue='aster', leverage=2.0, short_enabled=True, funding_override=FUND, long_th=lth, short_th=sth, cooldown_bars=cd, bars_per_year=2190.0, stop_loss=sl)

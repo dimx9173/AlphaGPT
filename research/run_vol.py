@@ -25,7 +25,7 @@ raw = {"open": torch.tensor([[b["open"] for b in bars]]),
        "close": torch.tensor([[b["close"] for b in bars]]),
        "volume": torch.tensor([[b["volume"] for b in bars]]),
        "liquidity": torch.full((1, n), 1e7), "fdv": torch.full((1, n), 1e8)}
-sig = StackVM().execute([3,2,7,2,7,11,15,4,4,6,6,10], FeatureEngineer.compute_features(raw))
+sig = StackVM(use_advanced=False).execute([3,2,7,2,7,11,15,4,4,6,6,10], FeatureEngineer.compute_features(raw, use_advanced=False))
 rets = [(bars[i+1]["close"]-bars[i]["close"])/bars[i]["close"] for i in range(n-1)] + [0.0]
 target = torch.tensor([rets])
 for vt in [None, 0.005, 0.01, 0.02]:

@@ -28,7 +28,7 @@ def build_mats(bars):
     c = torch.tensor([[b[3] for b in bars]])
     v = torch.tensor([[b[4] for b in bars]])
     raw = {'open':o,'high':h,'low':l,'close':c,'volume':v,'liquidity':torch.full((1,n),1e7),'fdv':torch.full((1,n),1e8)}
-    sig = StackVM().execute(FORMULA, FeatureEngineer.compute_features(raw))
+    sig = StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
     rets = [(bars[i+1][3]-bars[i][3])/bars[i][3] for i in range(n-1)] + [0.0]
     return raw, torch.tensor([rets]), sig
 def net_series(raw, rets_t, sig, lth, sth, cd, sl):
