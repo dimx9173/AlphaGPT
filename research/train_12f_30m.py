@@ -84,6 +84,10 @@ def main():
     steps = 3 if smoke else (int(sys.argv[1]) if len(sys.argv) > 1 else 200)
     bs = 4 if smoke else (int(sys.argv[2]) if len(sys.argv) > 2 else 64)
     coins = ("ETC", "TRX") if smoke else tuple(COINS5)
+    # smoke never touches real artifacts; floor-constrained run gets its own file
+    OUT = "/tmp/train_12f_30m_smoke.json" if smoke else (
+        "results/train_12f_30m_floor_best.json" if "TRAIN_12F_FLOOR" in os.environ
+        else "results/train_12f_30m_best.json")
     feats, target, raw, cnames = build_tensors(load_30m(coins))
     print(f"feats {tuple(feats.shape)} coins={cnames} vocab={VOC.size}", flush=True)
     device = ModelConfig.DEVICE
@@ -94,7 +98,7 @@ def main():
     opt = torch.optim.AdamW(model.parameters(), lr=1e-3)
     vm = StackVM(use_advanced=True)
     print(f"vm feat_offset={vm.feat_offset}", flush=True)
-    best_score, best_formula = -1e9, None
+    best_score, best_formula, best_worst = -1e9, None, None
     hist = []
     for step in tqdm(range(steps)):
         inp = torch.zeros((bs, 1), dtype=torch.long, device=device)
@@ -116,6 +120,7 @@ def main():
             if res.std() < 1e-4:
                 rewards[i] = -2.0; continue
             scores = []
+            worst = 1e9
             for j, c in enumerate(cnames):
                 lth, sth, cd, sl = TH[c]
                 bt = MemeBacktest(venue="aster", leverage=2.0, short_enabled=True,
@@ -123,10 +128,18 @@ def main():
                                   cooldown_bars=cd, bars_per_year=BPY30M, stop_loss=sl)
                 one = {k: (v[j:j + 1] if isinstance(v, torch.Tensor) else v) for k, v in raw_d.items()}
                 sc, _ = bt.evaluate(res[j:j + 1], one, target[j:j + 1])
-                scores.append(float(sc.item()) if isinstance(sc, torch.Tensor) else float(sc))
-            rewards[i] = sum(scores) / len(scores)
+                _s = float(sc.item()) if isinstance(sc, torch.Tensor) else float(sc)
+                scores.append(_s)
+                worst = min(worst, _s)
+            mean_s = sum(scores) / len(scores)
+            # per-leg floor: any leg sharpe<=0 vetoes (penalized, not adopted)
+            leg_floor = float(os.getenv("TRAIN_12F_FLOOR", "0.0"))
+            if worst <= leg_floor:
+                rewards[i] = worst  # veto: reward = worst leg (<=floor), keeps gradient signal
+                continue
+            rewards[i] = mean_s
             if float(rewards[i]) > best_score:
-                best_score = float(rewards[i]); best_formula = f
+                best_score = float(rewards[i]); best_formula = f; best_worst = worst
         adv = (rewards - rewards.mean()) / (rewards.std() + 1e-5)
         pl = torch.stack([-lp * adv for lp in lps], dim=0).sum(dim=0).mean()
         vl = F.mse_loss(torch.stack(vals, dim=0).mean(dim=0), rewards)
@@ -138,11 +151,13 @@ def main():
         if step % 20 == 0:
             print(f"step {step} avg={avg:.3f} best={best_score:.3f} formula={best_formula} decode={decode(best_formula) if best_formula else None}", flush=True)
     out = {"formula": best_formula, "decode": decode(best_formula) if best_formula else None,
-           "score": best_score, "hist": hist, "vocab": "12f",
+           "score": best_score, "worst_leg": best_worst, "floor": float(os.getenv("TRAIN_12F_FLOOR", "0.0")),
+           "hist": hist, "vocab": "12f",
            "coins": list(cnames), "bars": "30m-1y", "bpy": BPY30M}
-    os.makedirs("results", exist_ok=True)
-    with open("results/train_12f_30m_best.json", "w") as f:
+    os.makedirs(os.path.dirname(OUT) or ".", exist_ok=True)
+    with open(OUT, "w") as f:
         json.dump(out, f, indent=1)
+    print(f"wrote {OUT}")
     print(f"DONE best={best_score:.3f} formula={best_formula} decode={out['decode']}")
 
 
