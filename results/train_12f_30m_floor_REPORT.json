@@ -1,0 +1,65 @@
+{
+ "train": "12f 30m 1y Top5, 200 steps x bs64, RL + per-leg floor veto (TRAIN_12F_FLOOR=0.0, veto tracks best, fix 3411cb6)",
+ "best": {
+  "score": 7.406,
+  "worst_leg": 6.316,
+  "formula": [
+   2,
+   1,
+   21,
+   21,
+   16,
+   10,
+   24,
+   21,
+   0,
+   16,
+   14,
+   19
+  ],
+  "decode": [
+   "PRESSURE",
+   "LIQ_SCORE",
+   "DECAY",
+   "DECAY",
+   "NEG",
+   "CLOSE_POS",
+   "ZSCORE",
+   "DECAY",
+   "RET",
+   "NEG",
+   "MUL",
+   "GATE"
+  ]
+ },
+ "single_leg_30m": {
+  "ETC": {
+   "sharpe": 8.94,
+   "mdd": 0.3895,
+   "turnover": 0.0517
+  },
+  "TRX": {
+   "sharpe": 18.766,
+   "mdd": 0.0805,
+   "turnover": 0.1285
+  },
+  "ATOM": {
+   "sharpe": 6.105,
+   "mdd": 0.3592,
+   "turnover": 0.13
+  },
+  "APT": {
+   "sharpe": 6.121,
+   "mdd": 0.6983,
+   "turnover": 0.0515
+  },
+  "KAS": {
+   "sharpe": 5.993,
+   "mdd": 0.5863,
+   "turnover": 0.1294
+  }
+ },
+ "contrast_unconstrained": "prev best 9.399 mean masked TRX -36 collapse; floor version worst leg 6.32, all 5 legs > 0",
+ "verdict": "PENDING (needs permutation gate on fresh OOS + fee2x/turnover review). NO_ADOPTION, live untouched (E10 6f).",
+ "next": "12fold/walk-forward validation of floor formula vs E10; turnover 0.05-0.13 vs E10 ~0.027 costs review needed."
+}
