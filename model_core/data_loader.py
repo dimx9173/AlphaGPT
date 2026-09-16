@@ -62,7 +62,7 @@ class CryptoDataLoader:
             'liquidity': to_tensor('liquidity'),
             'fdv': to_tensor('fdv')
         }
-        flag = os.getenv("USE_ADVANCED", "0") == "1"
+        flag = os.getenv("USE_ADVANCED", "1") == "1"
         self.feat_tensor = FeatureEngineer.compute_features(self.raw_data_cache, use_advanced=flag)
         op = self.raw_data_cache['open']
         t1 = torch.roll(op, -1, dims=1)

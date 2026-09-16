@@ -1,0 +1,68 @@
+{
+ "train": "12f 30m 1y Top5 (ETC/TRX/ATOM/APT/KAS), 200 steps x bs64, RL (policy+value+entropy) + LoRD-less AdamW, reward=mean per-coin MemeBacktest sharpe (aster 2x fund0.0005, E10 per-coin lth/sth/cd/sl, BPY=17520)",
+ "best": {
+  "score": 9.399,
+  "formula": [
+   4,
+   9,
+   15,
+   4,
+   15,
+   17,
+   3,
+   4,
+   18,
+   28,
+   15,
+   21
+  ],
+  "decode": [
+   "DEV",
+   "HL_RANGE",
+   "DIV",
+   "DEV",
+   "DIV",
+   "ABS",
+   "FOMO",
+   "DEV",
+   "SIGN",
+   "CORR",
+   "DIV",
+   "DECAY"
+  ],
+  "note": "uses new 12f channels HL_RANGE(9); E10 token-ids NOT comparable (offset 6->12)"
+ },
+ "single_leg_30m": {
+  "ETC": {
+   "sharpe": 11.753,
+   "mdd": 0.8963,
+   "turnover": 0.0001
+  },
+  "TRX": {
+   "sharpe": -36.74,
+   "mdd": 17.637,
+   "turnover": 0.0005
+  },
+  "ATOM": {
+   "sharpe": 12.015,
+   "mdd": 0.6163,
+   "turnover": 0.0001
+  },
+  "APT": {
+   "sharpe": 10.729,
+   "mdd": 0.5544,
+   "turnover": 0.0001
+  },
+  "KAS": {
+   "sharpe": 7.351,
+   "mdd": 1.8202,
+   "turnover": 0.0001
+  }
+ },
+ "verdict": "PENDING (TRX leg collapse; mean-reward masked it). NO_ADOPTION, live untouched (E10 6f pinned in y1b_basket/runner/new_coin_pipeline).",
+ "next": "retrain with per-coin floor constraint (e.g. min sharpe > 0) or TRX-excluded basket; then permutation gate on fresh OOS.",
+ "demo": {
+  "hourly_fixed": true,
+  "note": "16:00 UTC sigmoid-None crash root-caused to vm default flip; E10 live path pinned use_advanced=False, manual hourly rerun ok:true balance 91655"
+ }
+}

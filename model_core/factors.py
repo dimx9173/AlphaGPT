@@ -156,7 +156,7 @@ class AdvancedFactorEngineer:
         return features
 
 
-USE_ADVANCED = os.getenv("USE_ADVANCED", "0") == "1"
+USE_ADVANCED = os.getenv("USE_ADVANCED", "1") == "1"
 
 
 class FeatureEngineer:

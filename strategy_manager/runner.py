@@ -27,7 +27,7 @@ class StrategyRunner:
 
             brokers = {"solana": SolanaBroker(trader=self.trader)}
         self.brokers = brokers
-        self.vm = StackVM()
+        self.vm = StackVM(use_advanced=False)  # E10 6f lock (12f needs new formula+freeze)
         
         self.loader = CryptoDataLoader()
         self.token_map = {} # {address: tensor_index} 用于快速查找特征

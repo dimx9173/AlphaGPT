@@ -4,7 +4,7 @@ from model_core.factors import FeatureEngineer, AdvancedFactorEngineer, MemeIndi
 def test_feature_engineer_compute_features_shape(sample_raw_data):
     feats = FeatureEngineer.compute_features(sample_raw_data)
     n, t = sample_raw_data["close"].shape
-    assert feats.shape == (n, 6, t)
+    assert feats.shape == (n, 12, t)
     assert torch.isfinite(feats).all()
 
 def test_robust_norm_clamps():
@@ -24,7 +24,7 @@ def test_robust_norm_handles_constant():
 
 def test_six_factors_are_finite(sample_raw_data):
     feats = FeatureEngineer.compute_features(sample_raw_data)
-    for i in range(6):
+    for i in range(12):
         assert torch.isfinite(feats[:, i, :]).all(), f"factor {i} not finite"
 
 def test_advanced_engineer_twelve_features(sample_raw_data):
@@ -35,7 +35,7 @@ def test_advanced_engineer_twelve_features(sample_raw_data):
     assert torch.isfinite(feats).all()
 
 def test_feature_engineer_input_dim():
-    assert FeatureEngineer.INPUT_DIM == 6
+    assert FeatureEngineer.INPUT_DIM == 12
 
 def test_meme_indicators_liquidity_health_bounds(sample_raw_data):
     liq = sample_raw_data["liquidity"]

@@ -3,7 +3,7 @@ from .ops import OPS_CONFIG
 from .vocab import FORMULA_VOCAB, ADVANCED_VOCAB
 
 class StackVM:
-    def __init__(self, use_advanced: bool = False):
+    def __init__(self, use_advanced: bool = True):
         vocab = ADVANCED_VOCAB if use_advanced else FORMULA_VOCAB
         self.feat_offset = vocab.operator_offset
         self.op_map = {i + self.feat_offset: cfg[1] for i, cfg in enumerate(OPS_CONFIG)}
