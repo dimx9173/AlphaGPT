@@ -136,8 +136,8 @@ def main():
             leg_floor = float(os.getenv("TRAIN_12F_FLOOR", "0.0"))
             if worst <= leg_floor:
                 rewards[i] = worst  # veto: reward = worst leg (<=floor), keeps gradient signal
-                continue
-            rewards[i] = mean_s
+            else:
+                rewards[i] = mean_s
             if float(rewards[i]) > best_score:
                 best_score = float(rewards[i]); best_formula = f; best_worst = worst
         adv = (rewards - rewards.mean()) / (rewards.std() + 1e-5)
