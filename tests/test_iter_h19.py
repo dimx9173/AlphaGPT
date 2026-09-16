@@ -104,12 +104,15 @@ def test_iter_h19_engine_mirror():
     assert "short_enabled=True" in src
 
 
-def test_iter_h19_smoke_runs_offline():
-    env = dict(os.environ, ITER_H19_SMOKE="1")
+def test_iter_h19_smoke_runs_offline(tmp_path):
+    out = tmp_path / "h19_smoke.json"
+    log = tmp_path / "h19_smoke.log"
+    env = dict(os.environ, ITER_H19_SMOKE="1",
+               ITER_H19_OUT=str(out), ITER_H19_LOG=str(log))
     r = subprocess.run([sys.executable, "research/run_iter_h19_interact.py"],
                        capture_output=True, text=True, cwd=".", env=env)
     assert r.returncode == 0, r.stderr[-2000:]
-    d = _load()
+    d = json.loads(out.read_text())
     assert d["config"]["smoke"] is True
     assert {(x["sl"], x["q"]) for x in d["sl_x_q_rows"]} == {(None, 0.2), (None, 0.3)}
     assert {(x["cd"], x["ts"]) for x in d["cd_x_ts_rows"]} == {(6, 12), (6, 24)}

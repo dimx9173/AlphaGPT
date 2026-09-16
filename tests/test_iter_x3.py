@@ -64,11 +64,12 @@ def test_iter_x3_no_broker():
         assert bad.lower() not in src.lower(), bad
 
 
-def test_iter_x3_smoke_runs_offline():
-    env = dict(os.environ, ITER_X3_SMOKE="1")
+def test_iter_x3_smoke_runs_offline(tmp_path):
+    env = dict(os.environ, ITER_X3_SMOKE="1",
+               ITER_X3_OUT=str(tmp_path / "x3.json"), ITER_X3_LOG=str(tmp_path / "x3.log"))
     r = subprocess.run([sys.executable, "research/run_iter_x3.py"],
                        capture_output=True, text=True, cwd=".", env=env)
     assert r.returncode == 0, r.stderr[-2000:]
-    d = _load()
+    d = json.loads((tmp_path / "x3.json").read_text())
     assert d["config"]["smoke"] is True
     assert len(d["rows"]) == 2

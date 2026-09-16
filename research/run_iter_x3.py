@@ -52,8 +52,8 @@ FLAT_TOL = 0.15
 PARAMS = ("lth", "sth")
 SGNS = (+0.02, -0.02)
 
-OUT = pathlib.Path("results/iter_X3_thresh.json")
-LOG = pathlib.Path("logs/iter_x3.log")
+OUT = pathlib.Path(os.getenv("ITER_X3_OUT", "results/iter_X3_thresh.json"))
+LOG = pathlib.Path(os.getenv("ITER_X3_LOG", "logs/iter_x3.log"))
 
 SMOKE = os.getenv("ITER_X3_SMOKE") == "1"
 SMOKE_COINS = ["ETC"]

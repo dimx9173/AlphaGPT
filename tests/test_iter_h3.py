@@ -92,11 +92,12 @@ def test_iter_h3_engine_mirror():
     assert "short_enabled=True" in src
 
 
-def test_iter_h3_smoke_runs_offline():
-    env = dict(os.environ, ITER_H3_SMOKE="1")
+def test_iter_h3_smoke_runs_offline(tmp_path):
+    env = dict(os.environ, ITER_H3_SMOKE="1",
+               ITER_H3_OUT=str(tmp_path / "h3.json"), ITER_H3_LOG=str(tmp_path / "h3.log"))
     r = subprocess.run([sys.executable, "research/run_iter_h3_stops.py"],
                        capture_output=True, text=True, cwd=".", env=env)
     assert r.returncode == 0, r.stderr[-2000:]
-    d = _load()
+    d = json.loads((tmp_path / "h3.json").read_text())
     assert d["config"]["smoke"] is True
     assert {(x["sl"], x["ts"]) for x in d["uniform_rows"]} == {(None, 24), (0.05, 24)}

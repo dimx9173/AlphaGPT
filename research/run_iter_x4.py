@@ -86,8 +86,8 @@ NOOP_BLOCKED = 0.05
 BARS_PER_YEAR = 2190.0
 VOL_WIN = 60
 
-OUT = pathlib.Path("results/iter_X4_cost.json")
-LOG = pathlib.Path("logs/iter_x4.log")
+OUT = pathlib.Path(os.getenv("ITER_X4_OUT", "results/iter_X4_cost.json"))
+LOG = pathlib.Path(os.getenv("ITER_X4_LOG", "logs/iter_x4.log"))
 
 SMOKE = os.getenv("ITER_X4_SMOKE") == "1"
 SMOKE_COSTS = [c for c in COSTS if c["label"] == TOP_CELL]

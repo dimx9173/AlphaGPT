@@ -72,8 +72,8 @@ TS_GRID = [12, 24, 36]
 BPY = 35040.0
 SCALE = 16  # 4h-bar params -> 15m bars
 
-OUT = pathlib.Path("results/iter_Y2_stops.json")
-LOG = pathlib.Path("logs/iter_y2_stops.log")
+OUT = pathlib.Path(os.getenv("ITER_Y2_OUT", "results/iter_Y2_stops.json"))
+LOG = pathlib.Path(os.getenv("ITER_Y2_LOG", "logs/iter_y2_stops.log"))
 
 SMOKE = os.getenv("ITER_Y2_SMOKE") == "1"
 SMOKE_SL = [None, 0.05]

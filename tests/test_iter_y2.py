@@ -105,12 +105,13 @@ def test_iter_y2_engine_mirror():
     assert "short_enabled=True" in src
 
 
-def test_iter_y2_smoke_runs_offline():
-    env = dict(os.environ, ITER_Y2_SMOKE="1")
+def test_iter_y2_smoke_runs_offline(tmp_path):
+    env = dict(os.environ, ITER_Y2_SMOKE="1",
+               ITER_Y2_OUT=str(tmp_path / "y2.json"), ITER_Y2_LOG=str(tmp_path / "y2.log"))
     r = subprocess.run([sys.executable, "research/run_iter_y2_stops.py"],
                        capture_output=True, text=True, cwd=".", env=env)
     assert r.returncode == 0, r.stderr[-2000:]
-    d = _load()
+    d = json.loads((tmp_path / "y2.json").read_text())
     assert d["config"]["smoke"] is True
     assert {(x["sl"], x["ts"]) for x in d["uniform_rows"]} == {(None, 24), (0.05, 24)}
     assert {(x["coin"], x["sl"]) for x in d["percoin_rows"]} == {

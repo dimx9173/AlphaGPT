@@ -91,11 +91,12 @@ def test_iter_x4_no_broker():
         assert bad.lower() not in src.lower(), bad
 
 
-def test_iter_x4_smoke_runs_offline():
-    env = dict(os.environ, ITER_X4_SMOKE="1")
+def test_iter_x4_smoke_runs_offline(tmp_path):
+    env = dict(os.environ, ITER_X4_SMOKE="1",
+               ITER_X4_OUT=str(tmp_path / "x4.json"), ITER_X4_LOG=str(tmp_path / "x4.log"))
     r = subprocess.run([sys.executable, "research/run_iter_x4.py"],
                        capture_output=True, text=True, cwd=".", env=env)
     assert r.returncode == 0, r.stderr[-2000:]
-    d = _load()
+    d = json.loads((tmp_path / "x4.json").read_text())
     assert d["config"]["smoke"] is True
     assert {(x["cost"], x["K"]) for x in d["rows"]} == {("20bp-0.002", 0), ("20bp-0.002", 2)}
