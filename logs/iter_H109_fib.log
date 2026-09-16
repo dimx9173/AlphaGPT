@@ -1,0 +1,17 @@
+iter_H109_fib start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] Ns=[48, 96] scale=x4
+base legs built (locked engine, fee=0.0004 fund=0.0005)
+ETC fib(48) coverage=0.9945 long=0.5928 short=0.4017
+TRX fib(48) coverage=0.9945 long=0.6635 short=0.3311
+ATOM fib(48) coverage=0.9945 long=0.5655 short=0.4290
+APT fib(48) coverage=0.9945 long=0.5600 short=0.4345
+KAS fib(48) coverage=0.9945 long=0.5321 short=0.4624
+ETC fib(96) coverage=0.9890 long=0.5621 short=0.4269
+TRX fib(96) coverage=0.9890 long=0.6805 short=0.3086
+ATOM fib(96) coverage=0.9890 long=0.5400 short=0.4491
+APT fib(96) coverage=0.9890 long=0.5288 short=0.4603
+KAS fib(96) coverage=0.9890 long=0.4829 short=0.5062
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 to=0.026575 trades=580 cov=1.0000
+fib_48 FULL sh=7.387 mdd=0.1421 cum=4.1822 to=0.020091 trades=441 cov=0.9945
+fib_96 FULL sh=7.050 mdd=0.1606 cum=3.8518 to=0.017534 trades=384 cov=0.9890
+wrote results/iter_H109_fib.json verdict=PENDING decision=NO_ADOPTION

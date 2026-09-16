@@ -1,0 +1,17 @@
+iter_H105_pctb start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] Ns=[48, 96] scale=x4
+base legs built (locked engine, fee=0.0004 fund=0.0005)
+ETC pctb(48) coverage=0.1555
+TRX pctb(48) coverage=0.1745
+ATOM pctb(48) coverage=0.1558
+APT pctb(48) coverage=0.1565
+KAS pctb(48) coverage=0.1497
+ETC pctb(96) coverage=0.1455
+TRX pctb(96) coverage=0.1602
+ATOM pctb(96) coverage=0.1557
+APT pctb(96) coverage=0.1546
+KAS pctb(96) coverage=0.1588
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 to=0.026575 trades=580 cov=1.0000
+pctb_48 FULL sh=6.725 mdd=0.1411 cum=3.6123 to=0.022055 trades=482 cov=0.0130
+pctb_96 FULL sh=5.974 mdd=0.1320 cum=2.8725 to=0.017306 trades=379 cov=0.0136
+wrote results/iter_H105_pctb.json verdict=PENDING decision=NO_ADOPTION

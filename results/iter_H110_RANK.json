@@ -1,0 +1,398 @@
+{
+ "meta": {
+  "iter": "H110",
+  "scope": "Top5 1h-native (ETC/TRX/ATOM/APT/KAS) batch H101-H109",
+  "dims": [
+   "sharpe_gain",
+   "dd_cut_pct",
+   "robustness"
+  ],
+  "rank_rule": "competition rank per dim (1=best); composite=rank-sum, lower better",
+  "absent": [],
+  "n_done": 9,
+  "n_absent": 0,
+  "note": "read-only, no backtest; all PENDING(P0-3 FAIL), no demo change"
+ },
+ "baseline": {
+  "FULL_sharpe": 8.514,
+  "FULL_mdd": 0.1998,
+  "source": "H1 base FULL (Top5 1h-native, lev2, q0.3)"
+ },
+ "rounds": [
+  {
+   "round": "H101",
+   "file": "results/iter_H101_ema.json",
+   "topic": "1h EMA-cross gate (EMA12/48 + EMA24/96, entry-only)",
+   "status": "done",
+   "sharpe_gain": -0.826,
+   "sharpe_gain_note": "best-arm FULL-vs-base ema_12_48 (loses; no gain arm)",
+   "dd_cut_pct": 2.3,
+   "robustness": 6,
+   "detail": "gated basket sh=7.689(-0.826) mdd=0.1952(-2.3%) to=0.020457 trades=449 cov=0.4999; per-coin gated all below base (TRX 10.727 closest); NO_ADOPTION",
+   "conclusion_zh": "H101 EMA门组合-0.83、dd纸面-2.3%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H102",
+   "file": "results/iter_H102_sma.json",
+   "topic": "1h SMA-trend filter (close>SMA96 long / below short, N48/96/192)",
+   "status": "done",
+   "sharpe_gain": -1.713,
+   "sharpe_gain_note": "best-arm FULL-vs-base sma_48 (loses; no gain arm)",
+   "dd_cut_pct": -16.47,
+   "robustness": 6,
+   "detail": "gated basket sh=6.802(-1.713) mdd=0.2327(dd+16.5%) to=0.023379 trades=514 cov=0.9946; per-coin gated all below base (TRX 11.462 closest); NO_ADOPTION",
+   "conclusion_zh": "H102 SMA门组合-1.71且dd+16.5%，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H103",
+   "file": "results/iter_H103_roc.json",
+   "topic": "1h ROC-momentum gate (ROC12/24/48 sign)",
+   "status": "done",
+   "sharpe_gain": -0.748,
+   "sharpe_gain_note": "best-arm FULL-vs-base roc_12 (loses; no gain arm)",
+   "dd_cut_pct": 1.05,
+   "robustness": 6,
+   "detail": "gated basket sh=7.767(-0.748) mdd=0.1977(-1.1%) to=0.027260 trades=598 cov=0.9768; per-coin ETC 5.914(+0.757 sole gain) rest lose; NO_ADOPTION",
+   "conclusion_zh": "H103 ROC门组合-0.75、dd纸面-1.1%，仅ETC纸面小增，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H104",
+   "file": "results/iter_H104_atrtrail.json",
+   "topic": "1h ATR-trailing sweep (ATR48 x1.5/2/3, exit-only)",
+   "status": "done",
+   "sharpe_gain": -0.623,
+   "sharpe_gain_note": "best-arm FULL-vs-base x3.0 (loses; no gain arm)",
+   "dd_cut_pct": 8.06,
+   "robustness": 6,
+   "detail": "trail basket sh=7.892(-0.623) mdd=0.1837(-8.1%) to=0.064795 trades=1417 turnover x2.4; per-coin gated all below base (TRX 11.237 closest); NO_ADOPTION",
+   "conclusion_zh": "H104 ATR追踪组合-0.62、dd纸面-8.1%但换手翻倍，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H105",
+   "file": "results/iter_H105_pctb.json",
+   "topic": "1h Bollinger %b breakout gate (BB48/96)",
+   "status": "done",
+   "sharpe_gain": -1.79,
+   "sharpe_gain_note": "best-arm FULL-vs-base pctb_48 (loses; no gain arm)",
+   "dd_cut_pct": 29.38,
+   "robustness": 6,
+   "detail": "gated basket sh=6.725(-1.790) mdd=0.1411(-29.4%) to=0.022055 trades=482 cov=0.0130; per-coin gated all below base (TRX 8.977 closest); NO_ADOPTION",
+   "conclusion_zh": "H105 %b门组合-1.79、dd纸面-29.4%但sharpe大降，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H106",
+   "file": "results/iter_H106_kdj.json",
+   "topic": "1h KDJ gate (K>D long / K<D short, N14/27)",
+   "status": "done",
+   "sharpe_gain": -0.58,
+   "sharpe_gain_note": "best-arm FULL-vs-base kdj_27 (loses; no gain arm)",
+   "dd_cut_pct": 15.82,
+   "robustness": 6,
+   "detail": "gated basket sh=7.935(-0.580) mdd=0.1682(-15.8%) to=0.026073 trades=570 cov=0.4968; per-coin gated all below base (TRX 11.788 closest); NO_ADOPTION",
+   "conclusion_zh": "H106 KDJ门组合-0.58、dd纸面-15.8%但sharpe降，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H107",
+   "file": "results/iter_H107_dmi.json",
+   "topic": "1h DMI gate (+DI/-DI, N14/28)",
+   "status": "done",
+   "sharpe_gain": -0.503,
+   "sharpe_gain_note": "best-arm FULL-vs-base dmi_28 (loses; no gain arm)",
+   "dd_cut_pct": 0.0,
+   "robustness": 6,
+   "detail": "gated basket sh=8.012(-0.503) mdd=0.1998(-0.0%) to=0.021644 trades=475 cov=0.9968; per-coin gated all below base (TRX 11.617 closest); NO_ADOPTION",
+   "conclusion_zh": "H107 DMI门组合-0.50、dd持平，全币低于基线，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H108",
+   "file": "results/iter_H108_chaikin.json",
+   "topic": "1h Chaikin osc gate (27/10 + 48/24)",
+   "status": "done",
+   "sharpe_gain": -0.57,
+   "sharpe_gain_note": "best-arm FULL-vs-base chaikin_27_10 (loses; no gain arm)",
+   "dd_cut_pct": 31.93,
+   "robustness": 6,
+   "detail": "gated basket sh=7.945(-0.570) mdd=0.1360(-31.9%) to=0.020776 trades=456 cov=0.9969; per-coin ATOM 5.832(+0.140 sole gain) rest lose; NO_ADOPTION",
+   "conclusion_zh": "H108 Chaikin门组合-0.57、dd纸面-31.9%，仅ATOM纸面小增，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  },
+  {
+   "round": "H109",
+   "file": "results/iter_H109_fib.json",
+   "topic": "1h Fibonacci 61.8% retrace gate (swing48/96)",
+   "status": "done",
+   "sharpe_gain": -1.128,
+   "sharpe_gain_note": "best-arm FULL-vs-base fib_48 (loses; no gain arm)",
+   "dd_cut_pct": 28.88,
+   "robustness": 6,
+   "detail": "gated basket sh=7.387(-1.128) mdd=0.1421(-28.9%) to=0.020091 trades=441 cov=0.9945; per-coin gated all below base (TRX 9.278 closest); NO_ADOPTION",
+   "conclusion_zh": "H109 Fib门组合-1.13、dd纸面-28.9%但sharpe大降，不进demo。",
+   "demo": "no",
+   "demo_reason": "PENDING(P0-3 FAIL): no demo change"
+  }
+ ],
+ "rank_sharpe": [
+  {
+   "round": "H107",
+   "rank": 1,
+   "value": -0.503
+  },
+  {
+   "round": "H108",
+   "rank": 2,
+   "value": -0.57
+  },
+  {
+   "round": "H106",
+   "rank": 3,
+   "value": -0.58
+  },
+  {
+   "round": "H104",
+   "rank": 4,
+   "value": -0.623
+  },
+  {
+   "round": "H103",
+   "rank": 5,
+   "value": -0.748
+  },
+  {
+   "round": "H101",
+   "rank": 6,
+   "value": -0.826
+  },
+  {
+   "round": "H109",
+   "rank": 7,
+   "value": -1.128
+  },
+  {
+   "round": "H102",
+   "rank": 8,
+   "value": -1.713
+  },
+  {
+   "round": "H105",
+   "rank": 9,
+   "value": -1.79
+  }
+ ],
+ "rank_dd": [
+  {
+   "round": "H108",
+   "rank": 1,
+   "value": 31.93
+  },
+  {
+   "round": "H105",
+   "rank": 2,
+   "value": 29.38
+  },
+  {
+   "round": "H109",
+   "rank": 3,
+   "value": 28.88
+  },
+  {
+   "round": "H106",
+   "rank": 4,
+   "value": 15.82
+  },
+  {
+   "round": "H104",
+   "rank": 5,
+   "value": 8.06
+  },
+  {
+   "round": "H101",
+   "rank": 6,
+   "value": 2.3
+  },
+  {
+   "round": "H103",
+   "rank": 7,
+   "value": 1.05
+  },
+  {
+   "round": "H107",
+   "rank": 8,
+   "value": 0.0
+  },
+  {
+   "round": "H102",
+   "rank": 9,
+   "value": -16.47
+  }
+ ],
+ "rank_robust": [
+  {
+   "round": "H101",
+   "rank": 1,
+   "value": 6
+  },
+  {
+   "round": "H102",
+   "rank": 1,
+   "value": 6
+  },
+  {
+   "round": "H103",
+   "rank": 1,
+   "value": 6
+  },
+  {
+   "round": "H104",
+   "rank": 1,
+   "value": 6
+  },
+  {
+   "round": "H105",
+   "rank": 1,
+   "value": 6
+  },
+  {
+   "round": "H106",
+   "rank": 1,
+   "value": 6
+  },
+  {
+   "round": "H107",
+   "rank": 1,
+   "value": 6
+  },
+  {
+   "round": "H108",
+   "rank": 1,
+   "value": 6
+  },
+  {
+   "round": "H109",
+   "rank": 1,
+   "value": 6
+  }
+ ],
+ "rank_composite": [
+  {
+   "round": "H108",
+   "rank_sum": 4,
+   "ranks": {
+    "sharpe": 2,
+    "dd": 1,
+    "robust": 1
+   },
+   "rank": 1
+  },
+  {
+   "round": "H106",
+   "rank_sum": 8,
+   "ranks": {
+    "sharpe": 3,
+    "dd": 4,
+    "robust": 1
+   },
+   "rank": 2
+  },
+  {
+   "round": "H104",
+   "rank_sum": 10,
+   "ranks": {
+    "sharpe": 4,
+    "dd": 5,
+    "robust": 1
+   },
+   "rank": 3
+  },
+  {
+   "round": "H107",
+   "rank_sum": 10,
+   "ranks": {
+    "sharpe": 1,
+    "dd": 8,
+    "robust": 1
+   },
+   "rank": 3
+  },
+  {
+   "round": "H109",
+   "rank_sum": 11,
+   "ranks": {
+    "sharpe": 7,
+    "dd": 3,
+    "robust": 1
+   },
+   "rank": 5
+  },
+  {
+   "round": "H105",
+   "rank_sum": 12,
+   "ranks": {
+    "sharpe": 9,
+    "dd": 2,
+    "robust": 1
+   },
+   "rank": 6
+  },
+  {
+   "round": "H101",
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 6,
+    "dd": 6,
+    "robust": 1
+   },
+   "rank": 7
+  },
+  {
+   "round": "H103",
+   "rank_sum": 13,
+   "ranks": {
+    "sharpe": 5,
+    "dd": 7,
+    "robust": 1
+   },
+   "rank": 7
+  },
+  {
+   "round": "H102",
+   "rank_sum": 18,
+   "ranks": {
+    "sharpe": 8,
+    "dd": 9,
+    "robust": 1
+   },
+   "rank": 9
+  }
+ ],
+ "verdict": "ALL_PENDING_P03_FAIL",
+ "caveats": [
+  "H108 dd leader (+31.9% at -0.57 sharpe) and sharpe leader H107 (-0.503/dd flat) both lose vs base; shelf-only paper under P0-3 FAIL.",
+  "H102 worst real-dd (+16.5%) with -1.71 sharpe; H104 turnover x2.4 (0.064795) via trailing exits; all gates lose on sharpe.",
+  "All 9 PENDING(P0-3 FAIL); no adopted gain arm."
+ ],
+ "conclusions": [
+  "Composite rank-sums: H108(4), H106(8), H104(10), H107(10), H109(11), H105(12), H101(13), H103(13), H102(18).",
+  "Sharpe leader H107 (-0.503, dd flat) and dd leader H108 (+31.9%) both lose vs base; least-loss arms shelved under P0-3 FAIL.",
+  "No adopted gain arm in any of H101-H109; per-coin bests (TRX trailing, ETC ROC, ATOM Chaikin) shelf-only; all stay PENDING.",
+  "No demo change for any round; live untouched."
+ ],
+ "demo": {
+  "recommend_any": false,
+  "rounds_yes": []
+ }
+}

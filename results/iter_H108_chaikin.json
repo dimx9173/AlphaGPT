@@ -1,0 +1,366 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "Chaikin(slow,fast) directional entry-only sign gate: MFM=((close-low)-(high-close))/(high-low) (0 if high==low), MFV=MFM*volume, ADL=cumsum(MFV), osc=EMA_fast(ADL)-EMA_slow(ADL); flat->long / short->long flip only if osc>0, flat->short / long->short flip only if osc<0, osc==0 blocks entries/flips; holds/exits pass; warmup first max(slow,fast) bars osc=0",
+  "chaikin_params": [
+   [
+    27,
+    10
+   ],
+   [
+    48,
+    24
+   ]
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "params": null,
+   "slow": null,
+   "fast": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_long": 1.0,
+    "coverage_short": 0.0,
+    "coverage": 1.0,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0,
+     "coverage": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0,
+     "coverage": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0,
+     "coverage": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0,
+     "coverage": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0,
+     "coverage": 1.0
+    }
+   }
+  },
+  {
+   "unit": "chaikin_27_10",
+   "params": [
+    27,
+    10
+   ],
+   "slow": 27,
+   "fast": 10,
+   "FULL": {
+    "sharpe": 7.945,
+    "ann": 4.4842,
+    "mdd": 0.136,
+    "cum": 4.4842,
+    "final_x": 5.4842,
+    "n": 8760,
+    "turnover": 0.020776,
+    "trades": 456,
+    "coverage_long": 0.519178,
+    "coverage_short": 0.47774,
+    "coverage": 0.996918,
+    "coverage_all": 0.996918
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.653,
+     "ann": 4.0177,
+     "mdd": 0.5081,
+     "cum": 4.0177,
+     "final_x": 5.0177,
+     "n": 8760,
+     "turnover": 0.012671,
+     "trades": 56,
+     "coverage_long": 0.543607,
+     "coverage_short": 0.453311,
+     "coverage": 0.996918
+    },
+    "TRX": {
+     "sharpe": 9.404,
+     "ann": 2.8601,
+     "mdd": 0.0662,
+     "cum": 2.8601,
+     "final_x": 3.8601,
+     "n": 8760,
+     "turnover": 0.023059,
+     "trades": 101,
+     "coverage_long": 0.628539,
+     "coverage_short": 0.368379,
+     "coverage": 0.996918
+    },
+    "ATOM": {
+     "sharpe": 5.832,
+     "ann": 5.247,
+     "mdd": 0.2579,
+     "cum": 5.247,
+     "final_x": 6.247,
+     "n": 8760,
+     "turnover": 0.027283,
+     "trades": 120,
+     "coverage_long": 0.472831,
+     "coverage_short": 0.524087,
+     "coverage": 0.996918
+    },
+    "APT": {
+     "sharpe": 5.03,
+     "ann": 6.2679,
+     "mdd": 0.4684,
+     "cum": 6.2679,
+     "final_x": 7.2679,
+     "n": 8760,
+     "turnover": 0.013813,
+     "trades": 60,
+     "coverage_long": 0.465753,
+     "coverage_short": 0.531164,
+     "coverage": 0.996918
+    },
+    "KAS": {
+     "sharpe": 3.8,
+     "ann": 4.0284,
+     "mdd": 0.6402,
+     "cum": 4.0284,
+     "final_x": 5.0284,
+     "n": 8760,
+     "turnover": 0.027055,
+     "trades": 119,
+     "coverage_long": 0.48516,
+     "coverage_short": 0.511758,
+     "coverage": 0.996918
+    }
+   }
+  },
+  {
+   "unit": "chaikin_48_24",
+   "params": [
+    48,
+    24
+   ],
+   "slow": 48,
+   "fast": 24,
+   "FULL": {
+    "sharpe": 7.376,
+    "ann": 3.8824,
+    "mdd": 0.1424,
+    "cum": 3.8824,
+    "final_x": 4.8824,
+    "n": 8760,
+    "turnover": 0.017352,
+    "trades": 380,
+    "coverage_long": 0.530205,
+    "coverage_short": 0.464315,
+    "coverage": 0.994521,
+    "coverage_all": 0.994521
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.035,
+     "ann": 2.9599,
+     "mdd": 0.4008,
+     "cum": 2.9599,
+     "final_x": 3.9599,
+     "n": 8760,
+     "turnover": 0.009703,
+     "trades": 43,
+     "coverage_long": 0.568607,
+     "coverage_short": 0.425913,
+     "coverage": 0.994521
+    },
+    "TRX": {
+     "sharpe": 8.83,
+     "ann": 2.3804,
+     "mdd": 0.0623,
+     "cum": 2.3804,
+     "final_x": 3.3804,
+     "n": 8760,
+     "turnover": 0.016438,
+     "trades": 72,
+     "coverage_long": 0.679452,
+     "coverage_short": 0.315068,
+     "coverage": 0.994521
+    },
+    "ATOM": {
+     "sharpe": 5.269,
+     "ann": 4.693,
+     "mdd": 0.3363,
+     "cum": 4.693,
+     "final_x": 5.693,
+     "n": 8760,
+     "turnover": 0.024315,
+     "trades": 106,
+     "coverage_long": 0.475,
+     "coverage_short": 0.519521,
+     "coverage": 0.994521
+    },
+    "APT": {
+     "sharpe": 4.915,
+     "ann": 5.8217,
+     "mdd": 0.4323,
+     "cum": 5.8217,
+     "final_x": 6.8217,
+     "n": 8760,
+     "turnover": 0.012215,
+     "trades": 53,
+     "coverage_long": 0.463699,
+     "coverage_short": 0.530822,
+     "coverage": 0.994521
+    },
+    "KAS": {
+     "sharpe": 3.576,
+     "ann": 3.5568,
+     "mdd": 0.6402,
+     "cum": 3.5568,
+     "final_x": 4.5568,
+     "n": 8760,
+     "turnover": 0.024087,
+     "trades": 106,
+     "coverage_long": 0.464269,
+     "coverage_short": 0.530251,
+     "coverage": 0.994521
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "chaikin_27_10",
+  "chaikin_48_24"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): Chaikin osc sign-gate只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; Chaikin money-flow oscillator sign gate diagnostic only, no adoption, no live change."
+}

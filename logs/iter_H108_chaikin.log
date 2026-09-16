@@ -1,0 +1,17 @@
+iter_H108_chaikin start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] params=[(27, 10), (48, 24)] scale=x4
+base legs built (locked engine, fee=0.0004 fund=0.0005)
+ETC Chaikin(27,10) long=0.5436 short=0.4533
+TRX Chaikin(27,10) long=0.6285 short=0.3684
+ATOM Chaikin(27,10) long=0.4728 short=0.5241
+APT Chaikin(27,10) long=0.4658 short=0.5312
+KAS Chaikin(27,10) long=0.4852 short=0.5118
+ETC Chaikin(48,24) long=0.5686 short=0.4259
+TRX Chaikin(48,24) long=0.6795 short=0.3151
+ATOM Chaikin(48,24) long=0.4750 short=0.5195
+APT Chaikin(48,24) long=0.4637 short=0.5308
+KAS Chaikin(48,24) long=0.4643 short=0.5303
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 final_x=6.8854 ann=5.8854 n=8760 to=0.026575 trades=580 cov=1.0000 (L=1.0000/S=0.0000)
+chaikin_27_10 FULL sh=7.945 mdd=0.1360 cum=4.4842 final_x=5.4842 ann=4.4842 n=8760 to=0.020776 trades=456 cov=0.9969 (L=0.5192/S=0.4777)
+chaikin_48_24 FULL sh=7.376 mdd=0.1424 cum=3.8824 final_x=4.8824 ann=3.8824 n=8760 to=0.017352 trades=380 cov=0.9945 (L=0.5302/S=0.4643)
+wrote results/iter_H108_chaikin.json verdict=PENDING decision=NO_ADOPTION

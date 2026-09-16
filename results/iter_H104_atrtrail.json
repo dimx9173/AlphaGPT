@@ -1,0 +1,408 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "ATR-trailing exit-only: Wilder ATR(48) on 1h high/low/close (seed first 48 bars -> inactive); long trail ratchets max(high-mult*ATR), exit on close < trail; short mirrored; entries/flips pass, trail resets on flat",
+  "atr_window": 48,
+  "atr_mults": [
+   1.5,
+   2.0,
+   3.0
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "mult": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_all": 1.0,
+    "breaches": 0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 1.0,
+     "breaches": 0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 1.0,
+     "breaches": 0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage": 1.0,
+     "breaches": 0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 1.0,
+     "breaches": 0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 1.0,
+     "breaches": 0
+    }
+   }
+  },
+  {
+   "unit": "atrtrail_x1.5",
+   "mult": 1.5,
+   "FULL": {
+    "sharpe": 6.713,
+    "ann": 4.252,
+    "mdd": 0.2457,
+    "cum": 4.252,
+    "final_x": 5.252,
+    "n": 8760,
+    "turnover": 0.136712,
+    "trades": 2991,
+    "coverage_all": 0.770662,
+    "breaches": 2675
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.842,
+     "ann": 3.4536,
+     "mdd": 0.4066,
+     "cum": 3.4536,
+     "final_x": 4.4536,
+     "n": 8760,
+     "turnover": 0.115411,
+     "trades": 506,
+     "coverage": 0.94532,
+     "breaches": 479
+    },
+    "TRX": {
+     "sharpe": 9.186,
+     "ann": 3.1266,
+     "mdd": 0.0693,
+     "cum": 3.1266,
+     "final_x": 4.1266,
+     "n": 8760,
+     "turnover": 0.168037,
+     "trades": 734,
+     "coverage": 0.926484,
+     "breaches": 644
+    },
+    "ATOM": {
+     "sharpe": 4.513,
+     "ann": 4.7143,
+     "mdd": 0.5003,
+     "cum": 4.7143,
+     "final_x": 5.7143,
+     "n": 8760,
+     "turnover": 0.143607,
+     "trades": 628,
+     "coverage": 0.940068,
+     "breaches": 525
+    },
+    "APT": {
+     "sharpe": 4.942,
+     "ann": 6.1868,
+     "mdd": 0.52,
+     "cum": 6.1868,
+     "final_x": 7.1868,
+     "n": 8760,
+     "turnover": 0.113813,
+     "trades": 498,
+     "coverage": 0.945776,
+     "breaches": 475
+    },
+    "KAS": {
+     "sharpe": 3.144,
+     "ann": 3.7789,
+     "mdd": 0.6777,
+     "cum": 3.7789,
+     "final_x": 4.7789,
+     "n": 8760,
+     "turnover": 0.142694,
+     "trades": 625,
+     "coverage": 0.936986,
+     "breaches": 552
+    }
+   }
+  },
+  {
+   "unit": "atrtrail_x2.0",
+   "mult": 2.0,
+   "FULL": {
+    "sharpe": 7.303,
+    "ann": 4.7902,
+    "mdd": 0.2079,
+    "cum": 4.7902,
+    "final_x": 5.7902,
+    "n": 8760,
+    "turnover": 0.098607,
+    "trades": 2157,
+    "coverage_all": 0.848516,
+    "breaches": 1676
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.154,
+     "ann": 3.7992,
+     "mdd": 0.464,
+     "cum": 3.7992,
+     "final_x": 4.7992,
+     "n": 8760,
+     "turnover": 0.079909,
+     "trades": 350,
+     "coverage": 0.965639,
+     "breaches": 301
+    },
+    "TRX": {
+     "sharpe": 10.433,
+     "ann": 3.6719,
+     "mdd": 0.0795,
+     "cum": 3.6719,
+     "final_x": 4.6719,
+     "n": 8760,
+     "turnover": 0.121918,
+     "trades": 532,
+     "coverage": 0.952854,
+     "breaches": 413
+    },
+    "ATOM": {
+     "sharpe": 4.864,
+     "ann": 5.3096,
+     "mdd": 0.5867,
+     "cum": 5.3096,
+     "final_x": 6.3096,
+     "n": 8760,
+     "turnover": 0.105137,
+     "trades": 460,
+     "coverage": 0.963927,
+     "breaches": 316
+    },
+    "APT": {
+     "sharpe": 5.502,
+     "ann": 7.0595,
+     "mdd": 0.5492,
+     "cum": 7.0595,
+     "final_x": 8.0595,
+     "n": 8760,
+     "turnover": 0.07911,
+     "trades": 346,
+     "coverage": 0.965982,
+     "breaches": 298
+    },
+    "KAS": {
+     "sharpe": 3.323,
+     "ann": 4.1108,
+     "mdd": 0.5162,
+     "cum": 4.1108,
+     "final_x": 5.1108,
+     "n": 8760,
+     "turnover": 0.106963,
+     "trades": 469,
+     "coverage": 0.960274,
+     "breaches": 348
+    }
+   }
+  },
+  {
+   "unit": "atrtrail_x3.0",
+   "mult": 3.0,
+   "FULL": {
+    "sharpe": 7.892,
+    "ann": 5.2998,
+    "mdd": 0.1837,
+    "cum": 5.2998,
+    "final_x": 6.2998,
+    "n": 8760,
+    "turnover": 0.064795,
+    "trades": 1417,
+    "coverage_all": 0.915982,
+    "breaches": 855
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.878,
+     "ann": 4.5711,
+     "mdd": 0.3619,
+     "cum": 4.5711,
+     "final_x": 5.5711,
+     "n": 8760,
+     "turnover": 0.048516,
+     "trades": 213,
+     "coverage": 0.983105,
+     "breaches": 148
+    },
+    "TRX": {
+     "sharpe": 11.237,
+     "ann": 4.0368,
+     "mdd": 0.0795,
+     "cum": 4.0368,
+     "final_x": 5.0368,
+     "n": 8760,
+     "turnover": 0.081963,
+     "trades": 357,
+     "coverage": 0.974315,
+     "breaches": 225
+    },
+    "ATOM": {
+     "sharpe": 5.403,
+     "ann": 6.0016,
+     "mdd": 0.5278,
+     "cum": 6.0016,
+     "final_x": 7.0016,
+     "n": 8760,
+     "turnover": 0.072489,
+     "trades": 317,
+     "coverage": 0.982534,
+     "breaches": 153
+    },
+    "APT": {
+     "sharpe": 5.758,
+     "ann": 7.5327,
+     "mdd": 0.5126,
+     "cum": 7.5327,
+     "final_x": 8.5327,
+     "n": 8760,
+     "turnover": 0.047603,
+     "trades": 208,
+     "coverage": 0.983562,
+     "breaches": 144
+    },
+    "KAS": {
+     "sharpe": 3.476,
+     "ann": 4.3566,
+     "mdd": 0.5567,
+     "cum": 4.3566,
+     "final_x": 5.3566,
+     "n": 8760,
+     "turnover": 0.073402,
+     "trades": 322,
+     "coverage": 0.978881,
+     "breaches": 185
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "atrtrail_x1.5",
+  "atrtrail_x2.0",
+  "atrtrail_x3.0"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): ATR-trailing退出只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; ATR-trailing exit filter diagnostic only, no adoption, no live change."
+}

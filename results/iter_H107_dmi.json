@@ -1,0 +1,329 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "DMI(N) directional entry-only: new entry (flat->non-zero) or long<->short flip allowed only when target side permitted (+DI>-DI long / -DI>+DI short, Wilder, causal, seed both=False); holds/exits pass",
+  "dmi_Ns": [
+   14,
+   28
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "N": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 1.0
+    }
+   }
+  },
+  {
+   "unit": "dmi_14",
+   "N": 14,
+   "FULL": {
+    "sharpe": 8.01,
+    "ann": 4.9357,
+    "mdd": 0.2018,
+    "cum": 4.9357,
+    "final_x": 5.9357,
+    "n": 8760,
+    "turnover": 0.024018,
+    "trades": 527,
+    "coverage_all": 0.998402
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.95,
+     "ann": 4.5531,
+     "mdd": 0.5391,
+     "cum": 4.5531,
+     "final_x": 5.5531,
+     "n": 8760,
+     "turnover": 0.014269,
+     "trades": 63,
+     "coverage": 0.998402,
+     "coverage_long": 0.425913,
+     "coverage_short": 0.572489
+    },
+    "TRX": {
+     "sharpe": 11.729,
+     "ann": 3.9762,
+     "mdd": 0.0662,
+     "cum": 3.9762,
+     "final_x": 4.9762,
+     "n": 8760,
+     "turnover": 0.02968,
+     "trades": 130,
+     "coverage": 0.998402,
+     "coverage_long": 0.50605,
+     "coverage_short": 0.492352
+    },
+    "ATOM": {
+     "sharpe": 5.114,
+     "ann": 4.9085,
+     "mdd": 0.4031,
+     "cum": 4.9085,
+     "final_x": 5.9085,
+     "n": 8760,
+     "turnover": 0.033219,
+     "trades": 146,
+     "coverage": 0.998402,
+     "coverage_long": 0.449087,
+     "coverage_short": 0.549315
+    },
+    "APT": {
+     "sharpe": 5.688,
+     "ann": 7.2158,
+     "mdd": 0.4856,
+     "cum": 7.2158,
+     "final_x": 8.2158,
+     "n": 8760,
+     "turnover": 0.014498,
+     "trades": 63,
+     "coverage": 0.998402,
+     "coverage_long": 0.4379,
+     "coverage_short": 0.560502
+    },
+    "KAS": {
+     "sharpe": 3.474,
+     "ann": 4.0248,
+     "mdd": 0.6402,
+     "cum": 4.0248,
+     "final_x": 5.0248,
+     "n": 8760,
+     "turnover": 0.028425,
+     "trades": 125,
+     "coverage": 0.998402,
+     "coverage_long": 0.451598,
+     "coverage_short": 0.546804
+    }
+   }
+  },
+  {
+   "unit": "dmi_28",
+   "N": 28,
+   "FULL": {
+    "sharpe": 8.012,
+    "ann": 4.8237,
+    "mdd": 0.1998,
+    "cum": 4.8237,
+    "final_x": 5.8237,
+    "n": 8760,
+    "turnover": 0.021644,
+    "trades": 475,
+    "coverage_all": 0.996804
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.451,
+     "ann": 4.0465,
+     "mdd": 0.5391,
+     "cum": 4.0465,
+     "final_x": 5.0465,
+     "n": 8760,
+     "turnover": 0.013128,
+     "trades": 58,
+     "coverage": 0.996804,
+     "coverage_long": 0.387215,
+     "coverage_short": 0.609589
+    },
+    "TRX": {
+     "sharpe": 11.617,
+     "ann": 3.697,
+     "mdd": 0.0662,
+     "cum": 3.697,
+     "final_x": 4.697,
+     "n": 8760,
+     "turnover": 0.026484,
+     "trades": 116,
+     "coverage": 0.996804,
+     "coverage_long": 0.489498,
+     "coverage_short": 0.507306
+    },
+    "ATOM": {
+     "sharpe": 5.699,
+     "ann": 5.3944,
+     "mdd": 0.4273,
+     "cum": 5.3944,
+     "final_x": 6.3944,
+     "n": 8760,
+     "turnover": 0.028425,
+     "trades": 125,
+     "coverage": 0.996804,
+     "coverage_long": 0.424429,
+     "coverage_short": 0.572374
+    },
+    "APT": {
+     "sharpe": 5.814,
+     "ann": 6.9755,
+     "mdd": 0.3745,
+     "cum": 6.9755,
+     "final_x": 7.9755,
+     "n": 8760,
+     "turnover": 0.013813,
+     "trades": 60,
+     "coverage": 0.996804,
+     "coverage_long": 0.40468,
+     "coverage_short": 0.592123
+    },
+    "KAS": {
+     "sharpe": 3.521,
+     "ann": 4.0051,
+     "mdd": 0.6402,
+     "cum": 4.0051,
+     "final_x": 5.0051,
+     "n": 8760,
+     "turnover": 0.02637,
+     "trades": 116,
+     "coverage": 0.996804,
+     "coverage_long": 0.430708,
+     "coverage_short": 0.566096
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "dmi_14",
+  "dmi_28"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): DMI directional entry过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; DMI directional entry filter diagnostic only, no adoption, no live change."
+}

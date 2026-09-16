@@ -1,0 +1,441 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "SMA(N) trend: LONG leg only where close>SMA_N (causal, full-window; first N-1 bars neutral), SHORT leg only where close<SMA_N; gates on legs pre-cooldown (post quantile mask)",
+  "sma_Ns": [
+   48,
+   96,
+   192
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "N": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    }
+   }
+  },
+  {
+   "unit": "sma_48",
+   "N": 48,
+   "FULL": {
+    "sharpe": 6.802,
+    "ann": 4.0743,
+    "mdd": 0.2327,
+    "cum": 4.0743,
+    "final_x": 5.0743,
+    "n": 8760,
+    "turnover": 0.023379,
+    "trades": 514,
+    "coverage_all": 0.994635
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.365,
+     "ann": 4.0255,
+     "mdd": 0.7549,
+     "cum": 4.0255,
+     "final_x": 5.0255,
+     "n": 8760,
+     "turnover": 0.012671,
+     "trades": 56,
+     "coverage": 0.994635,
+     "coverage_long": 0.430822,
+     "coverage_short": 0.563813
+    },
+    "TRX": {
+     "sharpe": 11.462,
+     "ann": 3.3435,
+     "mdd": 0.0763,
+     "cum": 3.3435,
+     "final_x": 4.3435,
+     "n": 8760,
+     "turnover": 0.028196,
+     "trades": 124,
+     "coverage": 0.994635,
+     "coverage_long": 0.542237,
+     "coverage_short": 0.452397
+    },
+    "ATOM": {
+     "sharpe": 4.496,
+     "ann": 4.4949,
+     "mdd": 0.308,
+     "cum": 4.4949,
+     "final_x": 5.4949,
+     "n": 8760,
+     "turnover": 0.033219,
+     "trades": 146,
+     "coverage": 0.994635,
+     "coverage_long": 0.445548,
+     "coverage_short": 0.549087
+    },
+    "APT": {
+     "sharpe": 3.148,
+     "ann": 3.8319,
+     "mdd": 0.7273,
+     "cum": 3.8319,
+     "final_x": 4.8319,
+     "n": 8760,
+     "turnover": 0.012785,
+     "trades": 56,
+     "coverage": 0.994635,
+     "coverage_long": 0.446918,
+     "coverage_short": 0.547717
+    },
+    "KAS": {
+     "sharpe": 4.347,
+     "ann": 4.6758,
+     "mdd": 0.5407,
+     "cum": 4.6758,
+     "final_x": 5.6758,
+     "n": 8760,
+     "turnover": 0.030023,
+     "trades": 132,
+     "coverage": 0.994635,
+     "coverage_long": 0.41895,
+     "coverage_short": 0.575685
+    }
+   },
+   "vs_base": {
+    "d_sharpe": -1.713,
+    "d_cum": -1.8111,
+    "d_turnover": -0.003196,
+    "d_trades": -66
+   }
+  },
+  {
+   "unit": "sma_96",
+   "N": 96,
+   "FULL": {
+    "sharpe": 6.076,
+    "ann": 3.562,
+    "mdd": 0.1917,
+    "cum": 3.562,
+    "final_x": 4.562,
+    "n": 8760,
+    "turnover": 0.021712,
+    "trades": 477,
+    "coverage_all": 0.989155
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.194,
+     "ann": 3.7235,
+     "mdd": 0.4722,
+     "cum": 3.7235,
+     "final_x": 4.7235,
+     "n": 8760,
+     "turnover": 0.012329,
+     "trades": 54,
+     "coverage": 0.989155,
+     "coverage_long": 0.39532,
+     "coverage_short": 0.593836
+    },
+    "TRX": {
+     "sharpe": 9.907,
+     "ann": 2.8705,
+     "mdd": 0.0769,
+     "cum": 2.8705,
+     "final_x": 3.8705,
+     "n": 8760,
+     "turnover": 0.025,
+     "trades": 110,
+     "coverage": 0.989155,
+     "coverage_long": 0.560046,
+     "coverage_short": 0.42911
+    },
+    "ATOM": {
+     "sharpe": 4.137,
+     "ann": 3.5835,
+     "mdd": 0.3325,
+     "cum": 3.5835,
+     "final_x": 4.5835,
+     "n": 8760,
+     "turnover": 0.031164,
+     "trades": 137,
+     "coverage": 0.989155,
+     "coverage_long": 0.426256,
+     "coverage_short": 0.5629
+    },
+    "APT": {
+     "sharpe": 3.217,
+     "ann": 3.8093,
+     "mdd": 0.7632,
+     "cum": 3.8093,
+     "final_x": 4.8093,
+     "n": 8760,
+     "turnover": 0.012557,
+     "trades": 55,
+     "coverage": 0.989155,
+     "coverage_long": 0.404224,
+     "coverage_short": 0.584932
+    },
+    "KAS": {
+     "sharpe": 3.719,
+     "ann": 3.8234,
+     "mdd": 0.507,
+     "cum": 3.8234,
+     "final_x": 4.8234,
+     "n": 8760,
+     "turnover": 0.027511,
+     "trades": 121,
+     "coverage": 0.989155,
+     "coverage_long": 0.384361,
+     "coverage_short": 0.604795
+    }
+   },
+   "vs_base": {
+    "d_sharpe": -2.439,
+    "d_cum": -2.3234,
+    "d_turnover": -0.004863,
+    "d_trades": -103
+   }
+  },
+  {
+   "unit": "sma_192",
+   "N": 192,
+   "FULL": {
+    "sharpe": 6.476,
+    "ann": 4.2787,
+    "mdd": 0.2399,
+    "cum": 4.2787,
+    "final_x": 5.2787,
+    "n": 8760,
+    "turnover": 0.018927,
+    "trades": 415,
+    "coverage_all": 0.978196
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.242,
+     "ann": 4.6457,
+     "mdd": 0.7157,
+     "cum": 4.6457,
+     "final_x": 5.6457,
+     "n": 8760,
+     "turnover": 0.01153,
+     "trades": 51,
+     "coverage": 0.978196,
+     "coverage_long": 0.35137,
+     "coverage_short": 0.626826
+    },
+    "TRX": {
+     "sharpe": 9.198,
+     "ann": 2.444,
+     "mdd": 0.066,
+     "cum": 2.444,
+     "final_x": 3.444,
+     "n": 8760,
+     "turnover": 0.01895,
+     "trades": 83,
+     "coverage": 0.978196,
+     "coverage_long": 0.549315,
+     "coverage_short": 0.428881
+    },
+    "ATOM": {
+     "sharpe": 5.795,
+     "ann": 4.9381,
+     "mdd": 0.492,
+     "cum": 4.9381,
+     "final_x": 5.9381,
+     "n": 8760,
+     "turnover": 0.027169,
+     "trades": 119,
+     "coverage": 0.978196,
+     "coverage_long": 0.382534,
+     "coverage_short": 0.595662
+    },
+    "APT": {
+     "sharpe": 4.748,
+     "ann": 5.8954,
+     "mdd": 0.5709,
+     "cum": 5.8954,
+     "final_x": 6.8954,
+     "n": 8760,
+     "turnover": 0.011301,
+     "trades": 50,
+     "coverage": 0.978196,
+     "coverage_long": 0.392123,
+     "coverage_short": 0.586073
+    },
+    "KAS": {
+     "sharpe": 2.952,
+     "ann": 3.4704,
+     "mdd": 0.5776,
+     "cum": 3.4704,
+     "final_x": 4.4704,
+     "n": 8760,
+     "turnover": 0.025685,
+     "trades": 112,
+     "coverage": 0.978196,
+     "coverage_long": 0.362785,
+     "coverage_short": 0.615411
+    }
+   },
+   "vs_base": {
+    "d_sharpe": -2.039,
+    "d_cum": -1.6067,
+    "d_turnover": -0.007648,
+    "d_trades": -165
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "sma_48",
+  "sma_96",
+  "sma_192"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): SMA-trend过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; SMA-trend filter diagnostic only, no adoption, no live change."
+}

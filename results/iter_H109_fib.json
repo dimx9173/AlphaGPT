@@ -1,0 +1,339 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "fib(N) entry-only: flat->non-zero entry or long<->short flip allowed only when the target side has fib permission (close vs 61.8% retrace of prior N swing high/low, causal, seed=False, flat=False); holds/exits pass",
+  "fib_swing_Ns": [
+   48,
+   96
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "N": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 0.0
+    }
+   }
+  },
+  {
+   "unit": "fib_48",
+   "N": 48,
+   "FULL": {
+    "sharpe": 7.387,
+    "ann": 4.1822,
+    "mdd": 0.1421,
+    "cum": 4.1822,
+    "final_x": 5.1822,
+    "n": 8760,
+    "turnover": 0.020091,
+    "trades": 441,
+    "coverage_all": 0.994521
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.103,
+     "ann": 3.4973,
+     "mdd": 0.5391,
+     "cum": 3.4973,
+     "final_x": 4.4973,
+     "n": 8760,
+     "turnover": 0.012671,
+     "trades": 56,
+     "coverage": 0.994521,
+     "coverage_long": 0.592808,
+     "coverage_short": 0.401712
+    },
+    "TRX": {
+     "sharpe": 9.278,
+     "ann": 2.851,
+     "mdd": 0.0768,
+     "cum": 2.851,
+     "final_x": 3.851,
+     "n": 8760,
+     "turnover": 0.023744,
+     "trades": 104,
+     "coverage": 0.994521,
+     "coverage_long": 0.66347,
+     "coverage_short": 0.33105
+    },
+    "ATOM": {
+     "sharpe": 5.219,
+     "ann": 4.6067,
+     "mdd": 0.2538,
+     "cum": 4.6067,
+     "final_x": 5.6067,
+     "n": 8760,
+     "turnover": 0.025685,
+     "trades": 113,
+     "coverage": 0.994521,
+     "coverage_long": 0.565525,
+     "coverage_short": 0.428995
+    },
+    "APT": {
+     "sharpe": 5.213,
+     "ann": 6.3595,
+     "mdd": 0.3745,
+     "cum": 6.3595,
+     "final_x": 7.3595,
+     "n": 8760,
+     "turnover": 0.012671,
+     "trades": 55,
+     "coverage": 0.994521,
+     "coverage_long": 0.560046,
+     "coverage_short": 0.434475
+    },
+    "KAS": {
+     "sharpe": 3.274,
+     "ann": 3.5967,
+     "mdd": 0.6402,
+     "cum": 3.5967,
+     "final_x": 4.5967,
+     "n": 8760,
+     "turnover": 0.025685,
+     "trades": 113,
+     "coverage": 0.994521,
+     "coverage_long": 0.532078,
+     "coverage_short": 0.462443
+    }
+   }
+  },
+  {
+   "unit": "fib_96",
+   "N": 96,
+   "FULL": {
+    "sharpe": 7.05,
+    "ann": 3.8518,
+    "mdd": 0.1606,
+    "cum": 3.8518,
+    "final_x": 4.8518,
+    "n": 8760,
+    "turnover": 0.017534,
+    "trades": 384,
+    "coverage_all": 0.989041
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.066,
+     "ann": 3.5046,
+     "mdd": 0.5391,
+     "cum": 3.5046,
+     "final_x": 4.5046,
+     "n": 8760,
+     "turnover": 0.011758,
+     "trades": 52,
+     "coverage": 0.989041,
+     "coverage_long": 0.5621,
+     "coverage_short": 0.426941
+    },
+    "TRX": {
+     "sharpe": 9.058,
+     "ann": 2.3806,
+     "mdd": 0.0612,
+     "cum": 2.3806,
+     "final_x": 3.3806,
+     "n": 8760,
+     "turnover": 0.017808,
+     "trades": 77,
+     "coverage": 0.989041,
+     "coverage_long": 0.680479,
+     "coverage_short": 0.308562
+    },
+    "ATOM": {
+     "sharpe": 4.773,
+     "ann": 4.1579,
+     "mdd": 0.3141,
+     "cum": 4.1579,
+     "final_x": 5.1579,
+     "n": 8760,
+     "turnover": 0.022717,
+     "trades": 100,
+     "coverage": 0.989041,
+     "coverage_long": 0.539954,
+     "coverage_short": 0.449087
+    },
+    "APT": {
+     "sharpe": 4.996,
+     "ann": 5.7244,
+     "mdd": 0.3984,
+     "cum": 5.7244,
+     "final_x": 6.7244,
+     "n": 8760,
+     "turnover": 0.011301,
+     "trades": 49,
+     "coverage": 0.989041,
+     "coverage_long": 0.528767,
+     "coverage_short": 0.460274
+    },
+    "KAS": {
+     "sharpe": 3.282,
+     "ann": 3.4918,
+     "mdd": 0.6984,
+     "cum": 3.4918,
+     "final_x": 4.4918,
+     "n": 8760,
+     "turnover": 0.024087,
+     "trades": 106,
+     "coverage": 0.989041,
+     "coverage_long": 0.482877,
+     "coverage_short": 0.506164
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "fib_48",
+  "fib_96"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): Fibonacci entry过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; Fibonacci entry filter diagnostic only, no adoption, no live change."
+}

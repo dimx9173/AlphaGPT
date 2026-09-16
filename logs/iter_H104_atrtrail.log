@@ -1,0 +1,28 @@
+iter_H104_atrtrail start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] mults=[1.5, 2.0, 3.0] scale=x4 atr_win=48
+base legs built (locked engine, fee=0.0004 fund=0.0005)
+ETC ATR(48) active=0.9946
+TRX ATR(48) active=0.9946
+ATOM ATR(48) active=0.9946
+APT ATR(48) active=0.9946
+KAS ATR(48) active=0.9946
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 to=0.026575 trades=580 cov=1.0000 br=0
+ETC ATRtrail(x1.5) coverage=0.9453 breaches=479
+TRX ATRtrail(x1.5) coverage=0.9265 breaches=644
+ATOM ATRtrail(x1.5) coverage=0.9401 breaches=525
+APT ATRtrail(x1.5) coverage=0.9458 breaches=475
+KAS ATRtrail(x1.5) coverage=0.9370 breaches=552
+atrtrail_x1.5 FULL sh=6.713 mdd=0.2457 cum=4.2520 to=0.136712 trades=2991 cov=0.7707 br=2675
+ETC ATRtrail(x2.0) coverage=0.9656 breaches=301
+TRX ATRtrail(x2.0) coverage=0.9529 breaches=413
+ATOM ATRtrail(x2.0) coverage=0.9639 breaches=316
+APT ATRtrail(x2.0) coverage=0.9660 breaches=298
+KAS ATRtrail(x2.0) coverage=0.9603 breaches=348
+atrtrail_x2.0 FULL sh=7.303 mdd=0.2079 cum=4.7902 to=0.098607 trades=2157 cov=0.8485 br=1676
+ETC ATRtrail(x3.0) coverage=0.9831 breaches=148
+TRX ATRtrail(x3.0) coverage=0.9743 breaches=225
+ATOM ATRtrail(x3.0) coverage=0.9825 breaches=153
+APT ATRtrail(x3.0) coverage=0.9836 breaches=144
+KAS ATRtrail(x3.0) coverage=0.9789 breaches=185
+atrtrail_x3.0 FULL sh=7.892 mdd=0.1837 cum=5.2998 to=0.064795 trades=1417 cov=0.9160 br=855
+wrote results/iter_H104_atrtrail.json verdict=PENDING decision=NO_ADOPTION

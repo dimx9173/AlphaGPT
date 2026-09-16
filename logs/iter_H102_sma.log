@@ -1,0 +1,23 @@
+iter_H102_sma start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] Ns=[48, 96, 192] scale=x4
+signals built (locked engine, fee=0.0004 fund=0.0005)
+ETC SMA(48) coverage=0.9946 long=0.4308 short=0.5638
+TRX SMA(48) coverage=0.9946 long=0.5422 short=0.4524
+ATOM SMA(48) coverage=0.9946 long=0.4455 short=0.5491
+APT SMA(48) coverage=0.9946 long=0.4469 short=0.5477
+KAS SMA(48) coverage=0.9946 long=0.4189 short=0.5757
+ETC SMA(96) coverage=0.9892 long=0.3953 short=0.5938
+TRX SMA(96) coverage=0.9892 long=0.5600 short=0.4291
+ATOM SMA(96) coverage=0.9892 long=0.4263 short=0.5629
+APT SMA(96) coverage=0.9892 long=0.4042 short=0.5849
+KAS SMA(96) coverage=0.9892 long=0.3844 short=0.6048
+ETC SMA(192) coverage=0.9782 long=0.3514 short=0.6268
+TRX SMA(192) coverage=0.9782 long=0.5493 short=0.4289
+ATOM SMA(192) coverage=0.9782 long=0.3825 short=0.5957
+APT SMA(192) coverage=0.9782 long=0.3921 short=0.5861
+KAS SMA(192) coverage=0.9782 long=0.3628 short=0.6154
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 to=0.026575 trades=580 cov=1.0000
+sma_48 FULL sh=6.802 mdd=0.2327 cum=4.0743 to=0.023379 trades=514 cov=0.9946
+sma_96 FULL sh=6.076 mdd=0.1917 cum=3.5620 to=0.021712 trades=477 cov=0.9892
+sma_192 FULL sh=6.476 mdd=0.2399 cum=4.2787 to=0.018927 trades=415 cov=0.9782
+wrote results/iter_H102_sma.json verdict=PENDING decision=NO_ADOPTION

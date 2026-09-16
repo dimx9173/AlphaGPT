@@ -1,0 +1,351 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "EMA(fast,slow) cross entry-only: long entries/flips allowed only when EMAfast>EMAslow, short entries/flips only when EMAfast<EMAslow (causal, k=2/(span+1), seed=close[0], ties block); holds/exits pass",
+  "ema_pairs": [
+   [
+    12,
+    48
+   ],
+   [
+    24,
+    96
+   ]
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "pair": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 1.0,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0
+    }
+   }
+  },
+  {
+   "unit": "ema_12_48",
+   "pair": [
+    12,
+    48
+   ],
+   "FULL": {
+    "sharpe": 7.689,
+    "ann": 4.623,
+    "mdd": 0.1952,
+    "cum": 4.623,
+    "final_x": 5.623,
+    "n": 8760,
+    "turnover": 0.020457,
+    "trades": 449,
+    "coverage_all": 0.499932
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.495,
+     "ann": 4.1063,
+     "mdd": 0.5391,
+     "cum": 4.1063,
+     "final_x": 5.1063,
+     "n": 8760,
+     "turnover": 0.013128,
+     "trades": 58,
+     "coverage": 0.499943,
+     "coverage_long": 0.393151,
+     "coverage_short": 0.606735
+    },
+    "TRX": {
+     "sharpe": 10.727,
+     "ann": 3.3476,
+     "mdd": 0.0665,
+     "cum": 3.3476,
+     "final_x": 4.3476,
+     "n": 8760,
+     "turnover": 0.023516,
+     "trades": 103,
+     "coverage": 0.499943,
+     "coverage_long": 0.547717,
+     "coverage_short": 0.452169
+    },
+    "ATOM": {
+     "sharpe": 5.48,
+     "ann": 5.0771,
+     "mdd": 0.4088,
+     "cum": 5.0771,
+     "final_x": 6.0771,
+     "n": 8760,
+     "turnover": 0.026598,
+     "trades": 117,
+     "coverage": 0.499886,
+     "coverage_long": 0.426598,
+     "coverage_short": 0.573174
+    },
+    "APT": {
+     "sharpe": 5.267,
+     "ann": 6.3928,
+     "mdd": 0.3835,
+     "cum": 6.3928,
+     "final_x": 7.3928,
+     "n": 8760,
+     "turnover": 0.0129,
+     "trades": 56,
+     "coverage": 0.499943,
+     "coverage_long": 0.406963,
+     "coverage_short": 0.592922
+    },
+    "KAS": {
+     "sharpe": 3.661,
+     "ann": 4.1911,
+     "mdd": 0.6402,
+     "cum": 4.1911,
+     "final_x": 5.1911,
+     "n": 8760,
+     "turnover": 0.026142,
+     "trades": 115,
+     "coverage": 0.499943,
+     "coverage_long": 0.399658,
+     "coverage_short": 0.600228
+    }
+   }
+  },
+  {
+   "unit": "ema_24_96",
+   "pair": [
+    24,
+    96
+   ],
+   "FULL": {
+    "sharpe": 7.044,
+    "ann": 4.1525,
+    "mdd": 0.1998,
+    "cum": 4.1525,
+    "final_x": 5.1525,
+    "n": 8760,
+    "turnover": 0.018767,
+    "trades": 413,
+    "coverage_all": 0.499932
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.385,
+     "ann": 3.8737,
+     "mdd": 0.5391,
+     "cum": 3.8737,
+     "final_x": 4.8737,
+     "n": 8760,
+     "turnover": 0.012443,
+     "trades": 55,
+     "coverage": 0.499943,
+     "coverage_long": 0.358676,
+     "coverage_short": 0.64121
+    },
+    "TRX": {
+     "sharpe": 10.063,
+     "ann": 2.8367,
+     "mdd": 0.0625,
+     "cum": 2.8367,
+     "final_x": 3.8367,
+     "n": 8760,
+     "turnover": 0.018493,
+     "trades": 81,
+     "coverage": 0.499943,
+     "coverage_long": 0.562443,
+     "coverage_short": 0.437443
+    },
+    "ATOM": {
+     "sharpe": 4.724,
+     "ann": 4.4112,
+     "mdd": 0.4273,
+     "cum": 4.4112,
+     "final_x": 5.4112,
+     "n": 8760,
+     "turnover": 0.026598,
+     "trades": 117,
+     "coverage": 0.499886,
+     "coverage_long": 0.397945,
+     "coverage_short": 0.601826
+    },
+    "APT": {
+     "sharpe": 4.954,
+     "ann": 5.7977,
+     "mdd": 0.4548,
+     "cum": 5.7977,
+     "final_x": 6.7977,
+     "n": 8760,
+     "turnover": 0.011986,
+     "trades": 53,
+     "coverage": 0.499943,
+     "coverage_long": 0.393379,
+     "coverage_short": 0.606507
+    },
+    "KAS": {
+     "sharpe": 3.466,
+     "ann": 3.8433,
+     "mdd": 0.6799,
+     "cum": 3.8433,
+     "final_x": 4.8433,
+     "n": 8760,
+     "turnover": 0.024315,
+     "trades": 107,
+     "coverage": 0.499943,
+     "coverage_long": 0.367808,
+     "coverage_short": 0.632078
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "ema_12_48",
+  "ema_24_96"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): EMA cross entry过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; EMA cross entry filter diagnostic only, no adoption, no live change."
+}

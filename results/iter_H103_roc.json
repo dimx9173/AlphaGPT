@@ -1,0 +1,423 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; ROC(N) sign gate on legs pre-cooldown (long ROC>0 / short ROC<0); static equal Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "ROC(N) momentum sign gate: ROC_N[t]=(close[t]-close[t-N])/close[t-N] causal, seed=0.0; long leg open only on ROC>0, short leg open only on ROC<0; applied post-quantile pre-cooldown",
+  "roc_Ns": [
+   12,
+   24,
+   48
+  ],
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "N": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0,
+     "coverage": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0,
+     "coverage": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0,
+     "coverage": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0,
+     "coverage": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage_long": 1.0,
+     "coverage_short": 1.0,
+     "coverage": 1.0
+    }
+   }
+  },
+  {
+   "unit": "roc_12",
+   "N": 12,
+   "FULL": {
+    "sharpe": 7.767,
+    "ann": 4.7827,
+    "mdd": 0.1977,
+    "cum": 4.7827,
+    "final_x": 5.7827,
+    "n": 8760,
+    "turnover": 0.02726,
+    "trades": 598,
+    "coverage_all": 0.976826
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.914,
+     "ann": 6.3642,
+     "mdd": 0.4571,
+     "cum": 6.3642,
+     "final_x": 7.3642,
+     "n": 8760,
+     "turnover": 0.013242,
+     "trades": 58,
+     "coverage_long": 0.467352,
+     "coverage_short": 0.528082,
+     "coverage": 0.995434
+    },
+    "TRX": {
+     "sharpe": 12.046,
+     "ann": 3.8281,
+     "mdd": 0.0619,
+     "cum": 3.8281,
+     "final_x": 4.8281,
+     "n": 8760,
+     "turnover": 0.034817,
+     "trades": 153,
+     "coverage_long": 0.522032,
+     "coverage_short": 0.474772,
+     "coverage": 0.996804
+    },
+    "ATOM": {
+     "sharpe": 4.385,
+     "ann": 4.1361,
+     "mdd": 0.4113,
+     "cum": 4.1361,
+     "final_x": 5.1361,
+     "n": 8760,
+     "turnover": 0.03984,
+     "trades": 175,
+     "coverage_long": 0.463242,
+     "coverage_short": 0.524543,
+     "coverage": 0.987785
+    },
+    "APT": {
+     "sharpe": 5.092,
+     "ann": 6.1399,
+     "mdd": 0.5518,
+     "cum": 6.1399,
+     "final_x": 7.1399,
+     "n": 8760,
+     "turnover": 0.013014,
+     "trades": 57,
+     "coverage_long": 0.459475,
+     "coverage_short": 0.537557,
+     "coverage": 0.997032
+    },
+    "KAS": {
+     "sharpe": 2.916,
+     "ann": 3.4453,
+     "mdd": 0.6713,
+     "cum": 3.4453,
+     "final_x": 4.4453,
+     "n": 8760,
+     "turnover": 0.035388,
+     "trades": 155,
+     "coverage_long": 0.460274,
+     "coverage_short": 0.533676,
+     "coverage": 0.99395
+    }
+   }
+  },
+  {
+   "unit": "roc_24",
+   "N": 24,
+   "FULL": {
+    "sharpe": 5.459,
+    "ann": 3.5046,
+    "mdd": 0.1893,
+    "cum": 3.5046,
+    "final_x": 4.5046,
+    "n": 8760,
+    "turnover": 0.025776,
+    "trades": 566,
+    "coverage_all": 0.983676
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.648,
+     "ann": 3.3866,
+     "mdd": 0.391,
+     "cum": 3.3866,
+     "final_x": 4.3866,
+     "n": 8760,
+     "turnover": 0.013128,
+     "trades": 58,
+     "coverage_long": 0.440411,
+     "coverage_short": 0.555479,
+     "coverage": 0.99589
+    },
+    "TRX": {
+     "sharpe": 11.541,
+     "ann": 3.5366,
+     "mdd": 0.084,
+     "cum": 3.5366,
+     "final_x": 4.5366,
+     "n": 8760,
+     "turnover": 0.030365,
+     "trades": 133,
+     "coverage_long": 0.531963,
+     "coverage_short": 0.464041,
+     "coverage": 0.996005
+    },
+    "ATOM": {
+     "sharpe": 2.742,
+     "ann": 2.8777,
+     "mdd": 0.4731,
+     "cum": 2.8777,
+     "final_x": 3.8777,
+     "n": 8760,
+     "turnover": 0.038927,
+     "trades": 171,
+     "coverage_long": 0.452626,
+     "coverage_short": 0.537557,
+     "coverage": 0.990183
+    },
+    "APT": {
+     "sharpe": 3.487,
+     "ann": 4.2938,
+     "mdd": 0.5875,
+     "cum": 4.2938,
+     "final_x": 5.2938,
+     "n": 8760,
+     "turnover": 0.013014,
+     "trades": 57,
+     "coverage_long": 0.457192,
+     "coverage_short": 0.539612,
+     "coverage": 0.996804
+    },
+    "KAS": {
+     "sharpe": 3.025,
+     "ann": 3.4282,
+     "mdd": 0.6781,
+     "cum": 3.4282,
+     "final_x": 4.4282,
+     "n": 8760,
+     "turnover": 0.033447,
+     "trades": 147,
+     "coverage_long": 0.439498,
+     "coverage_short": 0.554224,
+     "coverage": 0.993721
+    }
+   }
+  },
+  {
+   "unit": "roc_48",
+   "N": 48,
+   "FULL": {
+    "sharpe": 5.993,
+    "ann": 3.8506,
+    "mdd": 0.2206,
+    "cum": 3.8506,
+    "final_x": 4.8506,
+    "n": 8760,
+    "turnover": 0.022991,
+    "trades": 505,
+    "coverage_all": 0.981963
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.746,
+     "ann": 3.4342,
+     "mdd": 0.5959,
+     "cum": 3.4342,
+     "final_x": 4.4342,
+     "n": 8760,
+     "turnover": 0.012557,
+     "trades": 55,
+     "coverage_long": 0.421689,
+     "coverage_short": 0.571005,
+     "coverage": 0.992694
+    },
+    "TRX": {
+     "sharpe": 10.692,
+     "ann": 3.088,
+     "mdd": 0.098,
+     "cum": 3.088,
+     "final_x": 4.088,
+     "n": 8760,
+     "turnover": 0.026712,
+     "trades": 117,
+     "coverage_long": 0.54726,
+     "coverage_short": 0.446119,
+     "coverage": 0.993379
+    },
+    "ATOM": {
+     "sharpe": 4.208,
+     "ann": 4.2871,
+     "mdd": 0.4081,
+     "cum": 4.2871,
+     "final_x": 5.2871,
+     "n": 8760,
+     "turnover": 0.032991,
+     "trades": 145,
+     "coverage_long": 0.446347,
+     "coverage_short": 0.542694,
+     "coverage": 0.989041
+    },
+    "APT": {
+     "sharpe": 3.733,
+     "ann": 4.5875,
+     "mdd": 0.5592,
+     "cum": 4.5875,
+     "final_x": 5.5875,
+     "n": 8760,
+     "turnover": 0.012671,
+     "trades": 56,
+     "coverage_long": 0.421804,
+     "coverage_short": 0.571689,
+     "coverage": 0.993493
+    },
+    "KAS": {
+     "sharpe": 3.169,
+     "ann": 3.8561,
+     "mdd": 0.781,
+     "cum": 3.8561,
+     "final_x": 4.8561,
+     "n": 8760,
+     "turnover": 0.030023,
+     "trades": 132,
+     "coverage_long": 0.426256,
+     "coverage_short": 0.564954,
+     "coverage": 0.99121
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "roc_12",
+  "roc_24",
+  "roc_48"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): ROC-momentum sign过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; ROC-momentum sign filter diagnostic only, no adoption, no live change."
+}

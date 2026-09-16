@@ -1,0 +1,17 @@
+iter_H101_ema start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] pairs=[(12, 48), (24, 96)] scale=x4
+base legs built (locked engine, fee=0.0004 fund=0.0005)
+ETC EMA(12,48) long_cov=0.3932 short_cov=0.6067
+TRX EMA(12,48) long_cov=0.5477 short_cov=0.4522
+ATOM EMA(12,48) long_cov=0.4266 short_cov=0.5732
+APT EMA(12,48) long_cov=0.4070 short_cov=0.5929
+KAS EMA(12,48) long_cov=0.3997 short_cov=0.6002
+ETC EMA(24,96) long_cov=0.3587 short_cov=0.6412
+TRX EMA(24,96) long_cov=0.5624 short_cov=0.4374
+ATOM EMA(24,96) long_cov=0.3979 short_cov=0.6018
+APT EMA(24,96) long_cov=0.3934 short_cov=0.6065
+KAS EMA(24,96) long_cov=0.3678 short_cov=0.6321
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 to=0.026575 trades=580 cov=1.0000
+ema_12_48 FULL sh=7.689 mdd=0.1952 cum=4.6230 to=0.020457 trades=449 cov=0.4999
+ema_24_96 FULL sh=7.044 mdd=0.1998 cum=4.1525 to=0.018767 trades=413 cov=0.4999
+wrote results/iter_H101_ema.json verdict=PENDING decision=NO_ADOPTION

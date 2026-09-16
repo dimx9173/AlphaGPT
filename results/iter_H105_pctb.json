@@ -1,0 +1,310 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "pctb(N) entry-only: new entry (flat->non-zero) or long<->short flip allowed only on N-bar high/low breakout (close vs prior N highs/lows, causal, seed=False); holds/exits pass",
+  "pctb_Ns": [
+   48,
+   96
+  ],
+  "pctb_k": 2.0,
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "N": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 1.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 1.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage": 1.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 1.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 1.0
+    }
+   }
+  },
+  {
+   "unit": "pctb_48",
+   "N": 48,
+   "FULL": {
+    "sharpe": 6.725,
+    "ann": 3.6123,
+    "mdd": 0.1411,
+    "cum": 3.6123,
+    "final_x": 4.6123,
+    "n": 8760,
+    "turnover": 0.022055,
+    "trades": 482,
+    "coverage_all": 0.013014
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.759,
+     "ann": 4.115,
+     "mdd": 0.4284,
+     "cum": 4.115,
+     "final_x": 5.115,
+     "n": 8760,
+     "turnover": 0.013813,
+     "trades": 61,
+     "coverage": 0.155479
+    },
+    "TRX": {
+     "sharpe": 8.977,
+     "ann": 2.7335,
+     "mdd": 0.1065,
+     "cum": 2.7335,
+     "final_x": 3.7335,
+     "n": 8760,
+     "turnover": 0.026027,
+     "trades": 112,
+     "coverage": 0.174543
+    },
+    "ATOM": {
+     "sharpe": 3.307,
+     "ann": 3.0504,
+     "mdd": 0.479,
+     "cum": 3.0504,
+     "final_x": 4.0504,
+     "n": 8760,
+     "turnover": 0.030708,
+     "trades": 135,
+     "coverage": 0.155822
+    },
+    "APT": {
+     "sharpe": 4.402,
+     "ann": 5.3357,
+     "mdd": 0.4138,
+     "cum": 5.3357,
+     "final_x": 6.3357,
+     "n": 8760,
+     "turnover": 0.013584,
+     "trades": 59,
+     "coverage": 0.156507
+    },
+    "KAS": {
+     "sharpe": 2.776,
+     "ann": 2.8269,
+     "mdd": 0.558,
+     "cum": 2.8269,
+     "final_x": 3.8269,
+     "n": 8760,
+     "turnover": 0.026142,
+     "trades": 115,
+     "coverage": 0.149658
+    }
+   }
+  },
+  {
+   "unit": "pctb_96",
+   "N": 96,
+   "FULL": {
+    "sharpe": 5.974,
+    "ann": 2.8725,
+    "mdd": 0.132,
+    "cum": 2.8725,
+    "final_x": 3.8725,
+    "n": 8760,
+    "turnover": 0.017306,
+    "trades": 379,
+    "coverage_all": 0.013584
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.569,
+     "ann": 3.4487,
+     "mdd": 0.3127,
+     "cum": 3.4487,
+     "final_x": 4.4487,
+     "n": 8760,
+     "turnover": 0.01153,
+     "trades": 51,
+     "coverage": 0.145548
+    },
+    "TRX": {
+     "sharpe": 6.448,
+     "ann": 1.7672,
+     "mdd": 0.1244,
+     "cum": 1.7672,
+     "final_x": 2.7672,
+     "n": 8760,
+     "turnover": 0.01895,
+     "trades": 83,
+     "coverage": 0.16016
+    },
+    "ATOM": {
+     "sharpe": 3.002,
+     "ann": 2.5542,
+     "mdd": 0.6096,
+     "cum": 2.5542,
+     "final_x": 3.5542,
+     "n": 8760,
+     "turnover": 0.024429,
+     "trades": 107,
+     "coverage": 0.155708
+    },
+    "APT": {
+     "sharpe": 4.336,
+     "ann": 4.8906,
+     "mdd": 0.3745,
+     "cum": 4.8906,
+     "final_x": 5.8906,
+     "n": 8760,
+     "turnover": 0.011644,
+     "trades": 50,
+     "coverage": 0.154566
+    },
+    "KAS": {
+     "sharpe": 1.898,
+     "ann": 1.7018,
+     "mdd": 0.6402,
+     "cum": 1.7018,
+     "final_x": 2.7018,
+     "n": 8760,
+     "turnover": 0.019977,
+     "trades": 88,
+     "coverage": 0.15879
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "pctb_48",
+  "pctb_96"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): pctb entry过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; pctb entry filter diagnostic only, no adoption, no live change."
+}

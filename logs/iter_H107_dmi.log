@@ -1,0 +1,17 @@
+iter_H107_dmi start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] Ns=[14, 28] scale=x4
+base legs built (locked engine, fee=0.0004 fund=0.0005)
+ETC DMI(14) cov_long=0.4259 cov_short=0.5725
+TRX DMI(14) cov_long=0.5061 cov_short=0.4924
+ATOM DMI(14) cov_long=0.4491 cov_short=0.5493
+APT DMI(14) cov_long=0.4379 cov_short=0.5605
+KAS DMI(14) cov_long=0.4516 cov_short=0.5468
+ETC DMI(28) cov_long=0.3872 cov_short=0.6096
+TRX DMI(28) cov_long=0.4895 cov_short=0.5073
+ATOM DMI(28) cov_long=0.4244 cov_short=0.5724
+APT DMI(28) cov_long=0.4047 cov_short=0.5921
+KAS DMI(28) cov_long=0.4307 cov_short=0.5661
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 to=0.026575 trades=580 cov=1.0000
+dmi_14 FULL sh=8.010 mdd=0.2018 cum=4.9357 to=0.024018 trades=527 cov=0.9984
+dmi_28 FULL sh=8.012 mdd=0.1998 cum=4.8237 to=0.021644 trades=475 cov=0.9968
+wrote results/iter_H107_dmi.json verdict=PENDING decision=NO_ADOPTION

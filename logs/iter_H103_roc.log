@@ -1,0 +1,23 @@
+iter_H103_roc start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] Ns=[12, 24, 48] scale=x4
+base legs built (locked engine, fee=0.0004 fund=0.0005)
+ETC ROC(12) long_cov=0.4674 short_cov=0.5281
+TRX ROC(12) long_cov=0.5220 short_cov=0.4748
+ATOM ROC(12) long_cov=0.4632 short_cov=0.5245
+APT ROC(12) long_cov=0.4595 short_cov=0.5376
+KAS ROC(12) long_cov=0.4603 short_cov=0.5337
+ETC ROC(24) long_cov=0.4404 short_cov=0.5555
+TRX ROC(24) long_cov=0.5320 short_cov=0.4640
+ATOM ROC(24) long_cov=0.4526 short_cov=0.5376
+APT ROC(24) long_cov=0.4572 short_cov=0.5396
+KAS ROC(24) long_cov=0.4395 short_cov=0.5542
+ETC ROC(48) long_cov=0.4217 short_cov=0.5710
+TRX ROC(48) long_cov=0.5473 short_cov=0.4461
+ATOM ROC(48) long_cov=0.4463 short_cov=0.5427
+APT ROC(48) long_cov=0.4218 short_cov=0.5717
+KAS ROC(48) long_cov=0.4263 short_cov=0.5650
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 to=0.026575 trades=580 cov=1.0000
+roc_12 FULL sh=7.767 mdd=0.1977 cum=4.7827 to=0.027260 trades=598 cov=0.9768
+roc_24 FULL sh=5.459 mdd=0.1893 cum=3.5046 to=0.025776 trades=566 cov=0.9837
+roc_48 FULL sh=5.993 mdd=0.2206 cum=3.8506 to=0.022991 trades=505 cov=0.9820
+wrote results/iter_H103_roc.json verdict=PENDING decision=NO_ADOPTION

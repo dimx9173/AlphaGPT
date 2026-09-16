@@ -1,0 +1,328 @@
+{
+ "config": {
+  "engine": "mirror run_weight_modes.py leg_net + quantile q0.3 long-only + cooldown + stops + vol_scale(vt None->1.0) + roll1; static equal 0.2 Top5; 1h native cd/ts/vw x4",
+  "formula": [
+   3,
+   2,
+   7,
+   2,
+   7,
+   11,
+   15,
+   4,
+   4,
+   6,
+   6,
+   10
+  ],
+  "basket": {
+   "ETC": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "TRX": {
+    "lth": 0.85,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "ATOM": {
+    "lth": 0.85,
+    "sth": 0.15,
+    "cd": 6,
+    "sl": 0.05,
+    "ts": 24,
+    "q": 0.3
+   },
+   "APT": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 18,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   },
+   "KAS": {
+    "lth": 0.88,
+    "sth": 0.12,
+    "cd": 6,
+    "sl": null,
+    "ts": 24,
+    "q": 0.3
+   }
+  },
+  "weights": {
+   "ETC": 0.2,
+   "TRX": 0.2,
+   "ATOM": 0.2,
+   "APT": 0.2,
+   "KAS": 0.2
+  },
+  "filter": "KDJ(N, smooth 3) directional entry-only: flat->long / flip-into-long allowed only on K>D; flat->short / flip-into-short only on K<D (RSV causal window, seed K=D=50); holds/exits pass",
+  "kdj_Ns": [
+   14,
+   27
+  ],
+  "kdj_smooth": 3,
+  "lev": 2.0,
+  "fund": 0.0005,
+  "fee": 0.0004,
+  "smoke": false,
+  "grid": "1h",
+  "grid_bars": 8760,
+  "bpy": 8760.0,
+  "scale": 4
+ },
+ "rows": [
+  {
+   "unit": "base",
+   "N": null,
+   "FULL": {
+    "sharpe": 8.515,
+    "ann": 5.8854,
+    "mdd": 0.1998,
+    "cum": 5.8854,
+    "final_x": 6.8854,
+    "n": 8760,
+    "turnover": 0.026575,
+    "trades": 580,
+    "coverage_short_all": 0.0,
+    "coverage_all": 1.0
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.157,
+     "ann": 5.0039,
+     "mdd": 0.5391,
+     "cum": 5.0039,
+     "final_x": 6.0039,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 1.0,
+     "coverage_short": 0.0
+    },
+    "TRX": {
+     "sharpe": 12.624,
+     "ann": 4.6577,
+     "mdd": 0.0789,
+     "cum": 4.6577,
+     "final_x": 5.6577,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 1.0,
+     "coverage_short": 0.0
+    },
+    "ATOM": {
+     "sharpe": 5.692,
+     "ann": 6.475,
+     "mdd": 0.5199,
+     "cum": 6.475,
+     "final_x": 7.475,
+     "n": 8760,
+     "turnover": 0.039612,
+     "trades": 173,
+     "coverage": 1.0,
+     "coverage_short": 0.0
+    },
+    "APT": {
+     "sharpe": 5.927,
+     "ann": 7.9187,
+     "mdd": 0.4548,
+     "cum": 7.9187,
+     "final_x": 8.9187,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 1.0,
+     "coverage_short": 0.0
+    },
+    "KAS": {
+     "sharpe": 4.17,
+     "ann": 5.3719,
+     "mdd": 0.6402,
+     "cum": 5.3719,
+     "final_x": 6.3719,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 1.0,
+     "coverage_short": 0.0
+    }
+   }
+  },
+  {
+   "unit": "kdj_14",
+   "N": 14,
+   "FULL": {
+    "sharpe": 7.873,
+    "ann": 5.1636,
+    "mdd": 0.1757,
+    "cum": 5.1636,
+    "final_x": 6.1636,
+    "n": 8760,
+    "turnover": 0.026301,
+    "trades": 574,
+    "coverage_short_all": 0.499132,
+    "coverage_all": 0.499384
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 4.869,
+     "ann": 4.6239,
+     "mdd": 0.5391,
+     "cum": 4.6239,
+     "final_x": 5.6239,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 0.498174,
+     "coverage_short": 0.500342
+    },
+    "TRX": {
+     "sharpe": 11.788,
+     "ann": 4.1695,
+     "mdd": 0.0979,
+     "cum": 4.1695,
+     "final_x": 5.1695,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 0.511986,
+     "coverage_short": 0.48653
+    },
+    "ATOM": {
+     "sharpe": 5.221,
+     "ann": 5.5622,
+     "mdd": 0.477,
+     "cum": 5.5622,
+     "final_x": 6.5622,
+     "n": 8760,
+     "turnover": 0.038242,
+     "trades": 167,
+     "coverage": 0.49726,
+     "coverage_short": 0.501256
+    },
+    "APT": {
+     "sharpe": 5.497,
+     "ann": 7.256,
+     "mdd": 0.4548,
+     "cum": 7.256,
+     "final_x": 8.256,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 0.49589,
+     "coverage_short": 0.502626
+    },
+    "KAS": {
+     "sharpe": 3.431,
+     "ann": 4.2062,
+     "mdd": 0.6402,
+     "cum": 4.2062,
+     "final_x": 5.2062,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 0.493607,
+     "coverage_short": 0.504909
+    }
+   }
+  },
+  {
+   "unit": "kdj_27",
+   "N": 27,
+   "FULL": {
+    "sharpe": 7.935,
+    "ann": 5.0991,
+    "mdd": 0.1682,
+    "cum": 5.0991,
+    "final_x": 6.0991,
+    "n": 8760,
+    "turnover": 0.026073,
+    "trades": 570,
+    "coverage_short_all": 0.500274,
+    "coverage_all": 0.496758
+   },
+   "per_coin": {
+    "ETC": {
+     "sharpe": 5.096,
+     "ann": 4.7872,
+     "mdd": 0.5391,
+     "cum": 4.7872,
+     "final_x": 5.7872,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 66,
+     "coverage": 0.499087,
+     "coverage_short": 0.497945
+    },
+    "TRX": {
+     "sharpe": 11.161,
+     "ann": 3.8997,
+     "mdd": 0.0998,
+     "cum": 3.8997,
+     "final_x": 4.8997,
+     "n": 8760,
+     "turnover": 0.031735,
+     "trades": 137,
+     "coverage": 0.505479,
+     "coverage_short": 0.491553
+    },
+    "ATOM": {
+     "sharpe": 5.196,
+     "ann": 5.4046,
+     "mdd": 0.4432,
+     "cum": 5.4046,
+     "final_x": 6.4046,
+     "n": 8760,
+     "turnover": 0.0371,
+     "trades": 163,
+     "coverage": 0.499315,
+     "coverage_short": 0.497717
+    },
+    "APT": {
+     "sharpe": 5.318,
+     "ann": 7.0116,
+     "mdd": 0.45,
+     "cum": 7.0116,
+     "final_x": 8.0116,
+     "n": 8760,
+     "turnover": 0.014954,
+     "trades": 65,
+     "coverage": 0.489041,
+     "coverage_short": 0.507991
+    },
+    "KAS": {
+     "sharpe": 3.608,
+     "ann": 4.3924,
+     "mdd": 0.6402,
+     "cum": 4.3924,
+     "final_x": 5.3924,
+     "n": 8760,
+     "turnover": 0.031621,
+     "trades": 139,
+     "coverage": 0.490868,
+     "coverage_short": 0.506164
+    }
+   }
+  }
+ ],
+ "units_done": [
+  "base",
+  "kdj_14",
+  "kdj_27"
+ ],
+ "complete": true,
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "decision_note": "待定(P0-3 FAIL): KDJ entry过滤只做诊断,不采用,不改live, live basket与阈值保持locked原状。",
+ "conclusion": "PENDING (待定, P0-3 FAIL): 1h原生格子; KDJ entry filter diagnostic only, no adoption, no live change."
+}

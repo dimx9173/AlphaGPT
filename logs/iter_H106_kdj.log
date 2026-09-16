@@ -1,0 +1,17 @@
+iter_H106_kdj start smoke=False
+common 1h native n=8760 coins=['ETC', 'TRX', 'ATOM', 'APT', 'KAS'] Ns=[14, 27] scale=x4
+base legs built (locked engine, fee=0.0004 fund=0.0005)
+ETC KDJ(14) long_cov=0.4982 short_cov=0.5003
+TRX KDJ(14) long_cov=0.5120 short_cov=0.4865
+ATOM KDJ(14) long_cov=0.4973 short_cov=0.5013
+APT KDJ(14) long_cov=0.4959 short_cov=0.5026
+KAS KDJ(14) long_cov=0.4936 short_cov=0.5049
+ETC KDJ(27) long_cov=0.4991 short_cov=0.4979
+TRX KDJ(27) long_cov=0.5055 short_cov=0.4916
+ATOM KDJ(27) long_cov=0.4993 short_cov=0.4977
+APT KDJ(27) long_cov=0.4890 short_cov=0.5080
+KAS KDJ(27) long_cov=0.4909 short_cov=0.5062
+base FULL sh=8.515 mdd=0.1998 cum=5.8854 to=0.026575 trades=580 cov=1.0000
+kdj_14 FULL sh=7.873 mdd=0.1757 cum=5.1636 to=0.026301 trades=574 cov=0.4994
+kdj_27 FULL sh=7.935 mdd=0.1682 cum=5.0991 to=0.026073 trades=570 cov=0.4968
+wrote results/iter_H106_kdj.json verdict=PENDING decision=NO_ADOPTION
