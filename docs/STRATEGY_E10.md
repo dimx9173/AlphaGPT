@@ -172,6 +172,17 @@ STOP_SIGNAL_PATH = "./STOP_SIGNAL"
 
 ---
 
+## 12f 附則 (2026-09-16 追加，不改 global 判定)
+
+> `USE_ADVANCED` 預設已切 1 (12 因子詞表，`StackVM` offset 6→12)。E10 公式 `[3,2,7,2,7,11,15,4,4,6,6,10]`
+> 在 12f 詞表下語義改變 (token 7: SUB→MOM_REV 等)，故 **實盤 E10 鎖死 6f**：
+> `y1b_basket.py` / `runner.py` / `new_coin_pipeline.py` / `run_qsweep.py` / `run_aa.py`
+> 全部顯式 `StackVM(use_advanced=False)` + `compute_features(..., use_advanced=False)`。
+> 12f 僅用於新公式搜尋 (`research/train_12f_30m.py`, 30m 1y Top5)；新公式上線需新凍結+新 OOS，
+> 舊 E10 照跑不受影響。首輪 12f best 9.399 (TRX 腿 -36 崩，NO_ADOPTION，見 `results/train_12f_30m_REPORT.json`)。
+
+---
+
 ## E1-E9 x10 增量匯總 (2026-09-07 追加)
 
 > E1-E9 均不改變 global 判定 (promote_to_global false)，補強了以下邊界與交易層有效性：
