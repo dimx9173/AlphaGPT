@@ -9,7 +9,12 @@ approximated here by MemeBacktest with matching per-coin thresholds).
 Reward per formula: mean per-coin MemeBacktest sharpe on 30m bars
 (BPY=17520), invalid/const formulas penalized (-5/-2, mirrors engine).
 
-Output: results/train_12f_30m_best.json {formula, decode, score, hist}.
+Output routing (never mix):
+  default (no TRAIN_12F_FLOOR): results/train_12f_30m_best.json {formula, decode, score, hist}
+  floor run (TRAIN_12F_FLOOR set): results/train_12f_30m_floor_best.json {+ worst_leg, floor}
+  smoke (TRAIN_12F_SMOKE=1): /tmp/train_12f_30m_smoke.json (real artifacts untouched)
+Per-leg floor veto: TRAIN_12F_FLOOR=0.0 -> any leg sharpe<=0 vetoes (reward=worst leg);
+veto branch also tracks best (fix 2026-09-16; was starved at -1e9).
 Offline read-only (CSV reads only); no live/demo change.
 Usage: /home/linuxbrew/.linuxbrew/bin/python3 research/train_12f_30m.py [steps] [batch]
 Smoke (tests): TRAIN_12F_SMOKE=1 -> steps=3 batch=4 coins={ETC,TRX}.
