@@ -1,0 +1,467 @@
+{
+ "formula": [
+  2,
+  1,
+  21,
+  21,
+  16,
+  10,
+  24,
+  21,
+  0,
+  16,
+  14,
+  19
+ ],
+ "decode": [
+  "PRESSURE",
+  "LIQ_SCORE",
+  "DECAY",
+  "DECAY",
+  "NEG",
+  "CLOSE_POS",
+  "ZSCORE",
+  "DECAY",
+  "RET",
+  "NEG",
+  "MUL",
+  "GATE"
+ ],
+ "train_score": 7.406094074249268,
+ "folds": [
+  {
+   "fold": 0,
+   "bars": [
+    0,
+    1460
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 3.854,
+     "mdd": 0.3629,
+     "turnover": 0.05137
+    },
+    "TRX": {
+     "sharpe": 21.386,
+     "mdd": 0.0534,
+     "turnover": 0.12808
+    },
+    "ATOM": {
+     "sharpe": 6.473,
+     "mdd": 0.3592,
+     "turnover": 0.13014
+    },
+    "APT": {
+     "sharpe": 2.575,
+     "mdd": 0.6983,
+     "turnover": 0.05274
+    },
+    "KAS": {
+     "sharpe": 5.837,
+     "mdd": 0.3925,
+     "turnover": 0.13082
+    }
+   },
+   "basket_mean": 8.025
+  },
+  {
+   "fold": 1,
+   "bars": [
+    1460,
+    2920
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 10.846,
+     "mdd": 0.1303,
+     "turnover": 0.05137
+    },
+    "TRX": {
+     "sharpe": 13.682,
+     "mdd": 0.1015,
+     "turnover": 0.12397
+    },
+    "ATOM": {
+     "sharpe": 9.243,
+     "mdd": 0.2971,
+     "turnover": 0.13219
+    },
+    "APT": {
+     "sharpe": 4.899,
+     "mdd": 0.348,
+     "turnover": 0.05068
+    },
+    "KAS": {
+     "sharpe": 9.361,
+     "mdd": 0.2626,
+     "turnover": 0.12808
+    }
+   },
+   "basket_mean": 9.606
+  },
+  {
+   "fold": 2,
+   "bars": [
+    2920,
+    4380
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 7.528,
+     "mdd": 0.2381,
+     "turnover": 0.05274
+    },
+    "TRX": {
+     "sharpe": 18.269,
+     "mdd": 0.0316,
+     "turnover": 0.13014
+    },
+    "ATOM": {
+     "sharpe": 7.317,
+     "mdd": 0.1849,
+     "turnover": 0.13425
+    },
+    "APT": {
+     "sharpe": 8.434,
+     "mdd": 0.1975,
+     "turnover": 0.05
+    },
+    "KAS": {
+     "sharpe": 5.724,
+     "mdd": 0.5854,
+     "turnover": 0.12945
+    }
+   },
+   "basket_mean": 9.454
+  },
+  {
+   "fold": 3,
+   "bars": [
+    4380,
+    5840
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 11.051,
+     "mdd": 0.1232,
+     "turnover": 0.05068
+    },
+    "TRX": {
+     "sharpe": 18.815,
+     "mdd": 0.0398,
+     "turnover": 0.12123
+    },
+    "ATOM": {
+     "sharpe": 5.249,
+     "mdd": 0.2346,
+     "turnover": 0.12055
+    },
+    "APT": {
+     "sharpe": 7.577,
+     "mdd": 0.1928,
+     "turnover": 0.05274
+    },
+    "KAS": {
+     "sharpe": 6.182,
+     "mdd": 0.1704,
+     "turnover": 0.13082
+    }
+   },
+   "basket_mean": 9.775
+  },
+  {
+   "fold": 4,
+   "bars": [
+    5840,
+    7300
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 8.296,
+     "mdd": 0.1968,
+     "turnover": 0.05205
+    },
+    "TRX": {
+     "sharpe": 17.722,
+     "mdd": 0.0794,
+     "turnover": 0.12945
+    },
+    "ATOM": {
+     "sharpe": 7.816,
+     "mdd": 0.1887,
+     "turnover": 0.13151
+    },
+    "APT": {
+     "sharpe": 8.92,
+     "mdd": 0.2531,
+     "turnover": 0.05137
+    },
+    "KAS": {
+     "sharpe": 10.143,
+     "mdd": 0.2822,
+     "turnover": 0.13014
+    }
+   },
+   "basket_mean": 10.579
+  },
+  {
+   "fold": 5,
+   "bars": [
+    7300,
+    8760
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 8.766,
+     "mdd": 0.1465,
+     "turnover": 0.05205
+    },
+    "TRX": {
+     "sharpe": 24.135,
+     "mdd": 0.0348,
+     "turnover": 0.12603
+    },
+    "ATOM": {
+     "sharpe": 7.031,
+     "mdd": 0.1195,
+     "turnover": 0.13151
+    },
+    "APT": {
+     "sharpe": 9.312,
+     "mdd": 0.2043,
+     "turnover": 0.05
+    },
+    "KAS": {
+     "sharpe": 9.186,
+     "mdd": 0.1596,
+     "turnover": 0.1274
+    }
+   },
+   "basket_mean": 11.686
+  },
+  {
+   "fold": 6,
+   "bars": [
+    8760,
+    10220
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 6.894,
+     "mdd": 0.1646,
+     "turnover": 0.04932
+    },
+    "TRX": {
+     "sharpe": 14.238,
+     "mdd": 0.0437,
+     "turnover": 0.12671
+    },
+    "ATOM": {
+     "sharpe": 8.435,
+     "mdd": 0.1357,
+     "turnover": 0.13082
+    },
+    "APT": {
+     "sharpe": 9.841,
+     "mdd": 0.313,
+     "turnover": 0.05274
+    },
+    "KAS": {
+     "sharpe": 4.708,
+     "mdd": 0.2522,
+     "turnover": 0.13151
+    }
+   },
+   "basket_mean": 8.823
+  },
+  {
+   "fold": 7,
+   "bars": [
+    10220,
+    11680
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 7.928,
+     "mdd": 0.1037,
+     "turnover": 0.05274
+    },
+    "TRX": {
+     "sharpe": 15.918,
+     "mdd": 0.062,
+     "turnover": 0.12808
+    },
+    "ATOM": {
+     "sharpe": 4.56,
+     "mdd": 0.2875,
+     "turnover": 0.12945
+    },
+    "APT": {
+     "sharpe": 6.011,
+     "mdd": 0.154,
+     "turnover": 0.05205
+    },
+    "KAS": {
+     "sharpe": 4.64,
+     "mdd": 0.2945,
+     "turnover": 0.12671
+    }
+   },
+   "basket_mean": 7.811
+  },
+  {
+   "fold": 8,
+   "bars": [
+    11680,
+    13140
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 7.621,
+     "mdd": 0.1767,
+     "turnover": 0.05342
+    },
+    "TRX": {
+     "sharpe": 22.482,
+     "mdd": 0.0304,
+     "turnover": 0.13151
+    },
+    "ATOM": {
+     "sharpe": 4.725,
+     "mdd": 0.1776,
+     "turnover": 0.1274
+    },
+    "APT": {
+     "sharpe": 9.45,
+     "mdd": 0.1964,
+     "turnover": 0.05
+    },
+    "KAS": {
+     "sharpe": 6.463,
+     "mdd": 0.2374,
+     "turnover": 0.11986
+    }
+   },
+   "basket_mean": 10.148
+  },
+  {
+   "fold": 9,
+   "bars": [
+    13140,
+    14600
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 13.891,
+     "mdd": 0.0706,
+     "turnover": 0.05137
+    },
+    "TRX": {
+     "sharpe": 25.214,
+     "mdd": 0.0181,
+     "turnover": 0.13356
+    },
+    "ATOM": {
+     "sharpe": 7.676,
+     "mdd": 0.1335,
+     "turnover": 0.1363
+    },
+    "APT": {
+     "sharpe": 9.314,
+     "mdd": 0.1122,
+     "turnover": 0.05137
+    },
+    "KAS": {
+     "sharpe": 10.859,
+     "mdd": 0.0821,
+     "turnover": 0.13493
+    }
+   },
+   "basket_mean": 13.391
+  },
+  {
+   "fold": 10,
+   "bars": [
+    14600,
+    16060
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 18.384,
+     "mdd": 0.0771,
+     "turnover": 0.05
+    },
+    "TRX": {
+     "sharpe": 29.566,
+     "mdd": 0.0255,
+     "turnover": 0.12877
+    },
+    "ATOM": {
+     "sharpe": 4.791,
+     "mdd": 0.1983,
+     "turnover": 0.13219
+    },
+    "APT": {
+     "sharpe": 13.429,
+     "mdd": 0.0763,
+     "turnover": 0.05
+    },
+    "KAS": {
+     "sharpe": 14.265,
+     "mdd": 0.1024,
+     "turnover": 0.13219
+    }
+   },
+   "basket_mean": 16.087
+  },
+  {
+   "fold": 11,
+   "bars": [
+    16060,
+    17520
+   ],
+   "per_coin": {
+    "ETC": {
+     "sharpe": 9.988,
+     "mdd": 0.3303,
+     "turnover": 0.05411
+    },
+    "TRX": {
+     "sharpe": 14.865,
+     "mdd": 0.0657,
+     "turnover": 0.1363
+    },
+    "ATOM": {
+     "sharpe": 2.809,
+     "mdd": 0.2723,
+     "turnover": 0.12808
+    },
+    "APT": {
+     "sharpe": 1.854,
+     "mdd": 0.2889,
+     "turnover": 0.05274
+    },
+    "KAS": {
+     "sharpe": 0.819,
+     "mdd": 0.3074,
+     "turnover": 0.12945
+    }
+   },
+   "basket_mean": 6.067
+  }
+ ],
+ "summary": {
+  "mean": 10.121,
+  "median": 9.691,
+  "n_pos": 12,
+  "gates": {
+   "mean_gt_0": true,
+   "median_ge_1_5": true,
+   "n_pos_ge_8": true
+  },
+  "pass_all": true
+ },
+ "verdict": "PENDING",
+ "decision": "NO_ADOPTION",
+ "note": "diagnostic 12fold on train window (in-sample); fresh-OOS permutation still required; live untouched"
+}
