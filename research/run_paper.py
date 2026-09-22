@@ -6,20 +6,18 @@ import torch
 from model_core.factors import FeatureEngineer
 from model_core.vm import StackVM
 from model_core.backtest import MemeBacktest
-FORMULA = [3, 2, 7, 2, 7, 11, 15, 4, 4, 6, 6, 10]
+FORMULA = [4, 3, 5, 5, 3, 14, 19, 20, 20, 4, 19, 26]
 PORT = {'ETC': 0.5, 'TRX': 0.5}
 BEST = {'ETC': (0.88, 0.12, 12, None), 'TRX': (0.85, 0.15, 6, 0.05)}
 FEE = 0.0004
 FUND = 0.0005
-START_EQ = 10000.0
+START_EQ = 91673.93
 def load_bars(coin):
     import csv
-    rows = list(csv.DictReader(open('data/data_15m_3y/' + coin + '.csv')))
+    rows = list(csv.DictReader(open('data/data_1y/1h/' + coin + '.csv')))
     bars = []
-    for i in range(0, len(rows), 16):
-        blk = rows[i:i + 16]
-        if len(blk) < 16: break
-        bars.append((float(blk[0]['open']), max(float(x['high']) for x in blk), min(float(x['low']) for x in blk), float(blk[-1]['close']), sum(float(x['volume']) for x in blk)))
+    for r in rows:
+        bars.append((float(r['open']), float(r['high']), float(r['low']), float(r['close']), float(r['volume'])))
     return bars
 def run_paper():
     import torch
@@ -35,10 +33,10 @@ def run_paper():
     for c in coins:
         b = bars[c][:n]
         raw = {'open': torch.tensor([[x[0] for x in b]]), 'high': torch.tensor([[x[1] for x in b]]), 'low': torch.tensor([[x[2] for x in b]]), 'close': torch.tensor([[x[3] for x in b]]), 'volume': torch.tensor([[x[4] for x in b]]), 'liquidity': torch.full((1, n), 1e7), 'fdv': torch.full((1, n), 1e8)}
-        sig = StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
+        sig = StackVM(use_advanced=True).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=True))
         px = torch.tensor([x[3] for x in b])
         lth, sth, cd, sl = BEST[c]
-        bt = MemeBacktest(venue='aster', leverage=2.0, short_enabled=True, funding_override=FUND, long_th=lth, short_th=sth, cooldown_bars=cd, bars_per_year=2190.0, stop_loss=sl)
+        bt = MemeBacktest(venue='aster', leverage=2.0, short_enabled=True, funding_override=FUND, long_th=lth, short_th=sth, cooldown_bars=cd, bars_per_year=8760.0, stop_loss=sl)
         sg = torch.sigmoid(sig)
         safe = (raw['liquidity'] > bt.min_liq).float()
         lp = (sg > bt.long_th).float() * safe
@@ -73,12 +71,12 @@ def run_paper():
     rets = [(eq_curve[i + 1] - eq_curve[i]) / eq_curve[i] if eq_curve[i] else 0.0 for i in range(len(eq_curve) - 1)]
     mean = sum(rets) / max(len(rets), 1)
     var = sum((x - mean) ** 2 for x in rets) / max(len(rets) - 1, 1)
-    sharpe = mean / math.sqrt(var) * math.sqrt(2190.0) if var > 0 else 0.0
+    sharpe = mean / math.sqrt(var) * math.sqrt(8760.0) if var > 0 else 0.0
     tot = (equity - START_EQ) / START_EQ
     ratio = equity / START_EQ
     import math as _m
-    ann = float(_m.exp(2190.0 / max(len(rets), 1) * _m.log(ratio)) - 1.0) if ratio > 0 else float('-inf')
-    print('paper ETC+TRX 50/50 lev2x fee=' + str(FEE) + ' fund=' + str(FUND), flush=True)
+    ann = float(_m.exp(8760.0 / max(len(rets), 1) * _m.log(ratio)) - 1.0) if ratio > 0 else float('-inf')
+    print('paper ETC+TRX 50/50 lev2x fee=' + str(FEE) + ' fund=' + str(FUND) + ' 1h bars', flush=True)
     print('trades=' + str(len(ledger)) + ' final_eq=' + str(round(equity, 2)) + ' tot=' + str(round(tot, 4)) + ' ann=' + str(round(ann, 4)) + ' sharpe=' + str(round(sharpe, 3)) + ' maxdd=' + str(round(max_dd_pct, 4)), flush=True)
     by = {}
     for e in ledger:

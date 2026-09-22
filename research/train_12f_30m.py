@@ -41,6 +41,18 @@ from model_core.vm import StackVM
 from model_core.backtest import MemeBacktest
 from model_core.vocab import get_vocab
 
+# ==================== 固定隨機種子 ====================
+# 確保每次訓練結果可重現
+import random
+SEED = 42
+torch.manual_seed(SEED)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(SEED)
+random.seed(SEED)
+import numpy as np
+np.random.seed(SEED)
+# ==================== 固定隨機種子 ====================
+
 COINS5 = ["ETC", "TRX", "ATOM", "APT", "KAS"]
 # per-coin E10 thresholds (lth/sth/cd/sl) for reward backtest
 TH = {"ETC": (0.88, 0.12, 18, None), "TRX": (0.85, 0.12, 6, 0.05),
@@ -85,6 +97,11 @@ def decode(formula):
 
 
 def main():
+    # 確保種子設定（防止嵌套模組重置）
+    random.seed(SEED)
+    torch.manual_seed(SEED)
+    np.random.seed(SEED)
+    
     smoke = os.getenv("TRAIN_12F_SMOKE") == "1"
     steps = 3 if smoke else (int(sys.argv[1]) if len(sys.argv) > 1 else 200)
     bs = 4 if smoke else (int(sys.argv[2]) if len(sys.argv) > 2 else 64)

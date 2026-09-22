@@ -14,12 +14,10 @@ FUND = 0.0005
 LEV = 2.0
 def load_bars(coin):
     import csv
-    rows = list(csv.DictReader(open('data/data_15m_3y/' + coin + '.csv')))
+    rows = list(csv.DictReader(open('data/data_1y/1h/' + coin + '.csv')))
     bars = []
-    for i in range(0, len(rows), 16):
-        blk = rows[i:i + 16]
-        if len(blk) < 16: break
-        bars.append((float(blk[0]['open']), max(float(x['high']) for x in blk), min(float(x['low']) for x in blk), float(blk[-1]['close']), sum(float(x['volume']) for x in blk)))
+    for r in rows:
+        bars.append((float(r['open']), float(r['high']), float(r['low']), float(r['close']), float(r['volume'])))
     return bars
 def leg_net(bars, lth, sth, cd, sl):
     import torch
@@ -28,7 +26,7 @@ def leg_net(bars, lth, sth, cd, sl):
     raw = {'open': torch.tensor([[x[0] for x in bars]]), 'high': torch.tensor([[x[1] for x in bars]]), 'low': torch.tensor([[x[2] for x in bars]]), 'close': torch.tensor([[x[3] for x in bars]]), 'volume': torch.tensor([[x[4] for x in bars]]), 'liquidity': torch.full((1, n), 1e7), 'fdv': torch.full((1, n), 1e8)}
     sig = StackVM(use_advanced=False).execute(FORMULA, FeatureEngineer.compute_features(raw, use_advanced=False))
     rets = [(bars[i + 1][3] - bars[i][3]) / bars[i][3] if i < n - 1 else 0.0 for i in range(n)]
-    bt = MemeBacktest(venue='aster', leverage=LEV, short_enabled=True, funding_override=FUND, long_th=lth, short_th=sth, cooldown_bars=cd, bars_per_year=2190.0, stop_loss=sl)
+    bt = MemeBacktest(venue='aster', leverage=LEV, short_enabled=True, funding_override=FUND, long_th=lth, short_th=sth, cooldown_bars=cd, bars_per_year=8760.0, stop_loss=sl)
     sg = torch.sigmoid(sig)
     safe = (raw['liquidity'] > bt.min_liq).float()
     lp = (sg > bt.long_th).float() * safe
@@ -81,11 +79,11 @@ def run():
     rets = [(eq[i + 1] - eq[i]) / eq[i] if eq[i] else 0.0 for i in range(len(eq) - 1)]
     mean = sum(rets) / max(len(rets), 1)
     var = sum((x - mean) ** 2 for x in rets) / max(len(rets) - 1, 1)
-    sharpe = mean / math.sqrt(var) * math.sqrt(2190.0) if var > 0 else 0.0
+    sharpe = mean / math.sqrt(var) * math.sqrt(8760.0) if var > 0 else 0.0
     peak = eq[0]; mdd = 0.0
     for v in eq:
         peak = max(peak, v); mdd = max(mdd, (peak - v) / peak if peak else 0.0)
-    print('paper2 legs=ETC+TRX 50/50 lev=' + str(LEV), flush=True)
+    print('paper2 legs=ETC+TRX 50/50 lev=' + str(LEV) + ' 1h bars', flush=True)
     print('trades=' + str(len(ledger)) + ' final_x=' + str(round(eq[-1], 4)) + ' sharpe=' + str(round(sharpe, 3)) + ' mdd=' + str(round(mdd, 4)) + ' n=' + str(n), flush=True)
     by = {}
     for e in ledger: by[e['coin']] = by.get(e['coin'], 0) + 1

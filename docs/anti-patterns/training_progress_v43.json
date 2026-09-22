@@ -1,0 +1,80 @@
+{
+  "permutation_test": {
+    "completed": true,
+    "date": "2026-09-19",
+    "n_perm": 5000,
+    "results": {
+      "ETC": {
+        "p": 0.0526,
+        "verdict": "FAIL (p>=0.05)"
+      },
+      "TRX": {
+        "p": 0.1664,
+        "verdict": "FAIL (p>=0.05)"
+      },
+      "DSR": {
+        "score": 1.0,
+        "verdict": "PASS"
+      }
+    },
+    "gates": {
+      "perm_p_lt_0_05": false,
+      "dsr_gt_0_8": true
+    },
+    "verdict": "PENDING (P0-3 FAIL: entry filter diagnostic only)",
+    "decision": "NO_ADOPTION"
+  },
+  "training_summary": {
+    "floor_300steps": {
+      "score": 3.135,
+      "formula": [
+        4,
+        3,
+        5,
+        5,
+        3,
+        14,
+        19,
+        20,
+        20,
+        4,
+        19,
+        26
+      ]
+    },
+    "general_500steps": {
+      "score": -0.286,
+      "formula": [
+        4,
+        5,
+        27,
+        14,
+        9,
+        6,
+        14,
+        3,
+        24,
+        17,
+        14,
+        13
+      ]
+    },
+    "seed_fixed": true,
+    "seed_value": 42
+  },
+  "h_series": {
+    "complete": true,
+    "count": 10,
+    "all_verdicts": "NO_ADOPTION",
+    "best_sharpe_range": "5.257 to 8.099 (vs base 8.515)"
+  },
+  "n_series": {
+    "complete": true,
+    "pairs": 5,
+    "best_results": "N1N2: H1=11.47, N3N4: SL/TP, N5N6: TRX, N7N8: rotation/vol, N9N10: 6-fold CV"
+  },
+  "12h_demo": {
+    "balance": "91,677.83 USDT",
+    "pnl_12h": "+0.0021%"
+  }
+}

@@ -28,12 +28,12 @@ def test_plateau_schema_and_verdict():
 def test_permutation_schema_and_gates():
     m = json.load(open("results/permutation.json"))
     assert m["config"]["in_sample"] == [0, 6580]
-    assert m["config"]["n_perm"] == 200
+    assert m["config"]["n_perm"] == 5000
     assert m["deflated_sharpe"]["trials"] == 10
     assert 0.0 <= m["deflated_sharpe"]["dsr"] <= 1.0
     for coin in ("ETC", "TRX"):
         v = m["per_coin"][coin]
-        assert v["n_perm"] == 200
+        assert v["n_perm"] == 5000
         assert 0.0 <= v["p_value"] <= 1.0
     assert isinstance(m["gates"]["perm_p_lt_0_05"], bool)
     assert isinstance(m["gates"]["dsr_gt_0_8"], bool)

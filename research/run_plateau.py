@@ -27,7 +27,7 @@ FUND = 0.0005
 LOCKED = {"ETC": (0.88, 0.12, 18, None, 24), "TRX": (0.85, 0.12, 6, 0.05, 24)}
 BASE_STH = 0.12
 STH_GRID = [round(BASE_STH * (1.0 + d), 3) for d in (-0.2, -0.1, 0.0, 0.1, 0.2)]
-N_PERM = 200
+N_PERM = 5000
 GAMMA = 0.5772156649  # Euler-Mascheroni
 
 
@@ -202,7 +202,7 @@ def main():
                           "null_median": nulls_sorted[len(nulls_sorted) // 2],
                           "null_max": max(nulls), "p_value": round(p, 4),
                           "gate_p_lt_0_05": bool(p < 0.05)}
-        log("%s perm200 null_mean=%.3f std=%.3f max=%.3f obs=%.3f p=%.4f => %s" % (
+        log("%s perm5000 null_mean=%.3f std=%.3f max=%.3f obs=%.3f p=%.4f => %s" % (
             coin, per_coin[coin]["null_mean"], per_coin[coin]["null_std"],
             per_coin[coin]["null_max"], obs, p,
             "PASS" if p < 0.05 else "FAIL"))

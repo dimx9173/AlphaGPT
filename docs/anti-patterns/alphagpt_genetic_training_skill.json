@@ -1,0 +1,26 @@
+{
+ "id": "alphagpt_genetic_training_skill",
+ "type": "local:skill_creation",
+ "timestamp": "2026-09-19T14:00:00Z",
+ "summary": "AlphaGPT Genetic Training Skill created at /home/brian/.prime/agent/skills/alphagpt-genetic-training",
+ "details": {
+  "path": "/home/brian/.prime/agent/skills/alphagpt-genetic-training",
+  "modules": [
+   "trainer.py",
+   "decision.py",
+   "models.py",
+   "cli.py"
+  ],
+  "bugs_fixed": [
+   "smoke=sleep typo",
+   "hardcoded venv path \u2192 find_venv2_python()"
+  ],
+  "seed_fix": "SEED=42 added to research/train_12f_30m.py",
+  "current_state": {
+   "H111-H120": "complete (10 scripts, all NO_ADOPTION)",
+   "30m N-series": "complete (5 pairs)",
+   "floor training": "best=3.135 (SEED=42, 200 steps)",
+   "general training": "worst=-0.286 (SEED=42, 500 steps)"
+  }
+ }
+}
