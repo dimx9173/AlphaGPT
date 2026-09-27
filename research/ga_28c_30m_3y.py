@@ -16,7 +16,7 @@ from research.formula_grammar import valid_token_mask, update_depth, is_valid, A
 from research.causal_12f import (causal_features, evaluate_formula,
                                 constant_features, assert_features_vary,
                                 FEATURE_NAMES)
-from research.accounting_28c import scheduled_funding_rates, position_from_signal, accounting_bar_returns, account_portfolio, compound_equity, max_drawdown, daily_sharpe, metrics, ACCOUNTING_VERSION, FUND_RATE
+from research.accounting_28c import scheduled_funding_rates, position_from_signal, accounting_bar_returns, account_portfolio, compound_equity, max_drawdown, daily_sharpe, metrics, ACCOUNTING_VERSION, FUND_RATE, ACCOUNTING_VERSION_REAL, load_real_funding
 
 BPY=17520.0; LEV=2.0; FEE=0.0004; FUND=0.0005; FEATURE_COUNT=12; FORMULA_LEN=12
 DATA_DIR=ROOT/'data'/'data_3y'/'30m'
@@ -161,7 +161,7 @@ def mean_act_guard(mean_turn):
     return mean_turn < 1e-5
 
 
-def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None):
+def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None):
     leg_net = []; leg_sh = []; leg_turn = []; leg_ic = []; activity = []
     timestamps = bars[start:end]
     for c in COINS_28C:
@@ -173,7 +173,11 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
         r = returns[c][start:end]
         pos = p[start:end]
         turn = np.abs(np.diff(pos, prepend=0.0))
-        fnd = funding_mask[start:end] * FUND_RATE
+        # Real history when available, the constant otherwise. The constant is
+        # unconditional -- longs pay, shorts receive, every event -- and a
+        # net-short book was credited ~9.6%/yr the venue never paid.
+        fnd = (funding_by_coin[c][start:end] if funding_by_coin is not None
+               else funding_mask[start:end] * FUND_RATE)
         net = accounting_bar_returns(pos, r, FEE, fnd, LEV)
         leg_net.append(net)
         m = metrics(net, timestamps)
@@ -205,14 +209,24 @@ def seed_formulas():
 
 
 def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--generations',type=int,default=20); ap.add_argument('--population',type=int,default=32); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--out',type=Path,default=ROOT/'results'/'ga_28c_30m_3y.json'); args=ap.parse_args()
-    rng=random.Random(args.seed); common,maps,returns,funding_mask=load_data(); n=len(common); contract_splits=split_indices(n, common[0], common[-1]); ranges=search_splits(n, common[0], common[-1]); scale_end=ranges['train'][1]
+    ap=argparse.ArgumentParser(); ap.add_argument('--generations',type=int,default=20); ap.add_argument('--population',type=int,default=32); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--out',type=Path,default=ROOT/'results'/'ga_28c_30m_3y.json'); ap.add_argument('--funding',choices=('constant','real'),default='real',help='constant reproduces the historical equity-compound-v2 assumption; real uses recorded Binance funding. Default is real because the constant is known to overstate the rate ~16x and to invert the sign on ~30%% of events.'); args=ap.parse_args()
+    rng=random.Random(args.seed); common,maps,returns,funding_mask=load_data();
+    # Load once per run: real funding is per-coin and the loader is not free.
+    funding_by_coin=({c:load_real_funding(c,np.asarray(common,dtype=np.int64)) for c in COINS_28C}
+                     if args.funding=='real' else None)
+    if args.funding=='real':
+        from research.accounting_28c import real_funding_coverage
+        _cov=real_funding_coverage(list(COINS_28C),np.asarray(common,dtype=np.int64))
+        _bad=[c for c,v in _cov.items() if v['events_matched']<v['scheduled_events']]
+        if _bad:
+            print(f'[funding] incomplete history for {sorted(_bad)}; those events are treated as zero')
+    funding_version = ACCOUNTING_VERSION_REAL if args.funding=='real' else ACCOUNTING_VERSION; n=len(common); contract_splits=split_indices(n, common[0], common[-1]); ranges=search_splits(n, common[0], common[-1]); scale_end=ranges['train'][1]
     lockbox_range=contract_splits['lockbox']
     seeds=seed_formulas(); pop=(seeds+[random_formula(rng) for _ in range(max(0,args.population-len(seeds)))])[:args.population]; history=[]; best=None
     for gen in range(args.generations):
         scored=[]
         for f in pop:
-            a=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common); b=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common); a['reward']=shape_reward(a['portfolio_sharpe'],b['portfolio_sharpe'],a['min_leg_sharpe'],a['mean_ic'],a['turnover']); b['reward']=shape_reward(b['portfolio_sharpe'],a['portfolio_sharpe'],b['min_leg_sharpe'],b['mean_ic'],b['turnover'])
+            a=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin); b=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin); a['reward']=shape_reward(a['portfolio_sharpe'],b['portfolio_sharpe'],a['min_leg_sharpe'],a['mean_ic'],a['turnover']); b['reward']=shape_reward(b['portfolio_sharpe'],a['portfolio_sharpe'],b['min_leg_sharpe'],b['mean_ic'],b['turnover'])
             sel=0.5*a['reward']+0.5*b['reward']; scored.append((sel,f,a,b))
         scored.sort(key=lambda z:z[0],reverse=True); best=scored[0] if best is None or scored[0][0]>best[0] else best
         history.append({'generation':gen,'best_select_score':scored[0][0],'avg_select_score':float(np.mean([x[0] for x in scored])),'best_formula':list(scored[0][1])})
@@ -225,9 +239,9 @@ def main():
         pop=new
     # Use shared accounting for all evaluations
     f=best[1]
-    oos=evaluate(f,maps,returns,*lockbox_range,funding_mask,scale_end,common)
-    train=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common)
-    val=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common)
+    oos=evaluate(f,maps,returns,*lockbox_range,funding_mask,scale_end,common,funding_by_coin=funding_by_coin)
+    train=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin)
+    val=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin)
     
     gates=ACCEPTANCE_GATE_28C
     # Regime gate. Built from the SAME positions evaluate() builds, and run
@@ -245,7 +259,8 @@ def main():
         gate=evaluate_regime_gate(
             positions, returns, list(COINS_28C), funding_mask, contract_splits,
             np.asarray(common,dtype=np.int64), FEE, LEV, lockbox_range,
-            gates['min_positive_coins'], gates['max_oos_mdd'], int(common[0]))
+            gates['min_positive_coins'], gates['max_oos_mdd'], int(common[0]),
+            funding_by_coin=funding_by_coin)
     except Exception as exc:
         # Fail closed: an absent or broken gate is never a pass.
         gate={'verdict':'fail','verdict_reason':f'gate error: {type(exc).__name__}: {exc}','criteria':{},'folds':[]}
@@ -289,6 +304,17 @@ def main():
         'note': 'continuous causal GA diagnostic; thresholds fitted later; OOS not used for selection'
     }
     args.out.parent.mkdir(parents=True, exist_ok=True)
+    # Record which funding basis produced these numbers. A result is not
+    # comparable across the two, and the difference is large enough to flip
+    # a sign, so this must travel with the artifact rather than be recalled.
+    out['funding_source']=args.funding
+    out['accounting_version']=funding_version
+    out['funding_note']=(
+        'real Binance funding history at 00/08/16 UTC; may be negative'
+        if args.funding=='real' else
+        'flat +0.0005 at every settlement; overstates the rate and is '
+        'unconditionally credited to shorts. Superseded, kept only to '
+        'reproduce pre-94b59ca results.')
     args.out.write_text(json.dumps(out, indent=1))
     print(json.dumps({k: out[k] for k in ('status', 'live_adopted', 'formula', 'train', 'validation', 'oos', 'acceptance', 'diagnostics')}, indent=2))
 

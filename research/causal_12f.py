@@ -135,12 +135,43 @@ def _ts_rank(x,window=20):
     return _rank(x,window)
 
 
+def _rolling_sum(x, window):
+    """Sum over each trailing window, matching _windows(x, window).sum(axis=1).
+
+    _windows edge-pads on the left, so the first window-1 rows repeat x[0].
+    Reproducing that padding here keeps the rolling moments identical to the
+    windowed form instead of merely similar.
+    """
+    pad=np.pad(np.asarray(x,dtype=np.float64),(window-1,0),mode="edge")
+    c=np.concatenate(([0.0],np.cumsum(pad)))
+    return c[window:window+len(x)]-c[:len(x)]
+
+
 def _corr(x,y,window=60):
-    a=_windows(x,window); b=_windows(y,window)
-    a=a-a.mean(axis=1,keepdims=True); b=b-b.mean(axis=1,keepdims=True)
-    cov=(a*b).mean(axis=1)
-    den=a.std(axis=1)*b.std(axis=1)+1e-6
-    return np.clip(cov/den,-1,1)
+    """Rolling Pearson correlation in O(n) rather than O(n*window).
+
+    The windowed form materialises an (n, window) view and reduces along it,
+    which made _corr 88% of search time: the formula grammar makes CORR a
+    terminal token, so every evaluation pays for it on every coin.
+
+    The rolling moments below compute the same quantities from prefix sums.
+    Two details are load-bearing for equivalence: the left edge padding must
+    match _windows, and the correlation must be the population form (ddof=0),
+    which is what ndarray.std returns on the centred window.
+    """
+    x=np.asarray(x,dtype=np.float64); y=np.asarray(y,dtype=np.float64)
+    n=len(x)
+    if n<window:
+        return np.zeros(n,dtype=np.float64)
+    sx=_rolling_sum(x,window); sy=_rolling_sum(y,window)
+    sxx=_rolling_sum(x*x,window); syy=_rolling_sum(y*y,window); sxy=_rolling_sum(x*y,window)
+    inv=1.0/window
+    mx=sx*inv; my=sy*inv
+    cov=sxy*inv-mx*my
+    varx=sxx*inv-mx*mx; vary=syy*inv-my*my
+    # Rounding can push a true-zero variance a hair below zero.
+    stdx=np.sqrt(np.maximum(varx,0.0)); stdy=np.sqrt(np.maximum(vary,0.0))
+    return np.clip(cov/(stdx*stdy+1e-6),-1,1)
 
 
 def _apply(op,args):

@@ -226,7 +226,8 @@ def statistical_power(lockbox_bars: int, bar_minutes: int = 30,
 
 def evaluate_regime_gate(positions, returns_map, coins, funding_mask, splits,
                          timestamps, fee_rate, leverage, lockbox_range,
-                         min_positive_coins, max_oos_mdd, series_start_ts):
+                         min_positive_coins, max_oos_mdd, series_start_ts,
+                         funding_by_coin=None):
     """Per-fold table plus the A1..A6 criteria and one verdict.
 
     ``positions`` maps coin -> full-series position array. Net returns are
@@ -240,20 +241,36 @@ def evaluate_regime_gate(positions, returns_map, coins, funding_mask, splits,
     """
     n = len(timestamps)
     # funding arrives as a 0/1 event mask; accounting needs the rate.
-    fnd_full = np.asarray(funding_mask, dtype=np.float64) * FUND_RATE
+    #
+    # Recorded history is per-coin and signed, so when it is supplied each leg
+    # gets its own series. The constant fallback is a single shared series and
+    # is unconditional: longs pay, shorts receive, every event. A gate judged
+    # on that credits a net-short book a receipt the venue never made, so a
+    # verdict is only comparable within one funding basis.
     coin_list = list(coins)
+    if funding_by_coin is None:
+        fnd_of = {c: np.asarray(funding_mask, dtype=np.float64) * FUND_RATE
+                  for c in coins}
+    else:
+        fnd_of = {c: np.asarray(funding_by_coin[c], dtype=np.float64) for c in coins}
+    fnd_full = fnd_of[coin_list[0]] if coin_list else np.zeros(n)
 
     # Full-series net per leg, computed once.
     leg_net = {
         c: accounting_bar_returns(
             np.asarray(positions[c], dtype=np.float64),
             np.asarray(returns_map[c], dtype=np.float64),
-            fee_rate, fnd_full, leverage)
+            fee_rate, fnd_of[c], leverage)
         for c in coin_list
     }
     strat_full = np.mean(np.stack([leg_net[c] for c in coin_list]), axis=0)
+    # The benchmark is long-only, so per-coin funding does not apply to it in
+    # the same way: it is charged the mean of the real series rather than any
+    # single coin's, which keeps the comparison on one footing.
     bench_full = passive_benchmark_net(returns_map, coin_list, 0, n,
-                                       fnd_full, fee_rate, leverage)
+                                       np.mean(np.stack([fnd_of[c] for c in coin_list]), axis=0)
+                                       if coin_list else fnd_full,
+                                       fee_rate, leverage)
 
     folds = walk_forward_folds_28c(splits, series_start_ts)
     table = []
