@@ -303,6 +303,20 @@ def run(formula_file: Path, out_file: Path, data_dir: Path, limit: int | None = 
         # the first entries and the current state, not just the tail
         head = ledger_cap // 2
         persisted_ledger = ledger[:head] + ledger[-(ledger_cap - head):]
+    # A run that never opens a position is not a performance result. It means the
+    # formula's signal does not clear this runner's fixed thresholds
+    # (position_from_signal: sigmoid, long>0.85, short<0.15). Saying so prevents
+    # a flat 1.0x / 0 trades from being read as "the strategy did not make
+    # money" when the truth is "this signal model cannot express this formula".
+    all_flat = bool(np.all(np.abs(portfolio_net) < 1e-15)) and not ledger
+    if all_flat:
+        print(
+            "WARNING: no position was ever opened and net P&L is identically zero. "
+            "This is NOT a performance result -- the formula's signal never "
+            "crossed the paper runner's thresholds. Treat it as a framework "
+            "incompatibility, not a strategy outcome.",
+            flush=True,
+        )
     result = {
         "status": "paper_only",
         "mode": "transfer_diagnostic",
@@ -317,6 +331,13 @@ def run(formula_file: Path, out_file: Path, data_dir: Path, limit: int | None = 
         "decode": source.get("decode"),
         "source_result": str(formula_file),
         "source_sha256": sha256_file(formula_file),
+        "no_position_ever_opened": all_flat,
+        "flat_result_caveat": (
+            "No position was opened and net P&L is identically zero. This is a "
+            "framework incompatibility, NOT a performance outcome: the signal "
+            "never crossed position_from_signal's thresholds. Do not cite the "
+            "0.0 sharpe as evidence about the strategy."
+        ) if all_flat else None,
         "source_score": source.get("score"),
         "source_worst_leg": source.get("worst_leg"),
         "formula_training_coins": source.get("coins"),
