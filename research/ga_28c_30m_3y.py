@@ -13,12 +13,17 @@ from research.regime_gate_28c import evaluate_regime_gate
 from research.data_contract_28c import HISTORY_YEARS_COMMON_28
 from research.splits_28c import search_splits, split_indices
 from research.formula_grammar import valid_token_mask, update_depth, is_valid, ALL_TOKENS
-from research.causal_12f import causal_features, evaluate_formula
+from research.causal_12f import (causal_features, evaluate_formula,
+                                constant_features, assert_features_vary,
+                                FEATURE_NAMES)
 from research.accounting_28c import scheduled_funding_rates, position_from_signal, accounting_bar_returns, account_portfolio, compound_equity, max_drawdown, daily_sharpe, metrics, ACCOUNTING_VERSION, FUND_RATE
 
 BPY=17520.0; LEV=2.0; FEE=0.0004; FUND=0.0005; FEATURE_COUNT=12; FORMULA_LEN=12
 DATA_DIR=ROOT/'data'/'data_3y'/'30m'
 CACHE_DIR=ROOT/'data'/'data_3y'/'30m_causal'
+# Bump when causal_features changes meaning; stale caches are then ignored
+# instead of shadowing the current factor definitions.
+FEATURE_CACHE_VERSION='amihud-log-f1-v2'
 
 
 def load_data():
@@ -34,12 +39,33 @@ def load_data():
     for c in COINS_28C:
         idx={t:i for i,t in enumerate(raw[c]['timestamp'])}
         d={k:[raw[c][k][idx[t]] for t in common] for k in ('open','high','low','close','volume')}
-        cache=CACHE_DIR/f'{c}.npy'
-        maps[c]=np.load(cache) if cache.exists() else causal_features(d)
-        if len(maps[c]) != n:
-            # Cache is aligned by row only when source timestamps match; otherwise
-            # recompute from the aligned data to avoid silent misalignment.
+        # Cache is keyed by feature-contract version and validated by bar count.
+        #
+        # Two ways this used to go wrong. The length check called len() on a
+        # (n_factors, n_bars) array, which returns n_factors, so it never matched
+        # n_bars and the cache was recomputed on every run -- it was never
+        # actually used, only paid for. Had that check been "fixed" without also
+        # versioning, the stale files still on disk (f1 pinned at the old 0.4
+        # placeholder) would have silently shadowed the current factor code.
+        # Version the key and compare the right axis.
+        cache=CACHE_DIR/f'{c}-{FEATURE_CACHE_VERSION}.npy'
+        if cache.exists():
+            try:
+                loaded=np.load(cache)
+            except Exception:
+                loaded=None
+            if loaded is not None and loaded.shape==(len(FEATURE_NAMES), n) \
+               and not constant_features(loaded):
+                maps[c]=loaded
+            else:
+                maps[c]=causal_features(d)
+                np.save(cache,maps[c])
+        else:
             maps[c]=causal_features(d)
+            np.save(cache,maps[c])
+        # Refuse to hand a degenerate feature set to the search. Cheap, and it
+        # is the only check that can see a placeholder input.
+        assert_features_vary(maps[c], context=f"{c} on the 28c contract")
         close=np.asarray(d['close']); r=np.zeros(n); r[1:]=close[1:]/close[:-1]-1
         returns[c]=r
     funding=np.array([1.0 if (datetime.fromtimestamp(t/1000,tz=timezone.utc).hour%8==0 and datetime.fromtimestamp(t/1000,tz=timezone.utc).minute==0) else 0.0 for t in common],dtype=np.float64)

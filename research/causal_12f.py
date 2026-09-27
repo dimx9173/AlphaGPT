@@ -56,10 +56,33 @@ def causal_features(data: dict) -> np.ndarray:
     prev_vol=np.concatenate(([volume[0]],volume[:-1]))
     # 0 RET
     f0=_trailing_robust(ret)
-    # 1 liquidity score (raw data has synthetic liquidity in training)
-    liq=np.asarray(data.get('liquidity',np.full(n,1e7)),dtype=np.float64)
-    fdv=np.asarray(data.get('fdv',np.full(n,1e8)),dtype=np.float64)
-    f1=np.clip((liq/(fdv+1e-6))*4,0,1)
+    # 1 liquidity score, via Amihud illiquidity
+    #
+    # This used to read 'liquidity' and 'fdv' and fall back to fixed constants
+    # when they were absent. The 28c CSVs never carried those columns, so the
+    # factor was a constant 0.4 on every bar of every coin: a silent placeholder
+    # that still occupied a slot in the formula grammar, and still satisfied
+    # every "is this factor well formed" check because 0.4 is a legal number.
+    #
+    # Neither input is recoverable. Binance publishes no historical order book
+    # depth and no historical fully-diluted valuation, so the original
+    # definition cannot be evaluated at this horizon on any venue.
+    #
+    # Amihud illiquidity needs only close and volume, which the contract does
+    # have: ILLIQ = |return| / dollar_volume, the price impact per dollar
+    # traded. A deeper book moves less price per dollar, so lower ILLIQ means
+    # more liquid and the sign is flipped so that higher still means "more
+    # liquid", matching what the old factor claimed to mean. The trailing
+    # median/MAD normalisation is the same one the other robust factors use and
+    # keeps the factor strictly causal.
+    # The log is load-bearing. Amihud is a ratio spanning several orders of
+    # magnitude (BTC sits near 7e-12 with a p99 about 4x the median), so the
+    # raw ratio's median/MAD is tiny and the normalised factor collapses to
+    # ~1e-5 of variation -- technically non-constant, practically dead. Taking
+    # the log first puts the factor on the same [-5,5] footing as its peers.
+    dollar_vol=volume*np.maximum(close,1e-12)
+    illiq=np.log(np.maximum(np.abs(ret),1e-12)/np.maximum(dollar_vol,1e-12))
+    f1=_trailing_robust(-illiq)
     # 2 pressure
     f2=np.tanh(((close-open_)/(high-low+1e-9))*3)
     # 3 FOMO acceleration
@@ -158,3 +181,80 @@ def evaluate_formula(formula, features):
 
 def causal_signal(formula,data):
     return evaluate_formula(formula,causal_features(data))
+
+
+# ---------------------------------------------------------------------------
+# Fail loud on degenerate factors
+# ---------------------------------------------------------------------------
+#
+# Two separate defects in this project were the same defect: a missing input
+# silently became a constant, and a constant is a perfectly legal number, so
+# nothing complained.
+#
+#   funding     flat +0.0005 at every settlement      -> short book credited
+#   LIQ_SCORE   data.get('liquidity', 1e7)            -> constant 0.4
+#
+# The funding one cost 1.10 Sharpe on the v3c lockbox and flipped its sign. A
+# placeholder that shifts every bar by the same amount is invisible to a Sharpe
+# check, a drawdown check, and a formula-grammar check. It is only visible if
+# something looks at the input instead of the output.
+#
+# So look at the input. A factor with no variance carries no information, and a
+# search that is free to use it will happily build a formula around it.
+
+FEATURE_NAMES = ("RET", "LIQ_SCORE", "PRESSURE", "FOMO", "PUMP_DEV", "LOG_VOL",
+                 "VOL_CLUST", "MOM_REV", "DELTA_RSI", "HL_RANGE", "CLOSE_POS",
+                 "VOL_TREND")
+
+# A factor that varies by less than this over the whole series is treated as
+# constant. It is deliberately far above float noise and far below any real
+# factor's variation, so it catches placeholders and not rounding.
+CONSTANT_TOL = 1e-9
+
+# Factors that read inputs the offline contract does not carry, and what to
+# fetch if one is ever needed. Kept here so the next person does not have to
+# rediscover it by reading a fall-through default.
+FACTOR_INPUTS = {
+    "LIQ_SCORE": ("close", "volume"),
+    "FUNDING": ("funding history",),
+}
+
+
+def constant_features(features: np.ndarray, tol: float = CONSTANT_TOL) -> list:
+    """Names of factors that carry no information on this series."""
+    features = np.asarray(features, dtype=np.float64)
+    if features.ndim != 2:
+        raise ValueError(f"expected a (n_factors, n_bars) array, got {features.shape}")
+    out = []
+    for i in range(features.shape[0]):
+        row = features[i]
+        if row.size == 0:
+            continue
+        if float(np.ptp(row)) <= tol or float(np.std(row)) <= tol:
+            name = (FEATURE_NAMES[i] if i < len(FEATURE_NAMES) else f"f{i}")
+            out.append(name)
+    return out
+
+
+def assert_features_vary(features: np.ndarray, tol: float = CONSTANT_TOL,
+                         context: str = "") -> None:
+    """Raise if any factor is constant.
+
+    A constant factor is either a placeholder for data that was never loaded or
+    a bug in the factor itself. Both invalidate a search that used it, so this
+    is a hard stop rather than a warning: continuing produces a number that
+    looks like a result and is not one.
+    """
+    bad = constant_features(features, tol)
+    if not bad:
+        return
+    detail = ", ".join(
+        f"{name} (needs {FACTOR_INPUTS[name]})" if name in FACTOR_INPUTS else name
+        for name in bad)
+    where = f" for {context}" if context else ""
+    raise ValueError(
+        f"constant feature(s){where}: {detail}. A factor with no variance "
+        f"carries no information and usually means an input was never loaded "
+        f"and a default was substituted. Refusing to evaluate a search that "
+        f"used it."
+    )
