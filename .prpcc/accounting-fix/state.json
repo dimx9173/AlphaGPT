@@ -1,0 +1,13 @@
+{
+  "feature": "accounting-fix",
+  "phase": "code",
+  "status": "plan-approved",
+  "plan_review": "Codex PASS after boundary clarification",
+  "architect_review": "Claude PASS",
+  "tasks": [
+    "shared-accounting",
+    "migrate-consumers",
+    "trainer-reward",
+    "verify-review"
+  ]
+}

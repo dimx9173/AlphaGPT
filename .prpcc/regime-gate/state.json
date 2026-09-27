@@ -1,0 +1,79 @@
+{
+  "feature": "regime-gate",
+  "phase": "implemented-and-wired",
+  "status": "GATE-WIRED-INTO-GA-C1-SCHEMA-DONE",
+  "prp": "PRP.md",
+  "gate_thresholds_frozen": true,
+  "anti_gaming_clause": "PRP.md section 2",
+  "v3c_formula": [
+    7,
+    3,
+    12,
+    7,
+    12,
+    5,
+    27,
+    1,
+    9,
+    19,
+    22,
+    28
+  ],
+  "tasks": [
+    "slice-accounting",
+    "benchmark-regime-excess",
+    "walk-forward-folds",
+    "gate-eval",
+    "ga-wiring",
+    "verify"
+  ],
+  "revision": 2,
+  "codex_rev1_verdict": "CHANGES REQUIRED (B1-B6, 8 clarifications)",
+  "blocking_findings_addressed": [
+    "B1-fold-geometry",
+    "B2-fold-duration-arithmetic",
+    "B3-benchmark-leverage-parity",
+    "B4-A2-vacuous-deleted",
+    "B5-N4-unsatisfiable",
+    "B6-verdict-contract"
+  ],
+  "A2_median_criterion": "DELETED",
+  "code_changed": true,
+  "thresholds_changed": false,
+  "codex_verdict": "CHANGES REQUIRED (rev1: B1-B6; rev2: B1-B6 resolved, new B7-B9)",
+  "architect_verdict": "CHANGES REQUIRED (5 blocking items)",
+  "headline": "Gate cannot return pass for any strategy: A6 is unsatisfiable because the regime label reads a 2x cost-inclusive benchmark whose funding drag forces every fold to 'down'. 0 of 32 sampled 220-day windows in the search region are 'up'. The search region is a sustained bear market.",
+  "decided_by": "OWNER - not resolved by agent; benchmark-scale choice is observation-sensitive and \u00a72 forbids choosing it after seeing results",
+  "A6_claim": "REFUTED - the architect's '0/32 up windows' was wrong; 128/333 (38.4%) of 220d windows in the search region are up. The defect was Codex B7 (regime label read off the cost-inclusive leveraged series), not the data.",
+  "option_3_needed": false,
+  "option_4_done": [
+    "B7-regime-label-decoupled",
+    "B8-benchmark-cap-matched",
+    "B9-constant-cap-hold-test",
+    "fold-day-alignment",
+    "B5-slice-based-net",
+    "C1-pending"
+  ],
+  "v3c_verdict": "fail (A4 only: OOS 19/28 positive legs; pre-existing criterion)",
+  "new_criteria_result": "A1 4/4, A2p 4/4, A2pp +1.557, A3 0.0968, A5 solvent, A6 1up/3down - all pass",
+  "C1_schema": {
+    "module": "research/acceptance_schema_28c.py",
+    "schema_version": 2,
+    "rename": "acceptance.portfolio_sharpe -> diagnostics.oos_portfolio_sharpe_exceeds_legacy_bar",
+    "policy": "writers emit new schema only (no dual-write, no deprecated alias); readers go through read_acceptance() which understands v1 and v2 and never guesses; a v1 artifact is reported legacy=True and fail-closed; a missing verdict is fail",
+    "fold_table_key": "regime_gate (never 'history'/'plot_walk_forward' - N6 dashboard hazard)",
+    "tests": "tests/test_acceptance_schema_28c.py"
+  },
+  "GA_wiring": {
+    "live_adopted": "derived via derive_live_adopted(acceptance) == (verdict=='pass'); literal False removed",
+    "gate_call": "evaluate_regime_gate(...) run once at end from the SAME positions evaluate() builds; cannot influence selection",
+    "fail_closed": "try/except around gate; a crash yields verdict=fail with reason, never a pass",
+    "determinism": "two 1-gen GA runs byte-identical JSON (PRP test 13)"
+  },
+  "verification": {
+    "e2e_1gen": "acceptance schema v2 emitted; legacy key gone; diagnostics present; regime_gate 4 folds; live_adopted False (derived)",
+    "fail_closed_injection": "injected RuntimeError -> verdict=fail, reason recorded, criteria empty, folds empty",
+    "regression": "70 tests pass across 28c-relevant suite",
+    "pre_existing_failure": "tests/test_e10_gates.py::test_paper_baseline_within_tolerance reads static untracked results/paper_trades2.json (552 trades vs expected 478); artifact dated Sep 22, predates this session; unrelated legacy E10 drift, NOT a regression from this work"
+  }
+}

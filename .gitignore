@@ -96,3 +96,6 @@ STOP_SIGNAL
 STOP
 STOPPED
 best_meme_strategy.json
+
+# Editor/manual backup files (superseded by git history; never commit)
+*.bak
