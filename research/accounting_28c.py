@@ -6,6 +6,9 @@ All 28c consumers (GA, threshold fit, paper replay, trainer) must use this modul
 No broker, network, database, or model dependencies.
 """
 
+import json
+from pathlib import Path
+
 import numpy as np
 from datetime import datetime, timezone
 
@@ -267,3 +270,133 @@ def metrics(
         "daily_return_count": daily_count,
         "accounting_version": ACCOUNTING_VERSION,
     }
+
+
+# ---------------------------------------------------------------------------
+# equity-compound-v3: real funding history
+# ---------------------------------------------------------------------------
+#
+# v2 modelled funding as a constant +0.0005 at every 00/08/16 UTC event. That is
+# unconditional: longs pay, shorts receive, every event, in every regime.
+#
+# Measured against actual Binance history over the same window, the constant is
+# wrong in three independent ways:
+#
+#   magnitude  median real rate 0.000031 vs assumed 0.000500 (~16x too high)
+#   sign       ~29% of real events are negative, so shorts PAY
+#   timing     real rates respond to positioning; a constant cannot
+#
+# The impact is not a rounding error. On the v3c lockbox, a net-short book
+# (mean short exposure 0.184 vs long 0.009) moves from Sharpe +0.479 under the
+# constant to -0.624 under real history. The sign of the result depends on the
+# cost assumption, which means the assumption was never actually tested.
+#
+# v3 keeps every v2 formula unchanged and only replaces the funding input. The
+# v2 behaviour is preserved by ACCOUNTING_VERSION, so a result computed under
+# the constant stays reproducible and stays clearly labelled as such.
+
+ACCOUNTING_VERSION_REAL = "equity-compound-v3-real-funding"
+
+FUNDING_DIR = ROOT_FUNDING if (ROOT_FUNDING := (Path(__file__).resolve().parents[1]
+                                                 / "data" / "funding_binance")) else None
+
+
+def load_real_funding(coin: str, timestamps: np.ndarray,
+                      directory=None) -> np.ndarray:
+    """Map stored per-coin funding history onto the bar grid.
+
+    Funding is charged on the 00:00/08:00/16:00 UTC bar, the same convention as
+    ``scheduled_funding_rates``, but the RATE is the actual recorded value and
+    may be negative.
+
+    A coin with no stored history returns zeros rather than raising: absence of
+    data is not evidence of zero cost. Callers that need to distinguish should
+    check ``real_funding_coverage``.
+    """
+    from datetime import datetime as _dt, timezone as _tz
+    directory = Path(directory) if directory is not None else FUNDING_DIR
+    path = directory / f"{coin}.json"
+    rates = np.zeros(len(timestamps), dtype=np.float64)
+    if not path.exists():
+        return rates
+    doc = json.loads(path.read_text())
+    table = {int(t): float(r) for t, r in zip(doc["timestamps"], doc["rates"])}
+    if not table:
+        return rates
+    keys = np.array(sorted(table))
+    values = np.array([table[int(k)] for k in keys], dtype=np.float64)
+    horizon = int(timestamps[-1] - timestamps[0]) + 1 if len(timestamps) else 0
+    for i, ts_ms in enumerate(timestamps):
+        dt = _dt.fromtimestamp(ts_ms / 1000.0, tz=_tz.utc)
+        if dt.hour not in FUNDING_HOURS or dt.minute != 0:
+            continue
+        # Nearest recorded event inside a +/-4h window.
+        #
+        # A fixed tight tolerance is wrong: Binance does not settle every symbol
+        # every 8 hours. BNB settles four times a day, so its recorded events
+        # land ~7h or ~1h from the 00/08/16 grid and a narrow window silently
+        # discards 30% of them. Matching to the nearest event over a half-schedule
+        # window keeps them, and the alternative -- dropping them -- would credit
+        # a short book with free funding.
+        j = int(np.searchsorted(keys, ts_ms))
+        lo = max(0, j - 1)
+        hi = min(len(keys), j + 2)
+        seg = values[lo:hi]
+        if seg.size == 0:
+            continue
+        cand = keys[lo:hi]
+        k = int(np.argmin(np.abs(cand - ts_ms)))
+        if abs(int(cand[k]) - ts_ms) <= 4 * 3600_000:
+            rates[i] = float(values[lo:hi][k])
+    return rates
+
+
+def real_funding_coverage(coins, timestamps: np.ndarray, directory=None) -> dict:
+    """Distinguish a missing funding RECORD from a genuine zero-rate event.
+
+    These are not the same thing and conflating them is how a coverage report
+    ends up lying. BNB settles 3x/day on this venue and roughly 59% of its
+    recorded events carry a rate of exactly 0.0. Counting nonzero values as
+    "has history" reports 912/2222 for BNB, which reads as a data gap when the
+    record is in fact complete.
+
+    So coverage is measured by whether a nearby event was FOUND, not by whether
+    the rate it carried was nonzero. A matched 0.0 is a real observation.
+    """
+    from datetime import datetime as _dt, timezone as _tz
+    directory = Path(directory) if directory is not None else FUNDING_DIR
+    scheduled = 0
+    for ts_ms in timestamps:
+        d = _dt.fromtimestamp(ts_ms / 1000.0, tz=_tz.utc)
+        if d.hour in FUNDING_HOURS and d.minute == 0:
+            scheduled += 1
+    out = {}
+    for c in coins:
+        path = directory / f"{c}.json"
+        matched = nonzero = zero = 0
+        if path.exists():
+            table = {int(t): float(r) for t, r in
+                     zip(*(lambda d: (d["timestamps"], d["rates"]))(
+                         json.loads(path.read_text())))}
+            if table:
+                keys = np.array(sorted(table))
+                for ts_ms in timestamps:
+                    d = _dt.fromtimestamp(ts_ms / 1000.0, tz=_tz.utc)
+                    if d.hour not in FUNDING_HOURS or d.minute != 0:
+                        continue
+                    j = int(np.searchsorted(keys, ts_ms))
+                    lo, hi = max(0, j - 1), min(len(keys), j + 2)
+                    if hi <= lo:
+                        continue
+                    cand = keys[lo:hi]
+                    k = int(np.argmin(np.abs(cand - ts_ms)))
+                    if abs(int(cand[k]) - ts_ms) <= 4 * 3600_000:
+                        matched += 1
+                        if table[int(cand[k])] == 0.0:
+                            zero += 1
+                        else:
+                            nonzero += 1
+        out[c] = {"events_matched": matched, "events_nonzero": nonzero,
+                  "events_zero_rate": zero, "scheduled_events": scheduled,
+                  "has_history": bool(matched)}
+    return out
