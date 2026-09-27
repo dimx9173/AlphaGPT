@@ -184,6 +184,46 @@ def coverage_report(folds, splits):
 CRITERIA = ("A1", "A2p", "A2pp", "A3", "A4", "A5", "A6")
 
 
+def statistical_power(lockbox_bars: int, bar_minutes: int = 30,
+                      observed_sharpe: float | None = None) -> dict:
+    """How much of a Sharpe estimate can this lockbox actually resolve?
+
+    A gate that requires Sharpe >= 1.0 is only meaningful if the confidence
+    interval around the estimate is narrow enough to distinguish 1.0 from 0.
+    With a 30-minute bar and roughly independent daily returns,
+
+        t = mean / (sd / sqrt(n_days)),  Sharpe_annual = t / sqrt(n_years)
+
+    This reports the 95% CI half-width of the Sharpe estimate and the
+    t-statistic actually achieved. It is a property of the sample, not of the
+    strategy, and it is the reason a Sharpe threshold cannot be treated as
+    evidence on this data.
+
+    Measured serial correlation of the v3c daily returns is approximately zero
+    (sum of lags 1..3 = -0.026), so no autocorrelation correction is applied;
+    the interval is already close to the best this sample can give.
+    """
+    n_days = max(1, int(lockbox_bars * bar_minutes / (60 * 24)))
+    years = n_days / 365.25
+    # variance of the mean of n approximately independent daily returns
+    half_width = 1.96 * np.sqrt((1.0 + 0.5 ** 2) / years)
+    achieved_t = None
+    if observed_sharpe is not None:
+        achieved_t = observed_sharpe * np.sqrt(years)
+    return {
+        "lockbox_bars": int(lockbox_bars),
+        "oos_days": n_days,
+        "oos_years": round(years, 4),
+        "sharpe_ci95_half_width": round(float(half_width), 4),
+        "achieved_t_statistic": None if achieved_t is None else round(float(achieved_t), 4),
+        "t_required_for_95pct": 1.96,
+        "can_resolve_sharpe_1_0": bool(half_width < 1.0),
+        "note": ("A Sharpe threshold is not testable when this half-width is "
+                 "larger than the threshold. The criteria below are screening "
+                 "rules, not statistical evidence."),
+    }
+
+
 def evaluate_regime_gate(positions, returns_map, coins, funding_mask, splits,
                          timestamps, fee_rate, leverage, lockbox_range,
                          min_positive_coins, max_oos_mdd, series_start_ts):
@@ -289,11 +329,36 @@ def evaluate_regime_gate(positions, returns_map, coins, funding_mask, splits,
         verdict = "pass" if not failed else "fail"
         reason = "all criteria satisfied" if not failed else "failed: " + ",".join(failed)
 
+    # Statistical power is reported next to, not folded into, the verdict.
+    # A candidate can satisfy every screening rule and still be statistically
+    # indistinguishable from a random strategy, because the lockbox is too short
+    # to resolve the difference. Reporting only "pass" would overstate what the
+    # data can support.
+    # Lockbox Sharpe of the strategy itself, on the same equity-compound-v2
+    # accounting the criteria use.
+    lb_sharpe, lb_days = daily_sharpe(strat_full[lo:hi], timestamps[lo:hi])
+    power = statistical_power(int(hi - lo), observed_sharpe=lb_sharpe)
+    power["oos_daily_observations"] = int(lb_days)
+    evidence = (
+        "screening_only_not_statistically_resolved"
+        if not power["can_resolve_sharpe_1_0"] else "resolvable"
+    )
+
     return {
         "folds": table,
         "criteria": criteria,
         "verdict": verdict,
         "verdict_reason": reason,
+        "statistical_power": power,
+        "evidence_class": evidence,
+        "evidence_caveat": (
+            "This verdict is a SCREENING result, not proof of edge. The OOS "
+            "window yields a Sharpe confidence interval of +/-"
+            f"{power['sharpe_ci95_half_width']:.2f}, which is wider than the "
+            "gate's own Sharpe threshold. A candidate marked 'pass' here may "
+            "still be statistically indistinguishable from random. Do not "
+            "describe such a result as evidence that the strategy works."
+        ) if evidence == "screening_only_not_statistically_resolved" else None,
         "fold_coverage": coverage,
         "lockbox": {"start": int(lo), "end": int(hi), "max_dd": oos_mdd,
                     "positive_legs": oos_positive, "solvent": bool(oos_sol),
