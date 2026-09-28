@@ -240,6 +240,96 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
         reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
                               breadth=breadth, version=reward_version)
     return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
+def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
+                     folds, rng, scale_end_hint):
+    """Run the search fold by fold, giving each validation window one pass.
+
+    The single train/validation/lockbox contract lets a search look at one
+    validation window tens of thousands of times. This walks forward instead:
+    fold i selects on its own training window, scores once on its own
+    validation window, and that validation window then becomes part of fold
+    i+1's training data. No window is ever scored twice, and the final fold is
+    never trained on.
+
+    Returns the per-fold record and the formula that the final selection fold
+    produced, which is the only one that goes near the holdout.
+    """
+    records = []
+    selected = None
+    for fold in folds:
+        tr_s, tr_e = fold['train']
+        va_s, va_e = fold['validation']
+        is_holdout = fold['is_holdout']
+
+        if is_holdout:
+            # The holdout is scored once, after selection is finished, and the
+            # result is written to the record. It is not fed back into the loop.
+            if selected is None:
+                records.append({'fold': fold['index'], 'is_holdout': True,
+                                'note': 'no selection fold produced a formula'})
+                break
+            h = evaluate(selected, maps, returns, va_s, va_e, funding_mask,
+                         scale_end_hint, common, funding_by_coin=funding_by_coin,
+                         reward_version=args.reward_version)
+            records.append({
+                'fold': fold['index'], 'is_holdout': True,
+                'validation': (va_s, va_e),
+                'validation_bars': va_e - va_s,
+                'formula': list(selected),
+                'portfolio_sharpe': h['portfolio_sharpe'],
+                'portfolio_mdd': h['portfolio_mdd'],
+                'positive_coins': h['positive_coins'],
+                'min_leg_sharpe': h['min_leg_sharpe'],
+            })
+            break
+
+        # Selection fold. scale_end is this fold's own training end, so the
+        # signal normalisation is fit on training data only.
+        fold_scale_end = tr_e
+        pop = (seed_formulas()
+               + [random_formula(rng) for _ in range(max(0, args.population - len(seed_formulas())))])[:args.population]
+        fold_best = None
+        for gen in range(args.generations):
+            scored = []
+            for f in pop:
+                a = evaluate(f, maps, returns, tr_s, tr_e, funding_mask, fold_scale_end,
+                             common, funding_by_coin=funding_by_coin,
+                             reward_version=args.reward_version)
+                b = evaluate(f, maps, returns, va_s, va_e, funding_mask, fold_scale_end,
+                             common, funding_by_coin=funding_by_coin,
+                             reward_version=args.reward_version)
+                # The validation window contributes to the selection score, but
+                # only for this one pass. It is never revisited.
+                sel = 0.5 * a['reward'] + 0.5 * b['reward']
+                scored.append((sel, f, a, b))
+            scored.sort(key=lambda z: z[0], reverse=True)
+            if fold_best is None or scored[0][0] > fold_best[0]:
+                fold_best = scored[0]
+            elites = [x[1] for x in scored[:max(2, args.population // 10)]]
+            new = list(elites)
+            while len(new) < args.population:
+                p1 = scored[rng.randrange(min(5, len(scored)))][1]
+                p2 = scored[rng.randrange(min(5, len(scored)))][1]
+                child = (crossover(p1, p2, rng) if rng.random() < 0.5
+                         else mutate(p1, rng))
+                new.append(child)
+            pop = new
+        selected = fold_best[1]
+        records.append({
+            'fold': fold['index'], 'is_holdout': False,
+            'train': (tr_s, tr_e), 'validation': (va_s, va_e),
+            'train_bars': tr_e - tr_s, 'validation_bars': va_e - va_s,
+            'formula': list(selected),
+            'train_sharpe': fold_best[2]['portfolio_sharpe'],
+            'validation_sharpe': fold_best[3]['portfolio_sharpe'],
+            'train_positive_coins': fold_best[2]['positive_coins'],
+            'validation_positive_coins': fold_best[3]['positive_coins'],
+        })
+        print(f'[wf] fold {fold["index"]}: train {fold_best[2]["portfolio_sharpe"]:+.3f} '
+              f'val {fold_best[3]["portfolio_sharpe"]:+.3f}', flush=True)
+    return records, selected
+
+
 def seed_formulas():
     # Baseline seeds from the rank-IC scan: HL_RANGE, LOG_VOL, FOMO, VOL_TREND.
     seeds=[]
@@ -252,7 +342,9 @@ def seed_formulas():
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('--generations',type=int,default=20); ap.add_argument('--population',type=int,default=32); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--out',type=Path,default=ROOT/'results'/'ga_28c_30m_3y.json'); ap.add_argument('--funding',choices=('constant','real'),default='real',help='constant reproduces the historical equity-compound-v2 assumption; real uses recorded Binance funding. Default is real because the constant is known to overstate the rate ~16x and to invert the sign on ~30%% of events.'); ap.add_argument('--null',choices=('none','iid','xsec'),default='none',help='iid: block-bootstrapped returns and volume per coin, no real edge. '
      'xsec: each coin paired with a neighbour bars. Both are false-positive '
-     'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2'),default='v1'); ap.add_argument('--null-block',type=int,default=48); args=ap.parse_args()
+     'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
+     'walkforward: expanding folds, one selection pass per validation window, '
+     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); args=ap.parse_args()
     rng=random.Random(args.seed); common,maps,returns,funding_mask=load_data(null=args.null,null_seed=args.null_seed,null_block=args.null_block);
     # Load once per run: real funding is per-coin and the loader is not free.
     funding_by_coin=({c:load_real_funding(c,np.asarray(common,dtype=np.int64)) for c in COINS_28C}
@@ -265,6 +357,35 @@ def main():
             print(f'[funding] incomplete history for {sorted(_bad)}; those events are treated as zero')
     funding_version = ACCOUNTING_VERSION_REAL if args.funding=='real' else ACCOUNTING_VERSION; n=len(common); contract_splits=split_indices(n, common[0], common[-1]); ranges=search_splits(n, common[0], common[-1]); scale_end=ranges['train'][1]
     lockbox_range=contract_splits['lockbox']
+    if args.mode=='walkforward':
+        from research.splits_walkforward_28c import walk_forward_folds, fold_summaries
+        folds=walk_forward_folds(n,n_folds=args.folds)
+        for f_ in fold_summaries(folds,n):
+            print(f'[wf] fold {f_["fold"]}: train {f_["train_bars"]} bars, '
+                  f'val {f_["validation_bars"]} bars ({f_["validation_days"]:.0f}d)'
+                  f'{"  HOLDOUT" if f_["is_holdout"] else ""}',flush=True)
+        # scale_end for signal normalisation is the first fold's training end,
+        # so no fold normalises on data it will later be scored against.
+        wf_scale_end=folds[0]['train'][1]
+        wf_records,wf_selected=run_walkforward(
+            args,maps,returns,common,funding_mask,funding_by_coin,folds,rng,wf_scale_end)
+        out={'status':'ga_paper_only','live_adopted':False,'mode':'walkforward',
+             'null_data':args.null,'reward_version':args.reward_version,
+             'funding_source':args.funding,'accounting_version':funding_version,
+             'seed':args.seed,'generations':args.generations,'population':args.population,
+             'folds':fold_summaries(folds,n),'fold_records':wf_records,
+             'bars':n}
+        hold=[r for r in wf_records if r.get('is_holdout') and 'portfolio_sharpe' in r]
+        if hold:
+            h=hold[0]
+            out['holdout']={'portfolio_sharpe':h['portfolio_sharpe'],
+                            'portfolio_mdd':h['portfolio_mdd'],
+                            'positive_coins':h['positive_coins'],
+                            'formula':h['formula']}
+        args.out.parent.mkdir(parents=True,exist_ok=True)
+        with args.out.open('w') as f_: json.dump(out,f_,indent=1)
+        print(json.dumps(out.get('holdout',{}),indent=1))
+        return 0
     seeds=seed_formulas(); pop=(seeds+[random_formula(rng) for _ in range(max(0,args.population-len(seeds)))])[:args.population]; history=[]; best=None
     for gen in range(args.generations):
         scored=[]
