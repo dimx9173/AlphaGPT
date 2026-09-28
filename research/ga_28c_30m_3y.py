@@ -24,10 +24,22 @@ CACHE_DIR=ROOT/'data'/'data_3y'/'30m_causal'
 # Bump when causal_features changes meaning; stale caches are then ignored
 # instead of shadowing the current factor definitions.
 FEATURE_CACHE_VERSION='amihud-log-f1-v2'
+# A4 requires 24 of 28 legs positive out of sample. The reward targets the
+# same number so selection and the gate are not scoring different things.
+BREADTH_TARGET=24/28
 
 
-def load_data():
-    raw={}; ts0=None; common=None
+def load_data(null='none', null_seed=0, null_block=48):
+    """Aligned bars, features and returns for the 28c contract.
+
+    ``null`` swaps in synthetic data with no real relationship to predict, so
+    the search can be measured against a case where a positive result is a
+    false positive by construction. Features are recomputed from the null bars
+    and the feature cache is bypassed: a cache keyed only by coin would hand
+    back the real factors and quietly turn the null back into the original
+    experiment.
+    """
+    raw={}; common=None
     for c in COINS_28C:
         p=DATA_DIR/f'{c}.csv'
         with p.open() as f: rows=list(csv.DictReader(f))
@@ -35,34 +47,44 @@ def load_data():
         d['timestamp']=[int(float(r['timestamp'])) for r in rows]
         raw[c]=d; s=set(d['timestamp']); common=s if common is None else common&s
     common=sorted(common); n=len(common)
-    maps={}; returns={}
+
+    # Align every coin onto the common timestamps first, so a null is built
+    # from the same window the real features are built from.
+    aligned={}
     for c in COINS_28C:
         idx={t:i for i,t in enumerate(raw[c]['timestamp'])}
-        d={k:[raw[c][k][idx[t]] for t in common] for k in ('open','high','low','close','volume')}
-        # Cache is keyed by feature-contract version and validated by bar count.
-        #
-        # Two ways this used to go wrong. The length check called len() on a
-        # (n_factors, n_bars) array, which returns n_factors, so it never matched
-        # n_bars and the cache was recomputed on every run -- it was never
-        # actually used, only paid for. Had that check been "fixed" without also
-        # versioning, the stale files still on disk (f1 pinned at the old 0.4
-        # placeholder) would have silently shadowed the current factor code.
-        # Version the key and compare the right axis.
-        cache=CACHE_DIR/f'{c}-{FEATURE_CACHE_VERSION}.npy'
-        if cache.exists():
+        d={k:[raw[c][k][idx[t]] for t in common]
+           for k in ('open','high','low','close','volume')}
+        d['timestamp']=list(common)
+        aligned[c]=d
+
+    if null in ('iid','xsec'):
+        from research.null_data_28c import make_null
+        # Each coin is resampled from its own series, so the marginal return
+        # distribution, its fat tails and the return/volume relationship all
+        # survive; only the real cross-coin and temporal structure is lost.
+        aligned={c: make_null(null, aligned[c], seed=null_seed+i, block=null_block)
+                 for i,c in enumerate(COINS_28C)}
+
+    maps={}; returns={}
+    for c in COINS_28C:
+        d=aligned[c]
+        # A null run must recompute. An unversioned or coin-keyed cache would
+        # silently return the real factors and invalidate the control.
+        cache=(None if null!='none' else CACHE_DIR/f'{c}-{FEATURE_CACHE_VERSION}.npy')
+        loaded=None
+        if cache is not None and cache.exists():
             try:
                 loaded=np.load(cache)
             except Exception:
                 loaded=None
-            if loaded is not None and loaded.shape==(len(FEATURE_NAMES), n) \
-               and not constant_features(loaded):
-                maps[c]=loaded
-            else:
-                maps[c]=causal_features(d)
-                np.save(cache,maps[c])
+        if (loaded is not None and loaded.shape==(len(FEATURE_NAMES), n)
+                and not constant_features(loaded)):
+            maps[c]=loaded
         else:
             maps[c]=causal_features(d)
-            np.save(cache,maps[c])
+            if cache is not None:
+                np.save(cache,maps[c])
         # Refuse to hand a degenerate feature set to the search. Cheap, and it
         # is the only check that can see a placeholder input.
         assert_features_vary(maps[c], context=f"{c} on the 28c contract")
@@ -135,12 +157,23 @@ def smooth_causal(x, window=20):
 GAP_TAU = 1.0
 LEG_FLOOR = 0.0
 
-def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn):
+def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
+                 breadth=None, version='v1'):
     """Turn raw split diagnostics into a selection score.
 
     psh is this split's own portfolio Sharpe; psh_peer is the other selection
     split's Sharpe. psh is independent of psh_peer, so the caller can evaluate
     each split once and shape both scores afterwards.
+
+    v1 is kept so the previous batch stays reproducible and so the A/B against
+    null data is a real comparison rather than a rewrite.
+
+    v2 adds an explicit breadth term. The justification is the gate, not the
+    lockbox: A4 requires 24 of 28 legs to be positive, and across ten
+    independent searches the achieved breadth ranged 0..21 with a mean of 13.2,
+    so every run failed on that criterion while reporting a positive portfolio
+    Sharpe. A selection score that cannot see breadth will keep selecting
+    formulas that fail the gate.
     """
     if mean_act_guard(mean_turn):
         return -50.0
@@ -150,18 +183,24 @@ def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn):
     psh_worst = min(psh, peer)
     # Divergence: charge for the gap instead of averaging it away.
     gap = softplus((psh - peer) / GAP_TAU) * GAP_TAU
-    return (mean_ic
+    base = (mean_ic
             + 0.10 * psh_worst
             - 0.30 * gap
             - 0.02 * mean_turn
             - 0.10 * softplus((LEG_FLOOR - min_leg) / 0.5))
+    if version == 'v1' or breadth is None:
+        return base
+    # Shortfall against the gate's own requirement, charged superlinearly so a
+    # strategy that merely averages positive is not mistaken for a broad one.
+    short = max(0.0, BREADTH_TARGET - breadth)
+    return base - 2.0 * short
 
 
 def mean_act_guard(mean_turn):
     return mean_turn < 1e-5
 
 
-def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None):
+def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None, reward_version='v1'):
     leg_net = []; leg_sh = []; leg_turn = []; leg_ic = []; activity = []
     timestamps = bars[start:end]
     for c in COINS_28C:
@@ -197,7 +236,9 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
     if mean_act < 0.01 or mean_turn < 1e-5:
         reward = -50.0
     else:
-        reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn)
+        breadth = sum(x > 0 for x in leg_sh) / len(leg_sh) if leg_sh else 0.0
+        reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
+                              breadth=breadth, version=reward_version)
     return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
 def seed_formulas():
     # Baseline seeds from the rank-IC scan: HL_RANGE, LOG_VOL, FOMO, VOL_TREND.
@@ -209,8 +250,10 @@ def seed_formulas():
 
 
 def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--generations',type=int,default=20); ap.add_argument('--population',type=int,default=32); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--out',type=Path,default=ROOT/'results'/'ga_28c_30m_3y.json'); ap.add_argument('--funding',choices=('constant','real'),default='real',help='constant reproduces the historical equity-compound-v2 assumption; real uses recorded Binance funding. Default is real because the constant is known to overstate the rate ~16x and to invert the sign on ~30%% of events.'); args=ap.parse_args()
-    rng=random.Random(args.seed); common,maps,returns,funding_mask=load_data();
+    ap=argparse.ArgumentParser(); ap.add_argument('--generations',type=int,default=20); ap.add_argument('--population',type=int,default=32); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--out',type=Path,default=ROOT/'results'/'ga_28c_30m_3y.json'); ap.add_argument('--funding',choices=('constant','real'),default='real',help='constant reproduces the historical equity-compound-v2 assumption; real uses recorded Binance funding. Default is real because the constant is known to overstate the rate ~16x and to invert the sign on ~30%% of events.'); ap.add_argument('--null',choices=('none','iid','xsec'),default='none',help='iid: block-bootstrapped returns and volume per coin, no real edge. '
+     'xsec: each coin paired with a neighbour bars. Both are false-positive '
+     'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2'),default='v1'); ap.add_argument('--null-block',type=int,default=48); args=ap.parse_args()
+    rng=random.Random(args.seed); common,maps,returns,funding_mask=load_data(null=args.null,null_seed=args.null_seed,null_block=args.null_block);
     # Load once per run: real funding is per-coin and the loader is not free.
     funding_by_coin=({c:load_real_funding(c,np.asarray(common,dtype=np.int64)) for c in COINS_28C}
                      if args.funding=='real' else None)
@@ -226,7 +269,7 @@ def main():
     for gen in range(args.generations):
         scored=[]
         for f in pop:
-            a=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin); b=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin); a['reward']=shape_reward(a['portfolio_sharpe'],b['portfolio_sharpe'],a['min_leg_sharpe'],a['mean_ic'],a['turnover']); b['reward']=shape_reward(b['portfolio_sharpe'],a['portfolio_sharpe'],b['min_leg_sharpe'],b['mean_ic'],b['turnover'])
+            a=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version); b=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version); a['reward']=shape_reward(a['portfolio_sharpe'],b['portfolio_sharpe'],a['min_leg_sharpe'],a['mean_ic'],a['turnover']); b['reward']=shape_reward(b['portfolio_sharpe'],a['portfolio_sharpe'],b['min_leg_sharpe'],b['mean_ic'],b['turnover'])
             sel=0.5*a['reward']+0.5*b['reward']; scored.append((sel,f,a,b))
         scored.sort(key=lambda z:z[0],reverse=True); best=scored[0] if best is None or scored[0][0]>best[0] else best
         history.append({'generation':gen,'best_select_score':scored[0][0],'avg_select_score':float(np.mean([x[0] for x in scored])),'best_formula':list(scored[0][1])})
@@ -239,9 +282,9 @@ def main():
         pop=new
     # Use shared accounting for all evaluations
     f=best[1]
-    oos=evaluate(f,maps,returns,*lockbox_range,funding_mask,scale_end,common,funding_by_coin=funding_by_coin)
-    train=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin)
-    val=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin)
+    oos=evaluate(f,maps,returns,*lockbox_range,funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version)
+    train=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version)
+    val=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version)
     
     gates=ACCEPTANCE_GATE_28C
     # Regime gate. Built from the SAME positions evaluate() builds, and run
@@ -260,7 +303,7 @@ def main():
             positions, returns, list(COINS_28C), funding_mask, contract_splits,
             np.asarray(common,dtype=np.int64), FEE, LEV, lockbox_range,
             gates['min_positive_coins'], gates['max_oos_mdd'], int(common[0]),
-            funding_by_coin=funding_by_coin)
+            funding_by_coin=funding_by_coin,reward_version=args.reward_version)
     except Exception as exc:
         # Fail closed: an absent or broken gate is never a pass.
         gate={'verdict':'fail','verdict_reason':f'gate error: {type(exc).__name__}: {exc}','criteria':{},'folds':[]}
@@ -307,6 +350,8 @@ def main():
     # Record which funding basis produced these numbers. A result is not
     # comparable across the two, and the difference is large enough to flip
     # a sign, so this must travel with the artifact rather than be recalled.
+    out['null_data']=args.null
+    out['reward_version']=args.reward_version
     out['funding_source']=args.funding
     out['accounting_version']=funding_version
     out['funding_note']=(
