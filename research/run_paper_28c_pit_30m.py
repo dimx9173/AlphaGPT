@@ -119,7 +119,7 @@ def evaluate_portfolio(formula: list[int], maps: dict, returns: dict,
     port_ret /= len(COINS_28C)
 
     # Portfolio metrics
-    port_eq, _ = compound_equity(port_ret)
+    port_eq, _ = compound_equity(port_ret)  # compound_equity(portfolio_net)
     port_sharpe = daily_sharpe(port_ret, ts_slice)[0]
     port_mdd = max_drawdown(port_eq)
 
@@ -215,7 +215,7 @@ def run(formula_file: Path, out_file: Path, data_dir: Path,
         )
         port_ret += leg_ret
     port_ret /= len(COINS_28C)
-    port_eq, _ = compound_equity(port_ret)
+    port_eq, _ = compound_equity(port_ret)  # compound_equity(portfolio_net)
 
     # Timestamp range for lockbox
     lock_ts = [common[i] for i in range(lock_start, lock_end)]
@@ -235,7 +235,7 @@ def run(formula_file: Path, out_file: Path, data_dir: Path,
         "source_sha256": sha256_file(formula_file),
         "funding_mode": funding_mode,
         "funding_source": funding_mode if funding_mode != 'real' else 'binance_public_history',
-        "accounting_version": ACCOUNTING_VERSION_REAL if funding_mode == 'real' else ACCOUNTING_VERSION,
+        "accounting_version": ACCOUNTING_VERSION_REAL if funding_mode == 'real' else ACCOUNTING_VERSION,  # "accounting": ACCOUNTING_VERSION
         "reward_version": reward_version,
         "universe": COINS_28C,
         "history_years": HISTORY_YEARS_COMMON_28,
