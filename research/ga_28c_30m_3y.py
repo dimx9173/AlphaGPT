@@ -269,7 +269,7 @@ def main():
     for gen in range(args.generations):
         scored=[]
         for f in pop:
-            a=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version); b=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version); a['reward']=shape_reward(a['portfolio_sharpe'],b['portfolio_sharpe'],a['min_leg_sharpe'],a['mean_ic'],a['turnover']); b['reward']=shape_reward(b['portfolio_sharpe'],a['portfolio_sharpe'],b['min_leg_sharpe'],b['mean_ic'],b['turnover'])
+            a=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version); b=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version)
             sel=0.5*a['reward']+0.5*b['reward']; scored.append((sel,f,a,b))
         scored.sort(key=lambda z:z[0],reverse=True); best=scored[0] if best is None or scored[0][0]>best[0] else best
         history.append({'generation':gen,'best_select_score':scored[0][0],'avg_select_score':float(np.mean([x[0] for x in scored])),'best_formula':list(scored[0][1])})
@@ -303,7 +303,7 @@ def main():
             positions, returns, list(COINS_28C), funding_mask, contract_splits,
             np.asarray(common,dtype=np.int64), FEE, LEV, lockbox_range,
             gates['min_positive_coins'], gates['max_oos_mdd'], int(common[0]),
-            funding_by_coin=funding_by_coin,reward_version=args.reward_version)
+            funding_by_coin=funding_by_coin)
     except Exception as exc:
         # Fail closed: an absent or broken gate is never a pass.
         gate={'verdict':'fail','verdict_reason':f'gate error: {type(exc).__name__}: {exc}','criteria':{},'folds':[]}
