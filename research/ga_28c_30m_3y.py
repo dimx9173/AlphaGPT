@@ -12,7 +12,11 @@ from research.acceptance_schema_28c import (
 from research.regime_gate_28c import evaluate_regime_gate
 from research.data_contract_28c import HISTORY_YEARS_COMMON_28
 from research.splits_28c import search_splits, split_indices
-from research.formula_grammar import valid_token_mask, update_depth, is_valid, ALL_TOKENS
+from research.formula_grammar import valid_token_mask, update_depth, is_valid, ALL_TOKENS, OP_ARITY as FULL_OP_ARITY
+from research.grammar_reduced_28c import (REDUCED_TOKENS as REDUCED_ALL_TOKENS,
+                                  REDUCED_ARITY as REDUCED_OP_ARITY,
+                                  REDUCED_TOKEN_NAMES, validate_reduced,
+                                  REDUCED_OP_COUNT, evaluate_formula_reduced)
 from research.causal_12f import (causal_features, evaluate_formula,
                                 constant_features, assert_features_vary,
                                 FEATURE_NAMES)
@@ -65,6 +69,17 @@ def load_data(null='none', null_seed=0, null_block=48):
         # survive; only the real cross-coin and temporal structure is lost.
         aligned={c: make_null(null, aligned[c], seed=null_seed+i, block=null_block)
                  for i,c in enumerate(COINS_28C)}
+    elif null in ('iid1','iidw','iidg'):
+        from research.null_data_28c import make_diagnostic_null
+        # Diagnostic nulls. Each breaks exactly one property that the iid null
+        # preserves, so a difference in the search result attributes the
+        # effect to that property instead of leaving it open. They are
+        # deliberately LESS realistic than iid and are used to attribute an
+        # effect, not to pass or fail a candidate. See docs/
+        # reduced_grammar_null_calibration_28c.md.
+        aligned={c: make_diagnostic_null(null, aligned[c], seed=null_seed+i,
+                                         block=null_block)
+                 for i,c in enumerate(COINS_28C)}
 
     maps={}; returns={}
     for c in COINS_28C:
@@ -94,7 +109,131 @@ def load_data(null='none', null_seed=0, null_block=48):
     return common,maps,returns,funding
 
 
+# Search operators, parameterised by grammar.
+#
+# The full grammar is 29 tokens (12 factors + 17 operators) and admits roughly
+# 3.1e15 syntactically valid 12-token formulas. Ten independent searches return
+# ten disjoint formulas, so the search is not converging on anything; it is
+# sampling, and it samples Sharpe out of noise. The reduced grammar keeps the
+# ten operators that carry an economic argument and drops the seven that only
+# reshuffle a cross-section (ZSCORE, RANK, TS_RANK) or pattern-match a single
+# series (JUMP, MAX3, ABS). Fewer tokens is the point: a smaller hypothesis
+# class is a smaller multiple-testing burden, not a better optimiser.
+#
+# Both grammars are token-indexed the same way, features 0..11 then operators,
+# so a formula decoded under the full grammar keeps its meaning. The reduced
+# grammar re-indexes operators 12..22 with different meanings, which is why an
+# artifact records `grammar` and a reduced-grammar formula is never scored by
+# causal_12f's operator table.
+GRAMMAR_SPECS={
+    'full': dict(n_features=FEATURE_COUNT, arity=FULL_OP_ARITY,
+                 max_token=ALL_TOKENS),
+    'reduced': dict(
+        n_features=FEATURE_COUNT,
+        arity=REDUCED_OP_ARITY,
+        max_token=REDUCED_ALL_TOKENS,
+    ),
+}
+GRAMMAR='full'
+
+
+def _spec():
+    return GRAMMAR_SPECS[GRAMMAR]
+
+
+# The reduced grammar's own reachability test and evaluator. The full grammar
+# keeps using formula_grammar's versions, untouched: every stored artifact in
+# this repository was produced by that code path, and a rewrite of it that
+# produced the same formulas "up to reimplementation" would silently
+# invalidate all of them.
+def _can_finish_r(depth, slots, n, arity):
+    if slots==0: return depth==1
+    if depth>12: return False
+    if depth<1: return False
+    if depth>slots+1: return False
+    if _can_finish_r(depth+1, slots-1, n, arity): return True
+    for a in arity.values():
+        if depth>=a and _can_finish_r(depth-a+1, slots-1, n, arity): return True
+    return False
+
+
+def _valid_tokens_r(depth, pos, max_len, n, arity):
+    slots=max_len-pos-1
+    out=[t for t in range(n) if _can_finish_r(depth+1, slots, n, arity)]
+    out.extend(t for t, a in arity.items()
+               if depth>=a and _can_finish_r(depth-a+1, slots, n, arity))
+    return out
+
+
+def _step_r(depth, token, n, arity):
+    if token<n: return depth+1
+    a=arity[token]
+    if depth<a: raise ValueError('stack underflow')
+    return depth-a+1
+
+
+def _is_valid_r(formula):
+    n=FEATURE_COUNT; arity=REDUCED_OP_ARITY
+    depth=0
+    try:
+        for i, t in enumerate(formula):
+            t=int(t)
+            if not (0 <= t < REDUCED_ALL_TOKENS): return False
+            if t not in _valid_tokens_r(depth, i, len(formula), n, arity): return False
+            depth=_step_r(depth, t, n, arity)
+    except ValueError:
+        # Stack underflow. Only a malformed program may reach here: an
+        # unexpected exception type means a bug in this module, and swallowing
+        # it would report every formula as invalid instead of raising.
+        return False
+    return depth==1
+
+
+def _fill_r(prefix, rng, n, arity):
+    f=list(prefix); depth=0
+    for t in f: depth=_step_r(depth, int(t), n, arity)
+    while len(f)<FORMULA_LEN:
+        choices=_valid_tokens_r(depth, len(f), FORMULA_LEN, n, arity)
+        if not choices: return None
+        t=int(rng.choice(choices)); f.append(t); depth=_step_r(depth, t, n, arity)
+    return tuple(f) if depth==1 else None
+
+
+def _random_formula_reduced(rng):
+    n=FEATURE_COUNT; arity=REDUCED_OP_ARITY
+    for _ in range(200):
+        f=_fill_r([], rng, n, arity)
+        if f is not None: return f
+    raise RuntimeError('failed to sample a valid reduced-grammar formula')
+
+
+def _mutate_reduced(formula, rng):
+    n=FEATURE_COUNT; arity=REDUCED_OP_ARITY
+    for _ in range(50):
+        f=list(formula)
+        pos=rng.randrange(FORMULA_LEN)
+        depth=0
+        for t in f[:pos]: depth=_step_r(depth, int(t), n, arity)
+        choices=_valid_tokens_r(depth, pos, FORMULA_LEN, n, arity)
+        if not choices: continue
+        f[pos]=int(rng.choice(choices))
+        if _is_valid_r(f): return tuple(f)
+    return _random_formula_reduced(rng)
+
+
+def _crossover_reduced(a, b, rng):
+    # Repair is uniform resampling at the cut, not a tail-preserving splice.
+    # A tail-preserving repair would depend on the second parent's suffix, and
+    # under the reduced grammar the same token index means a different operator,
+    # so it would not be the same operator.
+    n=FEATURE_COUNT; arity=REDUCED_OP_ARITY
+    cut=rng.randrange(1, FORMULA_LEN)
+    f=_fill_r(list(a[:cut]), rng, n, arity)
+    return f if f is not None else _random_formula_reduced(rng)
+
+
 def random_formula(rng):
+    if GRAMMAR=='reduced': return _random_formula_reduced(rng)
     seq=[]; depth=0
     for pos in range(FORMULA_LEN):
         choices=np.flatnonzero(valid_token_mask(depth,pos,FORMULA_LEN).numpy()).tolist()
@@ -103,6 +242,7 @@ def random_formula(rng):
 
 
 def mutate(formula,rng):
+    if GRAMMAR=='reduced': return _mutate_reduced(formula,rng)
     f=list(formula)
     if rng.random()<0.7:
         pos=rng.randrange(FORMULA_LEN)
@@ -116,6 +256,7 @@ def mutate(formula,rng):
 
 
 def crossover(a,b,rng):
+    if GRAMMAR=='reduced': return _crossover_reduced(a,b,rng)
     cut=rng.randrange(1,FORMULA_LEN); f=list(a[:cut])
     depth=0
     for t in f: depth=update_depth(depth,t)
@@ -134,6 +275,12 @@ def softplus(x):
 
 
 def formula_signal(formula,maps,c):
+    # Token indices are grammar-specific: reduced token 20 is DELAY1 while full
+    # token 20 is JUMP. Routing a reduced formula through the full evaluator
+    # would compute a different function and report it honestly, so the
+    # grammar chooses the evaluator.
+    if GRAMMAR=='reduced':
+        return evaluate_formula_reduced(list(formula),maps[c])
     return evaluate_formula(list(formula),maps[c])
 
 
@@ -332,19 +479,29 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
 
 def seed_formulas():
     # Baseline seeds from the rank-IC scan: HL_RANGE, LOG_VOL, FOMO, VOL_TREND.
+    # A bare factor wrapped in the grammar's unary operator is legal at length
+    # 12, and the seeds are revalidated under the active grammar. Token 17 is
+    # ABS under the full grammar and SIGN under the reduced one; both are arity
+    # 1, so the same index is legal in both, but it is not the same function, so
+    # a seed must never be carried across grammars by index alone.
     seeds=[]
     for feature in (9,5,3,11):
         seq=[feature]+[17]*11
-        if is_valid(seq): seeds.append(tuple(seq))
+        ok=_is_valid_r(seq) if GRAMMAR=='reduced' else is_valid(seq)
+        if ok: seeds.append(tuple(seq))
     return seeds
 
 
 def main():
-    ap=argparse.ArgumentParser(); ap.add_argument('--generations',type=int,default=20); ap.add_argument('--population',type=int,default=32); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--out',type=Path,default=ROOT/'results'/'ga_28c_30m_3y.json'); ap.add_argument('--funding',choices=('constant','real'),default='real',help='constant reproduces the historical equity-compound-v2 assumption; real uses recorded Binance funding. Default is real because the constant is known to overstate the rate ~16x and to invert the sign on ~30%% of events.'); ap.add_argument('--null',choices=('none','iid','xsec'),default='none',help='iid: block-bootstrapped returns and volume per coin, no real edge. '
+    ap=argparse.ArgumentParser(); ap.add_argument('--generations',type=int,default=20); ap.add_argument('--population',type=int,default=32); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--out',type=Path,default=ROOT/'results'/'ga_28c_30m_3y.json'); ap.add_argument('--funding',choices=('constant','real'),default='real',help='constant reproduces the historical equity-compound-v2 assumption; real uses recorded Binance funding. Default is real because the constant is known to overstate the rate ~16x and to invert the sign on ~30%% of events.'); ap.add_argument('--null',choices=('none','iid','xsec','iid1','iidw','iidg'),default='none',help='iid: block-bootstrapped returns and volume per coin, no real edge. '
      'xsec: each coin paired with a neighbour bars. Both are false-positive '
      'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
      'walkforward: expanding folds, one selection pass per validation window, '
-     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); args=ap.parse_args()
+     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); args=ap.parse_args()
+    global GRAMMAR
+    GRAMMAR=args.grammar
+    print(f'[grammar] {GRAMMAR}: {_spec()["max_token"]} tokens, '
+          f'{len(_spec()["arity"])} operators', flush=True)
     rng=random.Random(args.seed); common,maps,returns,funding_mask=load_data(null=args.null,null_seed=args.null_seed,null_block=args.null_block);
     # Load once per run: real funding is per-coin and the loader is not free.
     funding_by_coin=({c:load_real_funding(c,np.asarray(common,dtype=np.int64)) for c in COINS_28C}
@@ -370,7 +527,7 @@ def main():
         wf_records,wf_selected=run_walkforward(
             args,maps,returns,common,funding_mask,funding_by_coin,folds,rng,wf_scale_end)
         out={'status':'ga_paper_only','live_adopted':False,'mode':'walkforward',
-             'null_data':args.null,'reward_version':args.reward_version,
+             'grammar':GRAMMAR,'null_data':args.null,'reward_version':args.reward_version,
              'funding_source':args.funding,'accounting_version':funding_version,
              'seed':args.seed,'generations':args.generations,'population':args.population,
              'folds':fold_summaries(folds,n),'fold_records':wf_records,
@@ -442,6 +599,7 @@ def main():
     out={
         'status': 'ga_paper_only',
         'live_adopted': derive_live_adopted(acceptance),
+        'grammar': GRAMMAR,
         'formula': list(f),
         'seed': args.seed,
         'generations': args.generations,

@@ -205,8 +205,35 @@ def statistical_power(lockbox_bars: int, bar_minutes: int = 30,
     """
     n_days = max(1, int(lockbox_bars * bar_minutes / (60 * 24)))
     years = n_days / 365.25
-    # variance of the mean of n approximately independent daily returns
-    half_width = 1.96 * np.sqrt((1.0 + 0.5 ** 2) / years)
+    # Lo (2002), "The Statistics of Sharpe Ratios":
+    #
+    #     SE(annualised SR) = sqrt((1 + S^2/2) * A / n)
+    #
+    # where S is the NON-annualised per-period Sharpe ratio and n counts the
+    # periods. This function's inputs are an annualised Sharpe, so S is the
+    # annualised value divided by sqrt(A). Writing A = 365.25 gives
+    #
+    #     half_width = 1.96 * sqrt((1 + 0.5 * SR_ann^2 / 365.25) / years)
+    #
+    # The previous version substituted a constant 0.5 for S, which asserts an
+    # annualised Sharpe of 0.5 * sqrt(365.25) ~= 9.6. For a realistic
+    # observed Sharpe the S^2/2 term is around 3e-4, so the old code overstated
+    # the variance by ~25%, which is ~12% on the reported half-width. It also
+    # had no way to say "this term was never measured", because a hardcoded
+    # 0.5 is indistinguishable from a measurement once it is in a dict.
+    #
+    # When no Sharpe is supplied the kurtosis-of-returns term cannot be
+    # evaluated, so the caller is told the interval is a lower bound rather
+    # than being handed a plausible-looking number.
+    per_period = None
+    unidentifiable = False
+    if observed_sharpe is None:
+        # S^2/2 >= 0 always, so 1.0 is the tightest defensible bound.
+        half_width = 1.96 * np.sqrt(1.0 / years)
+        unidentifiable = True
+    else:
+        per_period = float(observed_sharpe) / np.sqrt(365.25)
+        half_width = 1.96 * np.sqrt((1.0 + 0.5 * per_period ** 2) / years)
     achieved_t = None
     if observed_sharpe is not None:
         achieved_t = observed_sharpe * np.sqrt(years)
@@ -215,12 +242,18 @@ def statistical_power(lockbox_bars: int, bar_minutes: int = 30,
         "oos_days": n_days,
         "oos_years": round(years, 4),
         "sharpe_ci95_half_width": round(float(half_width), 4),
+        "observed_annualised_sharpe": None if observed_sharpe is None else round(float(observed_sharpe), 4),
+        "observed_per_period_sharpe": None if per_period is None else round(per_period, 6),
+        "serial_correction_unidentified": bool(unidentifiable),
         "achieved_t_statistic": None if achieved_t is None else round(float(achieved_t), 4),
         "t_required_for_95pct": 1.96,
         "can_resolve_sharpe_1_0": bool(half_width < 1.0),
         "note": ("A Sharpe threshold is not testable when this half-width is "
                  "larger than the threshold. The criteria below are screening "
-                 "rules, not statistical evidence."),
+                 "rules, not statistical evidence."
+                 + (" No Sharpe was supplied, so the kurtosis term in the "
+                    "variance is unmeasured and this half-width is a lower "
+                    "bound." if unidentifiable else "")),
     }
 
 

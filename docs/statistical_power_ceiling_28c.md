@@ -1,68 +1,155 @@
 # Why the 28c framework cannot produce a statistically resolvable verdict
 
-Date: 2026-09-27
+Date: 2026-09-27. Corrected 2026-09-28.
 Subject: v3c (`results/ga_28c_100gen_v3c_seed42.json`), 28-coin / 30m / 2.03y contract
 
 This document records a measurement, not an opinion. It is the admission gate for
 any future GA run: **do not start a new 28c search until someone has read this
 and accepted that the framework cannot answer the question being asked.**
 
+## Provenance warning, read this first
+
+The headline `+0.479` and the correlation figures originally in this document
+were measured on the factor set as it stood **before** commit `de2e353`, when
+`LIQ_SCORE` was the constant `0.4` on every bar of every coin. `de2e353`
+replaced it with a causal log-Amihud proxy. v3c's formula is
+`F7 F3 ADD F7 ADD F5 DELTA F1 F9 GATE DELAY1 CORR` and `F1` is exactly that
+factor, so **v3c's artifact is no longer reproducible from the current tree**,
+even on the constant-funding basis it was produced under.
+
+Re-measured with today's factors and today's code, same 8,833-bar lockbox:
+
+| funding basis | v3c lockbox Sharpe |
+|---|---|
+| as recorded in the artifact (constant +0.0005, old `LIQ_SCORE`) | +0.478 |
+| constant +0.0005, current log-Amihud `LIQ_SCORE` | **+0.199** |
+| real Binance funding, current log-Amihud `LIQ_SCORE` | **-0.897** |
+
+So `+0.479` is a historical number that this tree cannot regenerate. The
+conclusions below are unchanged, and the conclusion is in fact stronger when
+stated against the current code: the reproducible Sharpe is smaller, and the
+real-funding Sharpe is negative. Nothing here depends on the `+0.479` figure.
+
+What *is* version-independent is the statistical-power arithmetic, which
+depends only on the sample length. That section has been corrected: the CI
+formula used a hardcoded per-period Sharpe of 0.5, which asserts an annualised
+Sharpe of about 9.6. See "Correction to the CI formula" below.
+
 ## The short version
 
-The v3c lockbox Sharpe of +0.479 has a 95% confidence interval of roughly
-[-1.7, +2.9]. The interval contains zero. Under this contract, a candidate
-cannot be shown to differ from a random strategy, and no amount of additional
-searching changes that.
+The v3c lockbox of 8,833 bars is 184 daily observations. On the recorded
+`+0.479` that gives a 95% interval of about [-2.3, +3.2]; the weekly block
+bootstrap gave [-1.738, +2.901]. Every interval contains zero. On the
+current-tree value of `+0.199` it is wider still. Under this contract a
+candidate cannot be shown to differ from a random strategy, and no amount of
+additional searching changes that.
 
 ## Measurements
 
 ### 1. The lockbox is too short
 
-8,833 bars = 184 daily observations.
+8,833 bars = 184 daily observations. The units below are deliberately
+different quantities and are not comparable with each other: a point estimate
+is an annualised daily Sharpe, the bootstrap interval is a percentile interval
+on the same annualised Sharpe, and `t` is a standardised mean of *daily* returns.
 
-    point Sharpe                 : +0.479
-    weekly block bootstrap 95% CI : [-1.738, +2.901]
-    t-statistic for mean != 0    : +0.341   (1.96 required)
-    P(Sharpe <= 0)               : 0.336
+    point Sharpe                  : +0.479   (annualised, daily returns)
+    weekly block bootstrap 95% CI : [-1.738, +2.901]   (same units as above)
+    t-statistic for mean != 0     : +0.341   (1.96 required)
+    P(Sharpe <= 0)                : 0.336
 
-Serial correlation of the daily returns is approximately zero (sum of lags
-1..3 = -0.026), so the statistical efficiency is already near the theoretical
-maximum. This is not a resampling artefact.
+Measured again on the current factor set, the same lockbox gives:
 
-### 2. The required sample does not exist
+    point Sharpe (current factors, constant funding) : +0.199
+    t-statistic for mean != 0                        : +0.142
 
-95% CI half-width on a Sharpe estimate, as a function of OOS length:
+Serial correlation of the daily returns is approximately zero: the sum of
+sample autocorrelations at lags 1..3 is -0.013 on the current factor set and
+was -0.026 on the old one. So the statistical efficiency is already near the
+theoretical maximum. This is not a resampling artefact, and re-running it will
+not help.
 
-| OOS length | half-width |
-|---|---|
-| 185 days (current lockbox) | +/-2.92 |
-| 300 days (all that remains after a 1y burn-in) | +/-2.29 |
-| 1.2 years | +/-2.00 |
-| 4.8 years | +/-1.00 |
-| 19.2 years | +/-0.50 |
+### 2. Correction to the CI formula
 
-The contract contains 2.03 years in total. Resolving a Sharpe of 0.5 from zero
-needs 19.2 years: a shortfall of 23x.
+`statistical_power` previously computed
 
-### 3. Diversification cannot close the gap
+    half_width = 1.96 * sqrt((1 + 0.5**2) / years)
 
-    cross-sectional pairwise correlation (coins)  : +0.639  -> N_eff 1.53
-    strategy leg-return correlation              : +0.450  -> N_eff 2.13
-    same-formula position correlation            : +0.498
+The `0.5` is meant to be the per-period (non-annualised) Sharpe, per Lo (2002).
+Hardcoding it asserts a per-period Sharpe of 0.5, i.e. an **annualised** Sharpe
+of `0.5 * sqrt(365.25) ~= 9.6`. For any realistic observed Sharpe the term is
+around `3e-4`, so the old formula overstated the variance by about 25%, which
+is about 12% on the reported half-width, and it did so uniformly, so it never
+flipped a verdict. The corrected form is
 
-The strategy runs one formula across 28 names, so the positions are more
-synchronised than the prices. Even assuming a physically impossible
-correlation of exactly zero:
+    half_width = 1.96 * sqrt((1 + 0.5 * (SR_annualised / sqrt(365.25))**2) / years)
+
+and when no Sharpe is supplied the caller is told the kurtosis term is
+unmeasured rather than being handed a plausible-looking number. The function now
+also reports `observed_annualised_sharpe` and `observed_per_period_sharpe` so a
+reader can check which Sharpe went in.
+
+### 3. The required sample does not exist
+
+95% CI half-width on the annualised Sharpe estimate, corrected formula,
+evaluated at the recorded `+0.479`:
+
+| OOS length | bars | days | half-width |
+|---|---|---|---|
+| 184 days (v3c lockbox) | 8,832 | 184 | +/-2.76 |
+| 300 days (what remains after a 1y burn-in) | 14,400 | 300 | +/-2.16 |
+| 1.2 years | 21,024 | 438 | +/-1.79 |
+| 2.03 years (the entire contract) | 35,568 | 741 | +/-1.38 |
+| 4.8 years | 84,144 | 1,753 | +/-0.89 |
+| 19.2 years | 336,576 | 7,012 | +/-0.45 |
+
+The whole contract is 2.03 years. To resolve an annualised Sharpe to the
+precision the gate's own threshold needs:
+
+| target half-width | years required | multiple of the 2.03y contract |
+|---|---|---|
+| +/-1.00 | 3.84 | 2x |
+| +/-0.50 | 15.37 | 8x |
+| +/-0.25 | 61.48 | 30x |
+
+So even the entire 2.03-year contract, used in full and never touched by
+selection, resolves the Sharpe only to about +/-1.38. Resolving 0.5 from zero
+needs 15.4 years.
+
+### 4. Diversification cannot close the gap
+
+Recomputed on the current factor set over the same 8,833-bar lockbox. Each
+figure is the mean of the 378 off-diagonal pairwise correlations:
+
+    cross-sectional pairwise correlation (bar returns)  : +0.572  -> N_eff 1.70
+    same-formula position correlation                  : +0.369  -> N_eff 2.56
+    strategy leg-net-return correlation                : +0.392  -> N_eff 2.42
+
+`N_eff = n / (1 + (n-1) * rho)` with n = 28.
+
+Note the direction: the one formula's positions are **less** correlated across
+coins (+0.369) than the raw bar returns are (+0.572). The original version of
+this document claimed the opposite, that the positions were "more synchronised
+than the prices", while quoting numbers in its own table that said otherwise
+(+0.498 against +0.639). The measured claim is the second one, and it is the
+weaker one, so the conclusion below is unchanged.
+
+Even assuming a physically impossible correlation of exactly zero:
 
 | mean pairwise rho | N_eff | implied t |
 |---|---|---|
-| 0.639 (observed) | 1.53 | +0.174 |
-| 0.200 | 4.38 | +0.294 |
+| 0.572 (observed, bar returns) | 1.70 | +0.185 |
+| 0.200 | 4.38 | +0.310 |
 | 0.000 (unreachable) | 28.0 | +0.744 |
 
-The theoretical ceiling is t = 0.744. The requirement is 1.96.
+The theoretical ceiling is `t = 0.185 * sqrt(28) = 0.744`. The requirement is
+1.96. The `t` here is the current-tree value (+0.142 observed, +0.185
+correlation-adjusted); on the old factor set the same ceiling was +0.744 from
+an observed +0.341, and the ratio is the same either way: perfect
+diversification across 28 names buys a factor of `sqrt(28) ~= 5.3`, and the gap
+to significance is a factor of 8.8.
 
-### 4. Leverage is mathematically irrelevant here
+### 5. Leverage is mathematically irrelevant here
 
 The t-statistic is invariant to a common scale factor:
 
@@ -77,12 +164,16 @@ It changes neither Sharpe nor significance.
 
 | Direction | Ceiling | Verdict |
 |---|---|---|
-| Extend the OOS window | 19.2 years needed | data does not exist |
+| Extend the OOS window | 15.4 years needed for +/-0.50 | data does not exist |
 | Diversify further | t -> 0.744 at best | still far below 1.96 |
 | Increase leverage | no effect | scale-invariant |
 
 All three routes terminate at the same place: the only remaining lever is a
-higher per-bet edge, which means a better formula, not a longer or wider sample.
+higher per-bet edge, which means a genuinely better formula, not a longer or
+wider sample. And the null-control work in
+`docs/selection_bias_null_calibration_28c.md` shows that under this framework a
+"better formula" is currently obtained more reliably from structureless data
+than from real data, so even that lever is not yet trustworthy.
 
 ## Why the v3c result is not a bug in the accounting
 
@@ -96,7 +187,7 @@ pre-contract period. Two follow-ups pinned the cause:
 
 So the 0.0968 lockbox MDD is not evidence of risk control. It is what a
 0.5-year window looks like when it happens to be favourable, which is exactly
-what a +/-2.29 interval predicts.
+what a +/-2.76 interval predicts.
 
 ## What the gate now reports
 
