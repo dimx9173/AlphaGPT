@@ -492,6 +492,14 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
                 'formula': list(selected),
                 'portfolio_sharpe': h['portfolio_sharpe'],
                 'portfolio_mdd': h['portfolio_mdd'],
+                # The benchmark travels with the score. Without it a
+                # walk-forward record reports a Sharpe against zero, and the
+                # accept stage downstream has nothing to compare it to -- it
+                # either blocks forever or, worse, is loosened to compare
+                # against zero and the loop becomes a drift machine.
+                'buy_and_hold_sharpe': h['buy_and_hold_sharpe'],
+                'excess_sharpe_vs_buy_and_hold': h['excess_sharpe_vs_buy_and_hold'],
+                'mean_position': h['mean_position'],
                 'positive_coins': h['positive_coins'],
                 'min_leg_sharpe': h['min_leg_sharpe'],
             })
@@ -603,6 +611,9 @@ def main():
         if hold:
             h=hold[0]
             out['holdout']={'portfolio_sharpe':h['portfolio_sharpe'],
+                            'buy_and_hold_sharpe':h.get('buy_and_hold_sharpe'),
+                            'excess_sharpe_vs_buy_and_hold':h.get('excess_sharpe_vs_buy_and_hold'),
+                            'mean_position':h.get('mean_position'),
                             'portfolio_mdd':h['portfolio_mdd'],
                             'positive_coins':h['positive_coins'],
                             'formula':h['formula']}

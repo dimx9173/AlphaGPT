@@ -13,30 +13,68 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(ROOT)
 
+# Run the sub-steps with THIS interpreter, not with whatever ``python3`` the
+# shell happens to find.
+#
+# The sub-steps were invoked as bare ``python3``, which on this machine
+# resolves to ~/miniconda3/bin/python3 -- which has no pytest. The report
+# still exited cleanly, printed a compact summary, and said GATE_REPORT FAIL,
+# with the pytest check reporting zero failures and zero errors because the
+# whole pytest run had died on an ImportError before collecting anything.
+#
+# That is the worst possible failure shape for a gate: it looks like a
+# verdict, it is load-bearing, and the reason it failed is that the tool
+# could not start. A gate that cannot distinguish "no regressions" from
+# "could not run" is not a gate. Every sub-step now names the interpreter
+# explicitly, and the caller is checked for pytest before anything else.
+PY = sys.executable
+
 
 def sh(cmd):
     r = subprocess.run(cmd, shell=True, capture_output=True, text=True)
     return r.returncode, (r.stdout + r.stderr)[-3000:]
 
 
+def require(module):
+    """Fail loudly if the running interpreter cannot import a dependency."""
+    try:
+        __import__(module)
+        return True
+    except ImportError as exc:
+        print(f"GATE_REPORT ERROR: this interpreter cannot import {module}: {exc}")
+        print(f"  interpreter: {sys.executable}")
+        print("  run the gate with the project venv, e.g. "
+              ".venv2/bin/python research/run_gate_report.py")
+        return False
+
+
 def main():
     rep = {"ok": True, "checks": {}}
-    rc, out = sh("python3 -m pytest -q --tb=no -p no:warnings --junitxml=/tmp/gate_rep.xml 2>&1 | tail -n 3")
+    if not require("pytest"):
+        return 2
+    rep["interpreter"] = sys.executable
+    rc, out = sh(f'"{PY}" -m pytest -q --tb=no -p no:warnings '
+                 f'--junitxml=/tmp/gate_rep.xml 2>&1 | tail -n 3')
     try:
         import xml.etree.ElementTree as ET
         t = ET.parse("/tmp/gate_rep.xml").getroot().find("testsuite").attrib
         rep["checks"]["pytest"] = {"tests": int(t["tests"]), "failures": int(t["failures"]),
                                    "errors": int(t["errors"])}
-        if int(t["failures"]) or int(t["errors"]):
+        # Zero tests is not a pass. It is the signature of a collection error
+        # that the junit XML records as an empty suite.
+        if int(t["tests"]) == 0:
+            rep["checks"]["pytest"]["error"] = "collected 0 tests"
+            rep["ok"] = False
+        elif int(t["failures"]) or int(t["errors"]):
             rep["ok"] = False
     except Exception as e:
         rep["checks"]["pytest"] = {"error": str(e)}
         rep["ok"] = False
-    rc, out = sh("python3 research/run_y1b_verify.py 2>&1 | tail -n 6")
+    rc, out = sh(f'"{PY}" research/run_y1b_verify.py 2>&1 | tail -n 6')
     rep["checks"]["y1b_verify"] = {"pass": "Y1B_VERIFY PASS" in out, "tail": out.strip().splitlines()[-6:]}
     if "Y1B_VERIFY PASS" not in out:
         rep["ok"] = False
-    rc, out = sh("python3 research/run_e10.py --check 2>&1 | tail -n 2")
+    rc, out = sh(f'"{PY}" research/run_e10.py --check 2>&1 | tail -n 2')
     rep["checks"]["e10"] = {"pass": "PASS" in out}
     if "PASS" not in out:
         rep["ok"] = False
