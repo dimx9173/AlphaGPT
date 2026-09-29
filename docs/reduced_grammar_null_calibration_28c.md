@@ -322,3 +322,79 @@ a selection lift of +5 to +13 Sharpe that looks like the search working.
 
 The honest summary of this framework is: it reliably finds a position that
 loses to holding.
+
+
+## Are the factors themselves alive?
+
+The search is a drift-matching machine and the selection lift is +5 to +13
+Sharpe. Before running another search on top of that, it is worth asking
+whether there is anything underneath to find. A search over a grammar can
+only find what its features contain.
+
+`research/factor_screen_28c.py` runs each of the 12 factors alone through the
+live position path, on train, validation and lockbox, and splits the
+correlation into two pieces that look identical in a Sharpe:
+
+    raw IC      = corr(p, r)           credits holding a direction
+    demeaned IC = corr(p - mean(p), r)  credits picking the right times
+
+Every long position in a drifting market has a positive raw IC. Only the
+second is evidence of timing. On the lockbox:
+
+| factor | demeaned IC | t | iid null | real-minus-iid | Sharpe | excess vs B&H |
+|--------|-------------|---|----------|----------------|--------|---------------|
+| RET | -0.0114 | -1.07 | -0.0023 | -0.0091 | -10.270 | -11.392 |
+| LIQ_SCORE | +0.0064 | +0.60 | +0.0020 | +0.0044 | -7.951 | -9.073 |
+| PRESSURE | -0.0090 | -0.85 | -0.0008 | -0.0082 | -11.365 | -12.487 |
+| FOMO | +0.0137 | +1.29 | -0.0012 | +0.0149 | -19.578 | -20.700 |
+| PUMP_DEV | -0.0050 | -0.47 | +0.0072 | -0.0121 | -3.514 | -4.637 |
+| LOG_VOL | +0.0147 | +1.38 | +0.0088 | +0.0059 | -0.382 | -1.505 |
+| VOL_CLUST | +0.0057 | +0.53 | +0.0063 | -0.0006 | -0.439 | -1.561 |
+| MOM_REV | -0.0049 | -0.47 | +0.0006 | -0.0055 | -3.377 | -4.499 |
+| DELTA_RSI | -0.0050 | -0.47 | +0.0056 | -0.0106 | -3.988 | -5.111 |
+| HL_RANGE | +0.0132 | +1.24 | +0.0043 | +0.0089 | -0.772 | -1.894 |
+| CLOSE_POS | -0.0094 | -0.89 | -0.0029 | -0.0066 | -0.088 | -1.210 |
+| VOL_TREND | +0.0149 | +1.40 | +0.0035 | +0.0114 | -8.671 | -9.793 |
+
+**No factor is significant.** The largest |t| is 1.40, against a threshold of
+1.96 that does not yet account for testing 12 factors. The real-minus-iid
+gaps are the same size as the ICs themselves and change sign across windows:
+5 of 12 positive on train, 8 of 12 on validation, 5 of 12 on lockbox. A
+genuine signal does not flip its sign against a null with nothing in it.
+
+All 12 lose to a constant long on train and on lockbox, without exception.
+On validation, 2 of 12 clear the benchmark (LOG_VOL +0.23, VOL_CLUST +0.38)
+-- but that window's benchmark is -1.275, so clearing it is close to free,
+and neither factor is near significant there.
+
+### The two factors that look like signal
+
+VOL_TREND and FOMO post the largest lockbox demeaned IC (+0.0149, +0.0137)
+and the largest real-minus-iid gaps. Both are the artefacts of a sign that
+flips with the regime, and both lose to buy-and-hold by more than 9 Sharpe. A
+large IC paired with a catastrophic Sharpe is the signature of a position
+that is right about direction and wrong about size and timing, which is worse
+than holding no view at all. A summary that quotes the IC column without the
+excess column will describe these two as the best factors in the set.
+
+### The raw IC and the demeaned IC are the same number
+
+For every factor on every window, `raw_ic` and `demeaned_ic` agree to better
+than 1e-3. The position is already near-constant in sign, so there is almost
+no directional exposure left to strip. The factors are not mostly-directional
+signals that happen to be measured badly -- they are uninformative. There is
+nothing to rescue by de-meaning later, because the information is absent from
+the position itself rather than from the accounting.
+
+### What this means for the search
+
+The +5 to +13 Sharpe selection lift from the random-formula probe is not the
+search uncovering weak signal in these features. There is no weak signal to
+uncover. The lift is best-of-N over noise, and the factor screen explains
+why no amount of extra search would help: the search is not finding a small
+effect, it is selecting the largest of many noise draws and the features give
+it nothing real to select on.
+
+The correct next step is to change the factors, not to run the search again.
+That is a research project of its own, and nothing in this repository
+currently supports the claim that these 12 carry timing information.
