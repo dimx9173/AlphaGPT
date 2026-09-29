@@ -12,6 +12,10 @@ from research.acceptance_schema_28c import (
 from research.regime_gate_28c import evaluate_regime_gate
 from research.data_contract_28c import HISTORY_YEARS_COMMON_28
 from research.splits_28c import search_splits, split_indices
+
+# The passive benchmark's position cap. A constant long at this cap is the
+# reference every Sharpe in this project should be read against.
+POSITION_CAP = 0.25
 from research.formula_grammar import valid_token_mask, update_depth, is_valid, ALL_TOKENS, OP_ARITY as FULL_OP_ARITY
 from research.grammar_reduced_28c import (REDUCED_TOKENS as REDUCED_ALL_TOKENS,
                                   REDUCED_ARITY as REDUCED_OP_ARITY,
@@ -375,7 +379,7 @@ def mean_act_guard(mean_turn):
 
 def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None):
     grammar=resolve_grammar(formula,grammar)
-    leg_net = []; leg_sh = []; leg_turn = []; leg_ic = []; activity = []
+    leg_net = []; leg_sh = []; leg_turn = []; leg_ic = []; activity = []; leg_bh = []
     timestamps = bars[start:end]
     for c in COINS_28C:
         sig = formula_signal(formula, maps, c, grammar=grammar)
@@ -408,6 +412,10 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
             fnd = funding_mask[start:end] * FUND_RATE
         net = accounting_bar_returns(pos, r, FEE, fnd, LEV)
         leg_net.append(net)
+        # The same window, the same book, held flat and long at the position
+        # cap. A constant +1 never trades, so it pays no turnover fee.
+        leg_bh.append(accounting_bar_returns(
+            np.full(len(pos), POSITION_CAP), r, FEE, fnd, LEV))
         m = metrics(net, timestamps)
         leg_sh.append(m['sharpe'])
         leg_turn.append(float(turn.mean()))
@@ -417,6 +425,21 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
     pnet = np.mean(np.stack(leg_net), axis=0)
     pm = metrics(pnet, timestamps)
     psh = pm['sharpe']
+    # The reported Sharpe is measured against ZERO, which is not a benchmark
+    # anyone can hold. On this universe a constant long has a Sharpe of its
+    # own, because crypto drifted, and it was worth +1.05 net over the lockbox
+    # while the best real-data run scored -0.32. A Sharpe that clears zero can
+    # therefore still be worse than doing nothing, and reading one as an edge
+    # is reading a drift as a discovery.
+    #
+    # The excess is the Sharpe of the ACTIVE series (strategy minus hold), not
+    # the difference of two Sharpes, which is not a Sharpe. Subtracting the
+    # two P&L series keeps the compounding and the fee accounting on both
+    # sides consistent, so the result is a return series that could itself
+    # have been traded.
+    bnet = np.mean(np.stack(leg_bh), axis=0)
+    bh_sh = metrics(bnet, timestamps)['sharpe']
+    active_sh = metrics(pnet - bnet, timestamps)['sharpe']
     mdd = pm['mdd']
     min_leg = min(leg_sh) if leg_sh else 0.
     mean_ic = float(np.mean(leg_ic)) if leg_ic else 0.
@@ -428,7 +451,9 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
         breadth = sum(x > 0 for x in leg_sh) / len(leg_sh) if leg_sh else 0.0
         reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
                               breadth=breadth, version=reward_version)
-    return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
+    return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd,
+            'buy_and_hold_sharpe': bh_sh, 'excess_sharpe_vs_buy_and_hold': active_sh,
+            'mean_position': float(np.mean([float(np.mean(p[start:end])) for c in COINS_28C])) if COINS_28C else 0.0, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
 def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
                      folds, rng, scale_end_hint):
     """Run the search fold by fold, giving each validation window one pass.

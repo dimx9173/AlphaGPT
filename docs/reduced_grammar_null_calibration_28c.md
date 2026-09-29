@@ -246,3 +246,79 @@ construction is now the leading suspect:
 Each of these is one run of the existing null machinery with a different
 `null_mode`. None of them needs a new search protocol, and all three are
 cheaper than another GA batch.
+
+
+## The benchmark was zero, and zero is not a benchmark
+
+Every number above is a Sharpe, and every Sharpe here is measured against
+zero. Zero is not something an investor can hold. On this universe, over this
+window, a constant long position at the 0.25 cap earns a Sharpe of its own,
+because crypto drifted.
+
+`research/benchmark_buy_and_hold_28c.py` runs that reference through the
+identical evaluation path -- same bars, same fee, same funding, same leverage.
+A constant long never trades, so it pays no turnover fee at all.
+
+    mode    n   B&H net   strat net    excess   meanPos   %long   %short  beats B&H?
+    none    10    +1.054      -0.317    -1.371   -0.0556   34.8%    61.0%  1/10
+    iid     10    +1.129      +0.822    -0.307   -0.0064   37.2%    40.3%  4/10
+    iid1    10    +2.969      +2.346    -0.623   +0.2032   93.1%     5.6%  1/10
+    iidw    10    +3.406      +2.275    -1.131   +0.1667   85.3%    13.9%  0/10
+    iidg    10    +4.997      +4.662    -0.335   +0.2182   96.4%     2.7%  1/10
+
+**No run in 50, across five datasets, has beaten holding a constant long.**
+On real data 9 of 10 lose to it, and the median run is 1.37 Sharpe worse.
+
+### Why the diagnostic nulls looked like a discovery
+
+The diagnostic nulls reported a *higher gross* Sharpe than the real data
+(iid1 +3.05, iidw +2.84, iidg +5.00 against real +0.82). Structureless data
+scoring better than real data is either a profound finding or a bug, so it
+was worth resolving. It was neither.
+
+On those three nulls the factors collapsed to a constant sign. The position
+was long on 93-96% of bars with a mean position of +0.17 to +0.22. The search
+had not found anything -- it had discovered that long had paid over this
+window, and had written a formula that says so. The reported Sharpe was
+buy-and-hold, and the null's own drift supplied it. On iidg the strategy's
+Sharpe is within 0.34 of the benchmark's.
+
+A search with no directional prior is a drift-matching machine. On a window
+where long paid it finds long; on the real window, where long underperformed,
+it found short on 61% of bars and underperformed the benchmark by 1.37. Both
+behaviours are the same machine, and neither is forecasting.
+
+### What this means for every earlier number
+
+The Sharpe decomposes as follows, and the fee effect turns out to vary
+fivefold across modes while funding is negligible everywhere:
+
+    mode     gross   fee effect   fund effect     net
+    none     +0.821      -1.140       +0.002     -0.317
+    iid      +2.285      -1.456       -0.007     +0.822
+    iid1     +3.053      -0.655       -0.052     +2.346
+    iidw     +2.837      -0.491       -0.071     +2.275
+    iidg     +5.003      -0.285       -0.056     +4.662
+
+Fees explain about 17% of the null-vs-real gap; the rest is that the nulls
+drifted more, and the search leaned into it. Real funding contributes
++0.002 to -0.071 Sharpe. It was never the story.
+
+`evaluate()` now returns `buy_and_hold_sharpe`,
+`excess_sharpe_vs_buy_and_hold` and `mean_position` alongside the existing
+fields, so no future artifact can be read against zero by accident. The
+excess is the Sharpe of the *active series* -- strategy minus hold, both P&L
+series subtracted before compounding -- not a difference of two Sharpes,
+which is not itself a Sharpe.
+
+### The gate's verdict was right, and this is why
+
+The regime gate has never passed on any reduced- or full-grammar artifact.
+That verdict was correct, and this document is the reason. The framework
+produces a position that is worse than doing nothing, and it produces it
+reliably enough to have been mistaken for an edge: a positive Sharpe on a
+drifting market, a large gap to a null that is itself a drift artifact, and
+a selection lift of +5 to +13 Sharpe that looks like the search working.
+
+The honest summary of this framework is: it reliably finds a position that
+loses to holding.
