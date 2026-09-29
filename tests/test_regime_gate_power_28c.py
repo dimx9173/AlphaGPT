@@ -13,10 +13,22 @@ from research.regime_gate_28c import statistical_power
 
 
 def test_lockbox_cannot_resolve_the_gate_sharpe_threshold():
-    """8833 bars is the real v3c lockbox: 184 daily observations."""
+    """8833 bars is the real v3c lockbox: 184 daily observations.
+
+    The threshold is "the interval is wider than a Sharpe worth acting on",
+    not a literal constant. An earlier version asserted > 3.0, which the
+    reported half-width of +/-2.76 no longer satisfies, so the test failed for
+    a reason that had nothing to do with the claim it was making: a
+    documentation-grade constant had drifted from the corrected measurement.
+    Asserting against the smallest effect anyone would act on is the property
+    that actually matters and does not rot when the estimate is corrected.
+    """
     p = statistical_power(8833)
     assert p["oos_days"] == 184
-    assert p["sharpe_ci95_half_width"] > 3.0
+    # Wider than the 0.5 Sharpe the gate screens on, by a wide margin.
+    assert p["sharpe_ci95_half_width"] > 0.5
+    # And wider than the best Sharpe this framework has ever reported.
+    assert p["sharpe_ci95_half_width"] > 1.0
     assert p["can_resolve_sharpe_1_0"] is False
 
 

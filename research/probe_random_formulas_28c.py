@@ -40,12 +40,13 @@ sys.path.insert(0, str(ROOT))
 import research.ga_28c_30m_3y as GA
 from research.splits_28c import search_splits, split_indices
 
-# GRAMMAR is a module-level global that main() sets from --grammar. Token
-# indices are grammar-specific, so a reduced formula evaluated with GRAMMAR
-# left at its 'full' default is silently routed to the full evaluator and
-# computes a different function. Set it explicitly rather than inheriting the
-# import-time default.
-GA.GRAMMAR = "reduced"
+# Token indices are grammar-specific, so a reduced formula must be evaluated by
+# the reduced evaluator. The grammar is passed per call rather than set as a
+# module global: main() used to own a GRAMMAR global that an importing caller
+# silently inherited as 'full', and the formula then computed a different
+# function while reporting honestly. evaluate() now takes the grammar
+# explicitly and refuses a formula that does not belong to it.
+GRAMMAR = "reduced"
 
 
 def probe(null: str, n_formulas: int, seed: int, null_seed: int) -> dict:
@@ -76,7 +77,7 @@ def probe(null: str, n_formulas: int, seed: int, null_seed: int) -> dict:
         try:
             r = GA.evaluate(f, maps, returns, lockbox[0], lockbox[1],
                          funding_mask, scale_end, common,
-                         funding_by_coin=funding_by_coin)
+                         funding_by_coin=funding_by_coin, grammar=GRAMMAR)
         except Exception:
             skipped += 1
             continue

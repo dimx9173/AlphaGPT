@@ -274,12 +274,38 @@ def softplus(x):
     x=max(-40,min(40,x)); return math.log1p(math.exp(x))
 
 
-def formula_signal(formula,maps,c):
+def resolve_grammar(formula=None, grammar=None):
+    """Which evaluator a formula must go through, decided explicitly.
+
+    Token indices are grammar-specific: reduced token 20 is DELAY1 while full
+    token 20 is JUMP. A reduced formula routed through the full evaluator
+    computes a DIFFERENT FUNCTION and reports it honestly, so nothing crashes
+    and the number is simply wrong. This is the same class of bug as a
+    placeholder factor: the pipeline runs, the guard passes, and the output is
+    meaningless.
+
+    GRAMMAR was previously a module global set only inside main(), so any
+    importer -- a probe, a test, a notebook -- silently inherited 'full' and
+    sent reduced formulas to the wrong evaluator. The grammar is now a
+    parameter that travels with the formula, and a formula whose tokens do not
+    belong to the named grammar is refused rather than mistranslated.
+    """
+    if grammar is None:
+        grammar = GRAMMAR
+    if formula is not None and grammar == 'reduced' and not validate_reduced(formula):
+        raise ValueError(
+            f"formula {list(formula)} is not valid in the reduced grammar; "
+            "refusing to evaluate it rather than mistranslate its tokens")
+    return grammar
+
+
+def formula_signal(formula,maps,c,grammar=None):
     # Token indices are grammar-specific: reduced token 20 is DELAY1 while full
     # token 20 is JUMP. Routing a reduced formula through the full evaluator
     # would compute a different function and report it honestly, so the
-    # grammar chooses the evaluator.
-    if GRAMMAR=='reduced':
+    # grammar chooses the evaluator, and resolve_grammar refuses a mismatch.
+    grammar=resolve_grammar(formula,grammar)
+    if grammar=='reduced':
         return evaluate_formula_reduced(list(formula),maps[c])
     return evaluate_formula(list(formula),maps[c])
 
@@ -347,11 +373,12 @@ def mean_act_guard(mean_turn):
     return mean_turn < 1e-5
 
 
-def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None, reward_version='v1'):
+def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None):
+    grammar=resolve_grammar(formula,grammar)
     leg_net = []; leg_sh = []; leg_turn = []; leg_ic = []; activity = []
     timestamps = bars[start:end]
     for c in COINS_28C:
-        sig = formula_signal(formula, maps, c)
+        sig = formula_signal(formula, maps, c, grammar=grammar)
         fit_scale = float(np.std(sig[:scale_end])) if scale_end > 0 else 0.0
         raw_pos = np.tanh(sig / (fit_scale + 1e-6)) if fit_scale > 1e-8 else np.zeros_like(sig)
         p = 0.25 * smooth_causal(raw_pos, 5)
@@ -362,8 +389,23 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
         # Real history when available, the constant otherwise. The constant is
         # unconditional -- longs pay, shorts receive, every event -- and a
         # net-short book was credited ~9.6%/yr the venue never paid.
-        fnd = (funding_by_coin[c][start:end] if funding_by_coin is not None
-               else funding_mask[start:end] * FUND_RATE)
+        #
+        # funding_by_coin must be a dict of per-coin RATE arrays. load_data
+        # returns an 8-hour settlement MASK in that slot, which is a different
+        # shape entirely: indexing it with a coin name raises IndexError, and
+        # passing None instead silently reverts to the superseded flat rate.
+        # Both failure modes were observed, so the type is checked here rather
+        # than left to a comment. Comparing arrays of the wrong kind would
+        # still broadcast, so the lengths are checked too.
+        if funding_by_coin is not None:
+            if not isinstance(funding_by_coin, dict) or c not in funding_by_coin:
+                raise TypeError(
+                    f"funding_by_coin must be a dict keyed by coin, got "
+                    f"{type(funding_by_coin).__name__}; load_data returns the "
+                    "8-hour settlement mask, which is a different thing")
+            fnd = np.asarray(funding_by_coin[c], dtype=np.float64)[start:end]
+        else:
+            fnd = funding_mask[start:end] * FUND_RATE
         net = accounting_bar_returns(pos, r, FEE, fnd, LEV)
         leg_net.append(net)
         m = metrics(net, timestamps)

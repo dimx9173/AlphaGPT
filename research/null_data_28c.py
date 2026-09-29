@@ -71,9 +71,24 @@ def make_null(kind: str, data: dict, seed: int, block: int = 48):
     n = len(close)
     log_ret = np.diff(np.log(np.maximum(close, 1e-12)), prepend=np.log(close[0]))
     r, v = block_bootstrap_series(log_ret, volume, block, rng)
-    out = _rebuild_bars(close[0], r, v, rng)
-    out['timestamp'] = list(data['timestamp'])
-    return out
+    # The iid null is the frozen control: every "the search harvests noise"
+    # artifact was measured against it, and its reported Sharpe is quoted in
+    # the write-ups. It is rebuilt here EXACTLY as it was before _rebuild_bars
+    # existed, so those artifacts still reproduce.
+    #
+    # Routing iid through the shifted reconstruction instead changed the price
+    # path and moved the re-scored lockbox Sharpe by up to 0.36, which is large
+    # enough to change a median. That is the same failure as moving a
+    # benchmark: the control stayed the same NAME while becoming a different
+    # experiment. The new reconstruction is only safe for the diagnostic nulls,
+    # which were introduced alongside it.
+    new_close = np.maximum(close[0] * np.exp(np.cumsum(r)), 1e-12)
+    prev = np.concatenate(([new_close[0]], new_close[:-1]))
+    open_ = np.where(rng.random(n) < 0.5, prev, new_close)
+    hi = np.maximum(open_, new_close) * (1.0 + rng.random(n) * 0.004)
+    lo = np.minimum(open_, new_close) * (1.0 - rng.random(n) * 0.004)
+    return {'open': open_, 'high': hi, 'low': lo, 'close': new_close,
+            'volume': np.maximum(v, 0.0), 'timestamp': list(data['timestamp'])}
 
 
 def permute_cross_sectional(data_by_coin: dict, coins: list, seed: int) -> dict:
