@@ -143,6 +143,86 @@ separate the two spreads; see the tool's output for the ratio.
   is +/-1.38 on the entire contract used in full. Resolving a Sharpe of 0.5
   from zero needs 15.4 years.
 
+
+## Addendum: the random-formula probe, which reframes the whole result
+
+A reduced grammar 262x smaller did not close the real-vs-null gap. Before
+concluding "search freedom is not the binding constraint", a cheaper
+explanation had to be ruled out: that the position construction is mildly
+profitable for almost any input, so the GA only picks the least bad member
+and the real-vs-null gap is a red herring about scoring.
+
+`research/probe_random_formulas_28c.py` evaluates random reduced-grammar
+formulas through the exact `evaluate()` path the GA uses, with no search, no
+selection and no reward. 400 formulas per dataset, lockbox 26720-35553:
+
+| dataset | n | median | p90 | max | positive |
+|---|---|---|---|---|---|
+| real (`none`) | 400 | **-5.491** | -0.562 | +2.238 | 6% |
+| `iid` | 400 | **-6.902** | -1.051 | +2.455 | 6% |
+| `iid1` | 400 | -8.564 | -1.741 | +2.990 | 5% |
+| `iidw` | 400 | -10.041 | -1.833 | +3.439 | 4% |
+| `iidg` | 400 | -8.535 | -1.249 | +5.198 | 6% |
+
+**Random formulas are strongly negative, not mildly positive. The
+"everything is profitable" explanation is ruled out.** Only 4-6% of random
+formulas are positive at all, and the population median is -5.5 on real data
+and -6.9 on the null.
+
+So the search really is selecting, and this is where the numbers land:
+
+| | GA best-of-3200 (median over 10 runs) | random population median | lift |
+|---|---|---|---|
+| real | -0.317 | -5.491 | **+5.17** |
+| `iid` null | +0.822 | -6.902 | **+7.72** |
+
+The search lifts a population centred near -6 to roughly 0, on both real and
+null data. That is a selection effect of about 5 to 8 Sharpe units, and it is
+the dominant term in every number this framework has produced. The
+real-minus-null difference of -1.03 to -1.14 is a second-order perturbation
+sitting on top of a first-order artifact roughly five times larger.
+
+### What this means for every number in this project
+
+1. **The absolute Sharpe level carries no information about edge.** A reported
+   +0.8 lockbox Sharpe is what you get from 3200 draws of a population whose
+   median is -6. Reporting it as a candidate score is meaningless on its own.
+2. **Only a real-minus-null difference is even a candidate signal**, and that
+   difference is not significant at n=10 (p = 0.13 to 0.26), with 24% power.
+3. The diagnostic nulls are ordered by how hard they make the search's job:
+   `iidw` (-10.0) > `iid1`/`iidg` (-8.5) > `iid` (-6.9) > real (-5.5). Every
+   diagnostic mode pushes the random population DOWN, i.e. the search has less
+   to exploit, because the properties that the `iid` null preserves are the
+   ones the search was exploiting. That is consistent with the fat-tail and
+   volatility-clustering reading above, and it is now measured rather than
+   hypothesised.
+
+### The corrected bottom line
+
+The framework's reported Sharpe is approximately `random population median
+(about -6) + selection effect (about +5 to +8)`. The selection effect is
+applied to the null and the real data almost equally, because it is a
+property of the search, not of the data. **The search is a Sharpe
+manufacturing machine whose output is dominated by its own selection bias, and
+that bias is roughly five times larger than any real-vs-null difference this
+contract is capable of resolving.**
+
+This does not change the gate verdict, which was already failing everything.
+It changes why: the gate was passing nothing because the input to it is not
+measuring what it is meant to measure.
+
+### Implementation notes for anyone extending this
+
+- `GA.GRAMMAR` is a module global set only inside `main()`. Importing the
+  module leaves it at `'full'`, so a reduced formula is silently routed to the
+  full evaluator and computes a *different function*. Any caller outside
+  `main()` must set it.
+- `load_data` returns the 8-hour **settlement mask** as its fourth value, not
+  per-coin rates. Per-coin real rates come from
+  `load_real_funding(c, np.asarray(common, dtype=np.int64))`. Passing the mask
+  where the dict is expected raises `IndexError`; passing `None` silently
+  reverts to the superseded flat rate.
+
 ## What to do next, and what not to do
 
 Do **not** shrink the grammar further. It is not the binding constraint, and a
