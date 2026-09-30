@@ -210,7 +210,8 @@ def stage_iterate(loop, args, cycle, null=None):
     cmd = (f'"{PY}" research/ga_28c_30m_3y.py --mode {args.mode} '
            f'--grammar {args.grammar} --generations {args.generations} '
            f'--population {args.population} --seed {args.seed + cycle} '
-           f'--funding real --out "{out}"'
+           f'--funding real --reward-version {args.reward_version} '
+           f'--out "{out}"'
            + (f" --null {null}" if null else ""))
     rc, sout, dt = sh(cmd, timeout=args.stage_timeout)
     tail = "\n".join(l for l in sout.splitlines()[-10:] if "warn" not in l.lower())
@@ -301,6 +302,13 @@ def main() -> int:
     ap.add_argument("--grammar", choices=["full", "reduced"], default="reduced")
     ap.add_argument("--mode", choices=["standard", "walkforward"],
                     default="walkforward")
+    ap.add_argument("--reward-version", default="v1", choices=("v1", "v2", "v3"),
+                    help="v1 absolute Sharpe (historical). v2 adds a breadth "
+                         "term. v3 additionally rewards EXCESS over a constant "
+                         "levered long, which is what the accept gate actually "
+                         "tests. v1 and v2 optimise a different objective from "
+                         "the gate, so they search for something the gate then "
+                         "rejects for a reason the search never saw.")
     ap.add_argument("--with-null", action="store_true",
                     help="also run the search against the frozen iid null")
     ap.add_argument("--dry-run", action="store_true")

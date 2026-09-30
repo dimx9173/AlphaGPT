@@ -335,7 +335,7 @@ GAP_TAU = 1.0
 LEG_FLOOR = 0.0
 
 def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
-                 breadth=None, version='v1'):
+                 breadth=None, version='v1', excess=None):
     """Turn raw split diagnostics into a selection score.
 
     psh is this split's own portfolio Sharpe; psh_peer is the other selection
@@ -365,12 +365,28 @@ def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
             - 0.30 * gap
             - 0.02 * mean_turn
             - 0.10 * softplus((LEG_FLOOR - min_leg) / 0.5))
-    if version == 'v1' or breadth is None:
+    if version == 'v1':
         return base
-    # Shortfall against the gate's own requirement, charged superlinearly so a
-    # strategy that merely averages positive is not mistaken for a broad one.
     short = max(0.0, BREADTH_TARGET - breadth)
-    return base - 2.0 * short
+    base = base - 2.0 * short
+    if version == 'v2' or excess is None:
+        return base
+    # v3: charge the search for what the ACCEPT GATE actually tests.
+    #
+    # v1 and v2 reward absolute Sharpe. The gate tests EXCESS over a constant
+    # levered long on the same bars. Those are different objectives and nothing
+    # connected them, so the search maximised the wrong thing for two full
+    # iterations: it pushed absolute Sharpe up, which on this universe means
+    # matching drift, while the gate kept rejecting every result for failing to
+    # beat the hold.
+    #
+    # Weight is 0.30 against the 0.10 already applied to the worst split, so
+    # beating the hold is worth roughly three times as much as a one-Sharpe
+    # improvement in absolute terms. It is a reward, not a hard constraint: a
+    # formula that is short and loses is still scored on its own legs, and the
+    # null companion is what says whether v3 found anything or merely learned
+    # to look like a long.
+    return base + 0.30 * excess
 
 
 def mean_act_guard(mean_turn):
@@ -450,7 +466,8 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
     else:
         breadth = sum(x > 0 for x in leg_sh) / len(leg_sh) if leg_sh else 0.0
         reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
-                              breadth=breadth, version=reward_version)
+                              breadth=breadth, version=reward_version,
+                              excess=active_sh)
     return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd,
             'buy_and_hold_sharpe': bh_sh, 'excess_sharpe_vs_buy_and_hold': active_sh,
             'mean_position': float(np.mean([float(np.mean(p[start:end])) for c in COINS_28C])) if COINS_28C else 0.0, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
@@ -570,7 +587,7 @@ def seed_formulas():
 def main():
     ap=argparse.ArgumentParser(); ap.add_argument('--generations',type=int,default=20); ap.add_argument('--population',type=int,default=32); ap.add_argument('--seed',type=int,default=42); ap.add_argument('--out',type=Path,default=ROOT/'results'/'ga_28c_30m_3y.json'); ap.add_argument('--funding',choices=('constant','real'),default='real',help='constant reproduces the historical equity-compound-v2 assumption; real uses recorded Binance funding. Default is real because the constant is known to overstate the rate ~16x and to invert the sign on ~30%% of events.'); ap.add_argument('--null',choices=('none','iid','xsec','iid1','iidw','iidg'),default='none',help='iid: block-bootstrapped returns and volume per coin, no real edge. '
      'xsec: each coin paired with a neighbour bars. Both are false-positive '
-     'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
+     'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2','v3'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
      'walkforward: expanding folds, one selection pass per validation window, '
      'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); args=ap.parse_args()
     global GRAMMAR
