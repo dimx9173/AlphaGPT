@@ -249,6 +249,24 @@ def stage_accept(loop, args, out_path):
             "to comparing against zero.")
     rec["beats_buy_and_hold"] = bool(
         rec["excess"] is not None and rec["excess"] > 0.0)
+    # A book that sits at the position cap IS the benchmark. Its excess is
+    # whatever the lag and smoother cost, which can land slightly positive, and
+    # `excess > 0` alone would read that as the search beating the passive hold.
+    # One of the ten iterations in this experiment did exactly that: mean
+    # position 0.2498 against a cap of 0.25, Sharpe within 0.0006 of the hold.
+    # A strategy that discovered nothing scores buy-and-hold by construction,
+    # so a result that reproduces the benchmark is not a pass.
+    cap = 0.25
+    mp = rec.get("mean_position")
+    rec["is_benchmark_replica"] = bool(
+        mp is not None and abs(abs(mp) - cap) < 0.01)
+    rec["beats_buy_and_hold"] = bool(
+        rec["beats_buy_and_hold"] and not rec["is_benchmark_replica"])
+    if rec["is_benchmark_replica"]:
+        rec["reject_reason"] = (
+            f"mean position {mp:+.4f} is the position cap {cap}: this book is a "
+            f"constant levered long, not a strategy. Its excess of "
+            f"{rec['excess']:+.4f} is the cost of the lag and smoother, not edge.")
     rec["gate_verdict"] = art.get("gate", {}).get("verdict") if isinstance(
         art.get("gate"), dict) else art.get("gate_verdict")
     loop.stage("accept", "(in-process)", 0, json.dumps(rec, indent=1)[:1500],
