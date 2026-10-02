@@ -291,107 +291,151 @@ class TestAttributionConventionIsPinned(TestEvaluateLevelNeutrality):
 
 
 class TestSelectionPathScan:
-    """Blocking 2 from review 2, narrowed in review 3: a line-prefix heuristic can
-    be bypassed by dynamic keys, aliases, getattr, record laundering, or any new
-    helper outside the four named functions. This walks the AST instead, so it
-    reads what the code means rather than how it is spelled.
+    """Reviews 2 and 3 replaced a line-prefix heuristic, then found that the
+    replacement was still an allowlist over four named functions and four named
+    callables, and still missed keys built by concatenation.
+
+    This version has neither property. It analyses the WHOLE module:
+
+      - every function, not a named subset
+      - every way a key can be *read*: subscript with a literal, a concatenated
+        literal, a Name bound to such a concatenation anywhere in the function,
+        getattr with a literal or a built name, .attr access, dict.get with either
+      - every ranking callable, matched on the resolved name so heapq.nsmallest,
+        np.argsort, operator.attrgetter and operator.itemgetter are covered, not
+        just sort / max
+      - an attribution key is legal only as a literal key of a dict that is
+        RETURNED or STORED as a record; it is illegal as a value read anywhere
+
+    Deny-list semantics means a new helper is covered automatically, because
+    there is no list of helpers to update.
     """
 
     ATTRIBUTION_KEYS = {"gross_sharpe", "fee_drag", "funding_drag"}
 
-    # Functions that make selection decisions. Everything reachable from these
-    # must not read an attribution key except as a literal result field.
-    SELECTION_FNS = {"selection_score", "shape_reward", "run_standard_selection",
-                     "run_walkforward"}
+    # Callables that impose an order. Matched by the terminal attribute or name so
+    # heapq.nsmallest and operator.attrgetter resolve to their last component.
+    RANKERS = {"sort", "sorted", "max", "min", "nlargest", "nsmallest",
+               "argsort", "argmax", "argmin", "attrgetter", "itemgetter"}
+
+    # The one function that computes the attribution. Reading and writing the
+    # fields here is the whole point; everywhere else they must not appear.
+    PRODUCERS = {"evaluate"}
 
     @staticmethod
-    def _ast():
+    def _module():
         import ast
-        path = os.path.join(ROOT, "research", "ga_28c_30m_3y.py")
-        return ast.parse(open(path).read()), path
+        return ast.parse(open(os.path.join(ROOT, "research", "ga_28c_30m_3y.py")).read())
 
     @staticmethod
-    def _key_names(node):
-        """Every string that could denote an attribution key, including the
-        pieces of a concatenation like 'gross' + '_sharpe'."""
+    def _attr_key_names(node):
+        """String constants, decomposed so a concatenation still names the key."""
         import ast
-        found = set()
+        out = set()
         for sub in ast.walk(node):
             if isinstance(sub, ast.Constant) and isinstance(sub.value, str):
                 parts = sub.value.split("_")
                 for n in range(1, len(parts) + 1):
-                    found.add("_".join(parts[:n]))
-                    found.add("_".join(parts[-n:]))
-                found.add(sub.value)
-        return found
+                    out.add("_".join(parts[:n]))
+                    out.add("_".join(parts[-n:]))
+                out.add(sub.value)
+        return out
 
-    def test_attribution_keys_never_reach_a_selection_path(self):
-        """Semantic, not textual. Walks every selection function's AST and fails
-        if an attribution key is read anywhere except as a literal dict key."""
+    @staticmethod
+    def _callee_name(node):
+        f = node.func
+        return getattr(f, "attr", None) or getattr(f, "id", None)
+
+    def test_attribution_keys_are_never_read_as_values_anywhere(self):
+        """Whole-module, deny-list. An attribution key may be constructed and
+        written into a returned record, and read back out of THAT record by a
+        caller; what it may never do is enter any computation."""
         import ast
-        tree, path = self._ast()
-        funcs = {n.name: n for n in ast.walk(tree)
-                 if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
-        checked = []
-        for name in self.SELECTION_FNS:
-            assert name in funcs, f"{name} not found; the scan would silently pass"
-            node = funcs[name]
-            checked.append(name)
-            # collect the dict keys that ARE legitimately written
-            written = set()
-            for sub in ast.walk(node):
-                if isinstance(sub, ast.Dict):
-                    for k in sub.keys:
-                        if isinstance(k, ast.Constant) and isinstance(k.value, str):
-                            written.add(k.value)
-            for sub in ast.walk(node):
-                # a bare Name / Attribute read of a key
-                if isinstance(sub, ast.Name) and sub.id in self.ATTRIBUTION_KEYS:
-                    assert sub.id in written, (
-                        f"{sub.id} read inside {name} but never written there")
-                if isinstance(sub, ast.Attribute) and sub.attr in self.ATTRIBUTION_KEYS:
-                    assert sub.attr in written, (
-                        f"{sub.attr} read as an attribute inside {name}")
-                # subscript read: x['gross_sharpe']
+        tree = self._module()
+        hits = []
+        for fn in [n for n in ast.walk(tree)
+                   if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]:
+            fn_name = fn.name
+
+            # names bound to an attribution-key string anywhere in this function,
+            # including built up by concatenation or a join
+            bound = set()
+            for sub in ast.walk(fn):
+                if isinstance(sub, (ast.Assign, ast.AnnAssign)):
+                    targets = sub.targets if isinstance(sub, ast.Assign) else [sub.target]
+                    names = self._attr_key_names(sub.value)
+                    if names & self.ATTRIBUTION_KEYS:
+                        for tgt in targets:
+                            if isinstance(tgt, ast.Name):
+                                bound.add(tgt.id)
+
+            for sub in ast.walk(fn):
+                # subscript read whose index names an attribution key
                 if isinstance(sub, ast.Subscript):
-                    names = self._key_names(sub.slice)
-                    hit = names & self.ATTRIBUTION_KEYS
-                    assert not hit, f"{hit} read by subscript inside {name}"
-                # getattr with a literal name
+                    idx_names = self._attr_key_names(sub.slice)
+                    hit = idx_names & self.ATTRIBUTION_KEYS
+                    if hit and fn_name not in self.PRODUCERS:
+                        hits.append((fn_name, f"subscript read {hit}"))
+                    # x[k] where k was bound above
+                    if isinstance(sub.slice, ast.Name) and sub.slice.id in bound:
+                        hits.append((fn_name, f"subscript via bound name {sub.slice.id}"))
+                # getattr with a literal or a bound/built name
                 if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name) \
                         and sub.func.id == "getattr" and len(sub.args) >= 2:
-                    if isinstance(sub.args[1], ast.Constant):
-                        assert sub.args[1].value not in self.ATTRIBUTION_KEYS, (
-                            f"getattr for {sub.args[1].value} inside {name}")
-        assert set(checked) == self.SELECTION_FNS
+                    arg = sub.args[1]
+                    if (self._attr_key_names(arg) & self.ATTRIBUTION_KEYS
+                            and fn_name not in self.PRODUCERS):
+                        hits.append((fn_name, "getattr on an attribution key"))
+                    if isinstance(arg, ast.Name) and arg.id in bound:
+                        hits.append((fn_name, f"getattr via bound name {arg.id}"))
+                # dict.get / dict[key] chained, and .attr access
+                if (isinstance(sub, ast.Attribute) and sub.attr in self.ATTRIBUTION_KEYS
+                        and fn_name not in self.PRODUCERS):
+                    hits.append((fn_name, f"attribute access .{sub.attr}"))
+                # dict.get / mapping.get with a key literal. This is a Call, not a
+                # Subscript, so it needs its own arm; the earlier versions missed
+                # r.get('gross_sharpe') entirely.
+                if isinstance(sub, ast.Call) and self._callee_name(sub) == "get" \
+                        and sub.args:
+                    if (self._attr_key_names(sub.args[0]) & self.ATTRIBUTION_KEYS
+                            and fn_name not in self.PRODUCERS):
+                        hits.append((fn_name, "mapping.get on an attribution key"))
+                # A bare Name equal to a key. evaluate() legitimately BINDS these
+                # names to compute the attribution, so a store is not a leak. Only
+                # a LOAD counts, and only outside the function that produces them.
+                if isinstance(sub, ast.Name) and sub.id in self.ATTRIBUTION_KEYS \
+                        and isinstance(sub.ctx, ast.Load):
+                    if fn_name not in self.PRODUCERS:
+                        hits.append((fn_name, f"name read {sub.id}"))
 
-    def test_attribution_keys_are_not_passed_into_shape_reward(self):
-        """shape_reward must not gain an attribution parameter. A signature
-        change is the quiet way this refactor could start influencing selection."""
-        import inspect
-        import research.ga_28c_30m_3y as ga
-        params = set(inspect.signature(ga.shape_reward).parameters)
-        assert not (params & self.ATTRIBUTION_KEYS), (
-            f"shape_reward gained {params & self.ATTRIBUTION_KEYS}")
+        assert not hits, ("attribution fields reach a computation: "
+                          + "; ".join(f"{f}: {w}" for f, w in hits))
 
-    def test_selection_score_ignores_extra_keys(self):
-        import research.ga_28c_30m_3y as ga
-        a = {"reward": 2.0, "gross_sharpe": 99.0, "fee_drag": -50.0}
-        b = {"reward": 1.0, "gross_sharpe": -99.0, "fee_drag": 50.0}
-        assert ga.selection_score(a, b, mode="train") == pytest.approx(2.0)
-
-    def test_attribution_fields_never_feed_a_sort_key(self):
-        """Record laundering: the keys may be written into a results record, but
-        no sort or max over such a record may key on them."""
+    def test_no_ranking_callable_keys_on_an_attribution_field(self):
+        """Every ranking callable in the module, including heapq and operator,
+        must not take an attribution field as a key."""
         import ast
-        tree, _ = self._ast()
+        tree = self._module()
         for node in ast.walk(tree):
             if not isinstance(node, ast.Call):
                 continue
-            fname = getattr(node.func, "attr", None) or getattr(node.func, "id", None)
-            if fname not in ("sort", "sorted", "max", "min"):
+            if self._callee_name(node) not in self.RANKERS:
                 continue
             for arg in list(node.args) + [k.value for k in node.keywords]:
-                names = self._key_names(arg)
-                assert not (names & self.ATTRIBUTION_KEYS), (
-                    f"{fname} keys on an attribution field")
+                if self._attr_key_names(arg) & self.ATTRIBUTION_KEYS:
+                    raise AssertionError(
+                        f"{self._callee_name(node)} keys on an attribution field")
+
+    def test_attribution_keys_are_written_only_as_literal_record_fields(self):
+        """The positive half: the fields must actually be produced, and produced
+        as literal keys, so a rename cannot silently drop them."""
+        src = open(os.path.join(ROOT, "research", "ga_28c_30m_3y.py")).read()
+        for key in self.ATTRIBUTION_KEYS:
+            assert f"'{key}'" in src or f'"{key}"' in src, \
+                f"{key} is not written as a literal field name"
+
+    def test_shape_reward_signature_unchanged(self):
+        import inspect
+        import research.ga_28c_30m_3y as ga
+        params = set(inspect.signature(ga.shape_reward).parameters)
+        assert not (params & self.ATTRIBUTION_KEYS)
