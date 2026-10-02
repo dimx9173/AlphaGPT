@@ -19,6 +19,8 @@ import numpy as np
 import pytest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+_CURRENT_TREE = None
+MODULE_ALIASES = set()
 sys.path.insert(0, ROOT)
 
 from research import accounting_28c as A
@@ -322,23 +324,107 @@ class TestSelectionPathScan:
     # fields here is the whole point; everywhere else they must not appear.
     PRODUCERS = {"evaluate"}
 
+    # Callables that read a key out of a mapping. Each is a Call node, not a
+    # Subscript, so arming only Subscript misses all of them.
+    MAPPING_READERS = {"get", "pop", "setdefault", "getattr", "getitem"}
+
+    @staticmethod
+    def _loop_compares_key(call_node, fn_name, bound, tree):
+        """True if this items()/keys() call sits in a for-loop whose body tests the
+        loop variable, or any alias, for equality against an attribution key.
+
+        This is the laundering form: iterate a record and pick out a field by
+        name inside the loop, which no read arm sees because the field is only
+        named in the comparison.
+        """
+        import ast
+        if tree is None:
+            return False
+        for parent in ast.walk(tree):
+            if not isinstance(parent, ast.For):
+                continue
+            tgt = parent.target
+            names = set()
+            if isinstance(tgt, ast.Name):
+                names.add(tgt.id)
+            elif isinstance(tgt, ast.Tuple):
+                names |= {e.id for e in tgt.elts if isinstance(e, ast.Name)}
+            if not names:
+                continue
+            if not any(call_node is c for c in ast.walk(parent.iter)):
+                continue
+            for node in ast.walk(parent):
+                if not isinstance(node, ast.Compare):
+                    continue
+                sides = list(node.comparators) + [node.left]
+                has_var = any(isinstance(s, ast.Name) and s.id in names for s in sides)
+                has_key = any(TestSelectionPathScan._attr_key_names(s)
+                              & TestSelectionPathScan.ATTRIBUTION_KEYS for s in sides)
+                has_alias = any(isinstance(s, ast.Name) and s.id in bound for s in sides)
+                if has_var and (has_key or has_alias):
+                    return True
+        return False
+
     @staticmethod
     def _module():
         import ast
-        return ast.parse(open(os.path.join(ROOT, "research", "ga_28c_30m_3y.py")).read())
+        global MODULE_ALIASES, _CURRENT_TREE
+        tree = ast.parse(open(os.path.join(ROOT, "research", "ga_28c_30m_3y.py")).read())
+        _CURRENT_TREE = tree
+        aliases = set()
+        for node in tree.body:
+            if isinstance(node, (ast.Assign, ast.AnnAssign)):
+                targets = (node.targets if isinstance(node, ast.Assign) else [node.target])
+                if TestSelectionPathScan._attr_key_names(node.value) & \
+                        TestSelectionPathScan.ATTRIBUTION_KEYS:
+                    for tgt in targets:
+                        if isinstance(tgt, ast.Name):
+                            aliases.add(tgt.id)
+        MODULE_ALIASES = aliases
+        return tree
+
+    @staticmethod
+    def _literal_strings(node):
+        """Every string CONSTANT-FOLDED out of an expression.
+
+        ast.walk visits 'gross' and '_sharpe' as separate constants and never
+        reassembles them, which is exactly how r['gross'+'_sharpe'] slipped
+        through. This folds BinOp(+) and therefore any nesting of it, so the
+        concatenated form is seen whole.
+        """
+        import ast
+        if isinstance(node, ast.Constant):
+            return node.value if isinstance(node.value, str) else None
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+            left = TestSelectionPathScan._literal_strings(node.left)
+            right = TestSelectionPathScan._literal_strings(node.right)
+            if left is not None and right is not None:
+                return left + right
+            return None
+        if isinstance(node, ast.JoinedStr):
+            return "".join(v.value for v in node.values
+                           if isinstance(v, ast.Constant) and isinstance(v.value, str))
+        if isinstance(node, (ast.List, ast.Tuple)):
+            parts = [TestSelectionPathScan._literal_strings(e) for e in node.elts]
+            return [p for p in parts if p is not None] or None
+        return None
 
     @staticmethod
     def _attr_key_names(node):
-        """String constants, decomposed so a concatenation still names the key."""
+        """Key names reachable from an expression, including folded
+        concatenations and their underscore-delimited prefixes and suffixes."""
         import ast
         out = set()
         for sub in ast.walk(node):
-            if isinstance(sub, ast.Constant) and isinstance(sub.value, str):
-                parts = sub.value.split("_")
+            folded = TestSelectionPathScan._literal_strings(sub)
+            if folded is None:
+                continue
+            for s in ([folded] if isinstance(folded, str) else folded):
+                parts = s.split("_")
                 for n in range(1, len(parts) + 1):
                     out.add("_".join(parts[:n]))
                     out.add("_".join(parts[-n:]))
-                out.add(sub.value)
+                out.add(s)
         return out
 
     @staticmethod
@@ -352,14 +438,17 @@ class TestSelectionPathScan:
         caller; what it may never do is enter any computation."""
         import ast
         tree = self._module()
+        global _CURRENT_TREE
+        _CURRENT_TREE = tree
         hits = []
         for fn in [n for n in ast.walk(tree)
                    if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))]:
             fn_name = fn.name
 
-            # names bound to an attribution-key string anywhere in this function,
-            # including built up by concatenation or a join
-            bound = set()
+            # Names bound to an attribution-key string anywhere in this function
+            # AND every module-level alias, because a module constant is in scope
+            # inside every function and so is the cleanest laundering route.
+            bound = set(MODULE_ALIASES)
             for sub in ast.walk(fn):
                 if isinstance(sub, (ast.Assign, ast.AnnAssign)):
                     targets = sub.targets if isinstance(sub, ast.Assign) else [sub.target]
@@ -368,6 +457,7 @@ class TestSelectionPathScan:
                         for tgt in targets:
                             if isinstance(tgt, ast.Name):
                                 bound.add(tgt.id)
+            # a local named by a parameter default or an f-string is covered above
 
             for sub in ast.walk(fn):
                 # subscript read whose index names an attribution key
@@ -376,9 +466,10 @@ class TestSelectionPathScan:
                     hit = idx_names & self.ATTRIBUTION_KEYS
                     if hit and fn_name not in self.PRODUCERS:
                         hits.append((fn_name, f"subscript read {hit}"))
-                    # x[k] where k was bound above
+                    # x[k] where k is a bound local OR a module-level alias
                     if isinstance(sub.slice, ast.Name) and sub.slice.id in bound:
                         hits.append((fn_name, f"subscript via bound name {sub.slice.id}"))
+
                 # getattr with a literal or a bound/built name
                 if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name) \
                         and sub.func.id == "getattr" and len(sub.args) >= 2:
@@ -392,14 +483,38 @@ class TestSelectionPathScan:
                 if (isinstance(sub, ast.Attribute) and sub.attr in self.ATTRIBUTION_KEYS
                         and fn_name not in self.PRODUCERS):
                     hits.append((fn_name, f"attribute access .{sub.attr}"))
-                # dict.get / mapping.get with a key literal. This is a Call, not a
-                # Subscript, so it needs its own arm; the earlier versions missed
-                # r.get('gross_sharpe') entirely.
-                if isinstance(sub, ast.Call) and self._callee_name(sub) == "get" \
-                        and sub.args:
-                    if (self._attr_key_names(sub.args[0]) & self.ATTRIBUTION_KEYS
-                            and fn_name not in self.PRODUCERS):
-                        hits.append((fn_name, "mapping.get on an attribution key"))
+                # Every mapping-read callable, not just get. Each of these is a
+                # Call rather than a Subscript, and arming only `get` is how
+                # r.pop, r.setdefault and operator.getitem slipped through.
+                if isinstance(sub, ast.Call):
+                    reader = self._callee_name(sub)
+                    # items()/keys()/values() take NO key argument, so this arm
+                    # must not require sub.args; requiring it is exactly how the
+                    # laundering form slipped through.
+                    if reader in self.MAPPING_READERS and sub.args:
+                        if (self._attr_key_names(sub.args[0]) & self.ATTRIBUTION_KEYS
+                                and fn_name not in self.PRODUCERS):
+                            hits.append((fn_name,
+                                         f"{reader} on an attribution key"))
+                    # operator.getitem(obj, 'key') takes the object first
+                    if reader == "getitem" and len(sub.args) >= 2:
+                        if (self._attr_key_names(sub.args[1]) & self.ATTRIBUTION_KEYS
+                                and fn_name not in self.PRODUCERS):
+                            hits.append((fn_name, "operator.getitem on an attribution key"))
+                    # r.items() / r.keys() / r.values() loops whose body compares
+                    # the loop variable against a key: the laundering form
+                    if reader in ("items", "keys"):
+                        if self._loop_compares_key(sub, fn_name, bound, _CURRENT_TREE):
+                            hits.append((fn_name,
+                                         f"{reader}() loop naming an attribution key"))
+                # Any call taking a bound alias or module alias as an argument.
+                # This is the laundering route: K = 'gross_sharpe' at module level
+                # or locally, then some_reader(x, K).
+                if isinstance(sub, ast.Call):
+                    for a in list(sub.args) + [k.value for k in sub.keywords]:
+                        if isinstance(a, ast.Name) and a.id in bound \
+                                and fn_name not in self.PRODUCERS:
+                            hits.append((fn_name, f"call arg via alias {a.id}"))
                 # A bare Name equal to a key. evaluate() legitimately BINDS these
                 # names to compute the attribution, so a store is not a leak. Only
                 # a LOAD counts, and only outside the function that produces them.
