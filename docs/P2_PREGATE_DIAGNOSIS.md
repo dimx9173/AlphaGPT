@@ -15,8 +15,22 @@ Real-arm holdout Sharpe, pre-PRP-0 versus post-PRP-0:
 | 104 | -1.682 | +3.483 |
 
 positive_coins median went 0/28 -> 26/28.
-Closing the validation leak was worth roughly 8 Sharpe, so the earlier negative
-batches were partly an artifact of selecting on a window read 3,600 times.
+Closing the validation leak moved this holdout by roughly 8 Sharpe, seed for seed
+on the same window.
+
+What that number is and is not. It measures how much of the earlier negative
+result was an artifact of selecting on a window that had been read 3,600 times.
+It does NOT measure an improvement in strategy quality, and the fold-level
+numbers say so:
+
+    P2 validation Sharpe positive in             38/90 folds
+    P2 holdout excess over buy-and-hold positive in  0/10
+
+A pre/post comparison of the two walkforward batches is not usable here: they
+differ in fold count (30 vs 90), window length (144 days vs 63 days) and fold
+layout, and the post-fix batch has a worse median validation Sharpe (-1.033
+against -0.115). That is confounded so no claim is made from it, but it is why
+the 8 Sharpe should not be read as the strategy getting better.
 
 ## 2. What the search actually found: beta
 

@@ -21,6 +21,14 @@ Measured effect on the P2 batch: real-arm holdout Sharpe moved from -4.87 / -4.1
 to +3.31 / +3.66 on seeds 101 and 102, and `positive_coins` median from 0/28 to
 26/28. Roughly 8 Sharpe.
 
+That figure measures how much of the earlier negative result was an artifact of
+selecting on a window read 3,600 times. It is not an improvement in strategy
+quality: in the same batch, validation Sharpe is positive in 38/90 folds and
+excess over buy-and-hold on the holdout is positive in 0/10. A pre/post
+comparison against the old walkforward batch is confounded (different fold count
+and window length) and its post-fix median validation Sharpe is worse, so no
+claim is made from it.
+
 ## Prerequisite PRP-4: cost attribution
 
 Salvaged from PRP-3's F3 after PRP-3 was rejected. Six review rounds, final PASS,
