@@ -1,0 +1,10 @@
+{
+  "feature": "cost-attribution-logging",
+  "phase": "plan",
+  "history": [
+    {
+      "phase": "start",
+      "note": "salvaged from PRP-3 F3 after its NO-GO"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "feature": "joint-param-search",
+  "phase": "verify",
+  "tasks": [],
+  "review": null,
+  "verify": null,
+  "history": [
+    {
+      "phase": "start",
+      "note": "created after negative meter-repair pilot (docs/GA_SEARCH_RELIABILITY_2026-10-01.md)"
+    },
+    {
+      "phase": "verify",
+      "note": "NO-GO on preconditions; see ranking-quality measurement in research/measure_reward_ranking_quality.py"
+    }
+  ],
+  "verdict": "NO-GO",
+  "blocking": [
+    "R1/R2/R3 pre-gate: formula-only baseline loses to null. Measured gap -3.355 pre-PRP-0; the P2 pre-gate batch is still running but the ranking-quality measurement is already decisive.",
+    "Ranking quality gap = -0.0214. The score ranks holdout Sharpe equally well on real (+0.8545) and null (+0.8758) data, so it is ranking a property the synthetic world supplies for free. Joint search expands the space the search can exploit that property, so it should WIDEN the negative gap, not close it.",
+    "R5 null calibration: --null iid destroys the autocorrelation that cooldown and hold-time parameters exploit, so the iid arm cannot calibrate the execution-parameter space at all."
+  ]
+}

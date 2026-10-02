@@ -465,6 +465,7 @@ def mean_act_guard(mean_turn):
 def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None):
     grammar=resolve_grammar(formula,grammar)
     leg_net = []; leg_sh = []; leg_turn = []; leg_ic = []; activity = []; leg_bh = []
+    leg_gross = []; leg_fee = []; leg_fund = []   # PRP-4 cost attribution
     timestamps = bars[start:end]
     for c in COINS_28C:
         sig = formula_signal(formula, maps, c, grammar=grammar)
@@ -495,8 +496,15 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
             fnd = np.asarray(funding_by_coin[c], dtype=np.float64)[start:end]
         else:
             fnd = funding_mask[start:end] * FUND_RATE
-        net = accounting_bar_returns(pos, r, FEE, fnd, LEV)
+        # PRP-4: capture the cost components the accounting already computes, so
+        # the run can report where its Sharpe came from. Purely additive; the
+        # returned net is the same array the search already scored.
+        comp = {}
+        net = accounting_bar_returns(pos, r, FEE, fnd, LEV, out=comp)
         leg_net.append(net)
+        leg_gross.append(comp['gross'])
+        leg_fee.append(comp['fee'])
+        leg_fund.append(comp['funding_cost'])
         # The same window, the same book, held flat and long at the position
         # cap. A constant +1 never trades, so it pays no turnover fee.
         leg_bh.append(accounting_bar_returns(
@@ -510,6 +518,18 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
     pnet = np.mean(np.stack(leg_net), axis=0)
     pm = metrics(pnet, timestamps)
     psh = pm['sharpe']
+    # PRP-4: chained cost attribution. Sharpe is nonlinear, so "fee drag" only
+    # has meaning under a stated convention. This one is fixed and not
+    # parameterised: fee first, then funding, matching the gross - fee -
+    # funding_cost order inside accounting_bar_returns. The two drags therefore
+    # sum back to gross - net by construction, which is what C1 checks.
+    pgross = np.mean(np.stack(leg_gross), axis=0)
+    pfee = np.mean(np.stack(leg_fee), axis=0)
+    pfund = np.mean(np.stack(leg_fund), axis=0)
+    gross_sharpe = metrics(pgross, timestamps)['sharpe']
+    mid_sharpe = metrics(pgross - pfee, timestamps)['sharpe']
+    fee_drag = gross_sharpe - mid_sharpe
+    funding_drag = mid_sharpe - psh
     # The reported Sharpe is measured against ZERO, which is not a benchmark
     # anyone can hold. On this universe a constant long has a Sharpe of its
     # own, because crypto drifted, and it was worth +1.05 net over the lockbox
@@ -546,7 +566,10 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
                           excess=active_sh) + activity_penalty
     return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd,
             'buy_and_hold_sharpe': bh_sh, 'excess_sharpe_vs_buy_and_hold': active_sh,
-            'mean_position': float(np.mean([float(np.mean(p[start:end])) for c in COINS_28C])) if COINS_28C else 0.0, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
+            'mean_position': float(np.mean([float(np.mean(p[start:end])) for c in COINS_28C])) if COINS_28C else 0.0, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent'],
+             # PRP-4 additive; shape_reward never reads these.
+             'gross_sharpe': gross_sharpe, 'fee_drag': fee_drag,
+             'funding_drag': funding_drag}
 def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
                      folds, rng, scale_end_hint):
     """Run the search fold by fold.

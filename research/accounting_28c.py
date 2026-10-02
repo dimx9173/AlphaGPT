@@ -105,6 +105,7 @@ def accounting_bar_returns(
     fee_rate: float,
     funding_rate: np.ndarray,
     leverage: float = 2.0,
+    out: dict | None = None,
 ) -> np.ndarray:
     """
     Single-leg bar returns with compounding convention.
@@ -113,6 +114,16 @@ def accounting_bar_returns(
     fee_rate: per-side fee rate (e.g., 0.0004)
     funding_rate: funding rate per bar (sparse, from scheduled_funding_rates)
     leverage: leverage multiplier
+    out: optional dict that receives the gross, fee and funding components.
+
+    PRP-4. The components were always computed here and discarded; only `net`
+    left the function, so every Sharpe on the search path is net of costs and
+    nothing could say how much of a run is price movement versus accounting.
+
+    `out` is additive. When it is None the executed statements and their order
+    are exactly as before, and the returned array is bit-identical. That matters
+    because roughly twenty callers across research/, tools/ and tests/ pass no
+    `out`, and the search selects on the resulting values.
     """
     # Validate inputs
     if not np.all(np.isfinite(position)) or not np.all(np.isfinite(asset_return)) or not np.all(np.isfinite(funding_rate)):
@@ -132,6 +143,10 @@ def accounting_bar_returns(
     funding_cost = position * funding_rate * leverage
     
     net = gross - fee - funding_cost
+    if out is not None:
+        out["gross"] = gross
+        out["fee"] = fee
+        out["funding_cost"] = funding_cost
     return net
 
 

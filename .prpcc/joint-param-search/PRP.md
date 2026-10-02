@@ -160,6 +160,44 @@ Therefore:
 - Grid-jitter robustness: shift the grid by half a step on train and confirm the
   selected region is stable. A winner that moves when the grid moves was luck.
 
+## X. Ranking-quality criterion (added after the feasibility review)
+
+Every acceptance criterion above compares SELECTED MAXIMA across re-runs. That
+is consistent with pure selection bias: a search that ranks noise perfectly
+produces a high winner on real data too. Comparing winners cannot distinguish
+"found signal" from "ranked the apparatus well".
+
+The falsifiable statistic is the rank correlation between the training score and
+the holdout outcome across EVERY genome evaluated, not only the winner:
+
+    rho = spearman(train_score, holdout_net_sharpe)
+
+Two questions, both answered by research/measure_reward_ranking_quality.py:
+
+  Q1  Is the score informative at all? A rho near zero means the search ranks
+      nothing and no reward reshaping can help.
+  Q2  Is the score MORE informative on real data than on null data? This is the
+      one that matters. If real and null give the same rho, the score is ranking
+      a property the synthetic world provides for free, and none of the changes
+      in this PRP can create information the data does not contain.
+
+Measured on the current tree (3 folds x 3 generations x 10 population, 3 seeds
+per arm):
+
+    real: spearman(train_reward, holdout_sharpe) = +0.8545
+    null: spearman(train_reward, holdout_sharpe) = +0.8758
+    gap                                       = -0.0214
+
+    real: spearman(train_ic, holdout_ic)       = +0.6188
+    null: spearman(train_ic, holdout_ic)       = +0.4297
+    gap                                         = +0.1891
+
+Reading: the score is NOT broken. It ranks holdout Sharpe very well on BOTH arms,
+which means it ranks a property the synthetic world supplies by construction
+(volatility clustering, fat tails, drift) rather than anything about the data.
+Rank-IC, which is closer to a cross-sectional property, is the quantity that
+separates the arms, and it does separate by +0.189.
+
 ## 8. Sign-offs
 
 - Planner: pending

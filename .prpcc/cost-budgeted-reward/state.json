@@ -1,0 +1,24 @@
+{
+  "feature": "cost-budgeted-reward",
+  "phase": "verify",
+  "history": [
+    {
+      "phase": "start",
+      "note": "item 3 of 3; blocked on PRP-2"
+    },
+    {
+      "phase": "verify",
+      "note": "NO-GO on preconditions; see ranking-quality measurement in research/measure_reward_ranking_quality.py"
+    }
+  ],
+  "verdict": "NO-GO (with one salvageable item)",
+  "blocking": [
+    "The premise is inverted. accounting_bar_returns returns net = gross - fee - funding_cost, and evaluate() builds every leg from that net series, so portfolio_sharpe is ALREADY net. F1 is redundant.",
+    "F2 would DOUBLE-COUNT costs. Measured: 0.02*mean_turn spans 8.1e-05 to 1.4e-04 across the recorded runs, while 0.10*psh_worst spans 0.029 to 0.146. The turnover term is roughly three orders of magnitude smaller than the Sharpe term. It is a tie-breaker, not a cost model, and its second charge is arithmetically real but economically negligible.",
+    "The ordering claim P3 (must land after PRP-2) is false: turnover is priced inside every evaluation by the accounting regardless of reward version, and the terms are additively separable.",
+    "C2 (>=6/10 seeds v5 beats v4, no null arm) fires about 38% of the time under the null by coin flip, and observed seed variance (-4.87 to +0.64) dwarfs any reward-version effect. A pass would be luck-shaped."
+  ],
+  "salvageable": [
+    "F3 only: per-fold gross/net/fee/funding attribution as READ-ONLY logging. It makes no selection claim and costs nothing. It also directly tests the question that matters, namely where the Sharpe is actually going."
+  ]
+}

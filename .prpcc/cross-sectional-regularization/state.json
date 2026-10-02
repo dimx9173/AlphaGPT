@@ -1,0 +1,20 @@
+{
+  "feature": "cross-sectional-regularization",
+  "phase": "verify",
+  "history": [
+    {
+      "phase": "start",
+      "note": "item 2 of 3; blocked on P2 pre-gate"
+    },
+    {
+      "phase": "verify",
+      "note": "NO-GO on preconditions; see ranking-quality measurement in research/measure_reward_ranking_quality.py"
+    }
+  ],
+  "verdict": "NO-GO",
+  "blocking": [
+    "Same precondition failure as PRP-1: the pre-gate shows the search loses to null.",
+    "C1 (breadth 0 -> 14/28) passes by construction. A -2.0 breadth penalty forces positive_coins up with zero edge required, which is Goodhart farming: motion mistaken for progress while the real-null gap stays negative.",
+    "No mechanism by which a dispersion or breadth term favours real over null unless true signal exists, and the ranking-quality measurement says the current objective does not see that signal."
+  ]
+}
