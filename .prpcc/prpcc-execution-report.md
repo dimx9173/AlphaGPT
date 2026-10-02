@@ -19,7 +19,7 @@ Closed by selecting on the train reward alone, with the legacy key kept behind
 
 Measured effect on the P2 batch: real-arm holdout Sharpe moved from -4.87 / -4.14
 to +3.31 / +3.66 on seeds 101 and 102, and `positive_coins` median from 0/28 to
-26/28. Roughly 8 Sharpe.
+26.5/28. Roughly 8 Sharpe.
 
 That figure measures how much of the earlier negative result was an artifact of
 selecting on a window read 3,600 times. It is not an improvement in strategy
@@ -95,7 +95,7 @@ Why, from the PRP-0 diagnostics over 90 selection folds:
     median |overfit_gap|     0.7019
     median argmax_margin     0.0090      1.5% of the achievable reward range
     overfit_gap < 0          69/90
-    validation mean_ic = 0   32/90       while train mean_ic > 0 in 79/90
+    validation mean_ic = 0   20/90       while train mean_ic > 0 in 79/90
 
 A twelve-genome control separates two things that looked like one failure. Those
 random genomes score between -3.2161 and -0.4410, and the GA beats the best of

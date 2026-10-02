@@ -14,7 +14,7 @@ Real-arm holdout Sharpe, pre-PRP-0 versus post-PRP-0:
 | 103 | +0.641 | +3.069 |
 | 104 | -1.682 | +3.483 |
 
-positive_coins median went 0/28 -> 26/28.
+positive_coins median went 0/28 -> 26.5/28.
 Closing the validation leak moved this holdout by roughly 8 Sharpe, seed for seed
 on the same window.
 
