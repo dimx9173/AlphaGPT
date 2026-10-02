@@ -290,33 +290,108 @@ class TestAttributionConventionIsPinned(TestEvaluateLevelNeutrality):
             "cannot distinguish the two chains")
 
 
-class TestSelectionPathScan(TestEvaluateLevelNeutrality):
-    """Blocking 2 from review 2: a consumer ranking on gross_sharpe outside
-    evaluate() would pass every behavioural test. This scans the source instead.
+class TestSelectionPathScan:
+    """Blocking 2 from review 2, narrowed in review 3: a line-prefix heuristic can
+    be bypassed by dynamic keys, aliases, getattr, record laundering, or any new
+    helper outside the four named functions. This walks the AST instead, so it
+    reads what the code means rather than how it is spelled.
     """
 
-    def test_attribution_keys_never_reach_a_selection_path(self):
-        import re
-        src = open(os.path.join(ROOT, "research", "ga_28c_30m_3y.py")).read()
+    ATTRIBUTION_KEYS = {"gross_sharpe", "fee_drag", "funding_drag"}
 
-        # isolate the function bodies that make selection decisions
-        for fn in ("selection_score", "shape_reward", "run_standard_selection",
-                   "run_walkforward"):
-            i = src.index("def " + fn + "(")
-            j = src.find("\ndef ", i + 10)
-            body = src[i:j if j > 0 else len(src)]
-            for key in ("gross_sharpe", "fee_drag", "funding_drag"):
-                # allowed only as a pass-through into a results dict
-                for line in body.splitlines():
-                    stripped = line.strip()
-                    if key not in stripped:
-                        continue
-                    assert stripped.startswith("'") or stripped.startswith('"') \
-                        or stripped.startswith("'"), (
-                        f"{key} used in a non-literal context inside {fn}: {stripped}")
+    # Functions that make selection decisions. Everything reachable from these
+    # must not read an attribution key except as a literal result field.
+    SELECTION_FNS = {"selection_score", "shape_reward", "run_standard_selection",
+                     "run_walkforward"}
+
+    @staticmethod
+    def _ast():
+        import ast
+        path = os.path.join(ROOT, "research", "ga_28c_30m_3y.py")
+        return ast.parse(open(path).read()), path
+
+    @staticmethod
+    def _key_names(node):
+        """Every string that could denote an attribution key, including the
+        pieces of a concatenation like 'gross' + '_sharpe'."""
+        import ast
+        found = set()
+        for sub in ast.walk(node):
+            if isinstance(sub, ast.Constant) and isinstance(sub.value, str):
+                parts = sub.value.split("_")
+                for n in range(1, len(parts) + 1):
+                    found.add("_".join(parts[:n]))
+                    found.add("_".join(parts[-n:]))
+                found.add(sub.value)
+        return found
+
+    def test_attribution_keys_never_reach_a_selection_path(self):
+        """Semantic, not textual. Walks every selection function's AST and fails
+        if an attribution key is read anywhere except as a literal dict key."""
+        import ast
+        tree, path = self._ast()
+        funcs = {n.name: n for n in ast.walk(tree)
+                 if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))}
+        checked = []
+        for name in self.SELECTION_FNS:
+            assert name in funcs, f"{name} not found; the scan would silently pass"
+            node = funcs[name]
+            checked.append(name)
+            # collect the dict keys that ARE legitimately written
+            written = set()
+            for sub in ast.walk(node):
+                if isinstance(sub, ast.Dict):
+                    for k in sub.keys:
+                        if isinstance(k, ast.Constant) and isinstance(k.value, str):
+                            written.add(k.value)
+            for sub in ast.walk(node):
+                # a bare Name / Attribute read of a key
+                if isinstance(sub, ast.Name) and sub.id in self.ATTRIBUTION_KEYS:
+                    assert sub.id in written, (
+                        f"{sub.id} read inside {name} but never written there")
+                if isinstance(sub, ast.Attribute) and sub.attr in self.ATTRIBUTION_KEYS:
+                    assert sub.attr in written, (
+                        f"{sub.attr} read as an attribute inside {name}")
+                # subscript read: x['gross_sharpe']
+                if isinstance(sub, ast.Subscript):
+                    names = self._key_names(sub.slice)
+                    hit = names & self.ATTRIBUTION_KEYS
+                    assert not hit, f"{hit} read by subscript inside {name}"
+                # getattr with a literal name
+                if isinstance(sub, ast.Call) and isinstance(sub.func, ast.Name) \
+                        and sub.func.id == "getattr" and len(sub.args) >= 2:
+                    if isinstance(sub.args[1], ast.Constant):
+                        assert sub.args[1].value not in self.ATTRIBUTION_KEYS, (
+                            f"getattr for {sub.args[1].value} inside {name}")
+        assert set(checked) == self.SELECTION_FNS
+
+    def test_attribution_keys_are_not_passed_into_shape_reward(self):
+        """shape_reward must not gain an attribution parameter. A signature
+        change is the quiet way this refactor could start influencing selection."""
+        import inspect
+        import research.ga_28c_30m_3y as ga
+        params = set(inspect.signature(ga.shape_reward).parameters)
+        assert not (params & self.ATTRIBUTION_KEYS), (
+            f"shape_reward gained {params & self.ATTRIBUTION_KEYS}")
 
     def test_selection_score_ignores_extra_keys(self):
         import research.ga_28c_30m_3y as ga
         a = {"reward": 2.0, "gross_sharpe": 99.0, "fee_drag": -50.0}
         b = {"reward": 1.0, "gross_sharpe": -99.0, "fee_drag": 50.0}
         assert ga.selection_score(a, b, mode="train") == pytest.approx(2.0)
+
+    def test_attribution_fields_never_feed_a_sort_key(self):
+        """Record laundering: the keys may be written into a results record, but
+        no sort or max over such a record may key on them."""
+        import ast
+        tree, _ = self._ast()
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            fname = getattr(node.func, "attr", None) or getattr(node.func, "id", None)
+            if fname not in ("sort", "sorted", "max", "min"):
+                continue
+            for arg in list(node.args) + [k.value for k in node.keywords]:
+                names = self._key_names(arg)
+                assert not (names & self.ATTRIBUTION_KEYS), (
+                    f"{fname} keys on an attribution field")
