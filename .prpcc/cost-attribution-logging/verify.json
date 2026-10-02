@@ -1,0 +1,8 @@
+{
+  "review_verdict_PASS": true,
+  "tests_green": true,
+  "evaluate_untouched": true,
+  "fields_absent_from_ga": true,
+  "preexisting_unchanged": true,
+  "frapc_in_sync": true
+}

@@ -1,10 +1,27 @@
 {
   "feature": "cost-attribution-logging",
-  "phase": "plan",
+  "phase": "verified",
   "history": [
     {
       "phase": "start",
       "note": "salvaged from PRP-3 F3 after its NO-GO"
+    },
+    {
+      "phase": "review",
+      "note": "6 rounds; rounds 1-5 found real gaps in a source scan, round 6 PASS after the structural fix"
+    },
+    {
+      "phase": "verify",
+      "note": "6/6 gates green"
     }
-  ]
+  ],
+  "verdict": "PASS",
+  "verify": {
+    "review_verdict_PASS": true,
+    "tests_green": true,
+    "evaluate_untouched": true,
+    "fields_absent_from_ga": true,
+    "preexisting_unchanged": true,
+    "frapc_in_sync": true
+  }
 }

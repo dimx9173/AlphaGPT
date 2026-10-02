@@ -346,7 +346,7 @@ absence let the zero-funding defect through.
 # ADDENDUM 2026-09-27 — remote paper P&L was an accounting artifact. Real result is a loss.
 
 ## What the remote paper run was reporting
-`frapc` `brian@178.105.232.221` ran `5 * * * *` hourly, writing
+`frapc` `brian@100.71.177.25` ran `5 * * * *` hourly, writing
 `results/paper_latest.json`. It reported:
 
     equity 1.000 -> 26.784   total_return +2578%   sharpe 12.433   mdd 0.188
