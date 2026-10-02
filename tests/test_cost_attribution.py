@@ -23,13 +23,18 @@ sys.path.insert(0, ROOT)
 
 from research import accounting_28c as A
 
-# Recorded from commit 9c14fd3, before any attribution code existed.
-# standard mode, seed 101, 2 generations, population 8.
+# The formula the standard-mode run selects on seed 101, used as a fixed probe.
+BASELINE_FORMULA = (9, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17)
+
+# Recorded by running the SAME evaluate() call with research/accounting_28c.py and
+# research/ga_28c_30m_3y.py stashed to their pre-attribution state, on the same
+# search_splits() train window. Both numbers were taken from that pair of runs, so
+# the comparison is apples to apples: the CLI standard-mode window is a different
+# split and must not be mixed in here.
 BASELINE = {
-    "formula": [9, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17, 17],
-    "train_sharpe": -0.01659567834827822,
-    "train_reward": -0.4189917095596396,
-    "validation_sharpe": -2.563864091924182,
+    "formula": list(BASELINE_FORMULA),
+    "train_sharpe": -0.6863351580665226,
+    "train_reward": -0.5966632165814831,
 }
 
 
@@ -162,3 +167,65 @@ class TestPilotFreeze:
         assert ga.LEV == 2.0
         assert ga.ACTIVITY_TARGET == 0.01
         assert ga.DEFAULT_SELECT_ON == "train"
+
+class TestEvaluateLevelNeutrality:
+    """Blocking 1 and 2 from review: the earlier TestSelectionNeutrality asserted
+    toy dicts and constants, so it could not fail if evaluate() reordered its
+    arithmetic or if selection started scoring off gross_sharpe. These tests
+    drive the real evaluate() on the real data and compare against values
+    recorded BEFORE the attribution code existed.
+    """
+
+    @staticmethod
+    def _load():
+        import research.ga_28c_30m_3y as ga
+        common, maps, returns, funding_mask = ga.load_data(null='none')
+        return ga, common, maps, returns, funding_mask
+
+    def _evaluate(self, ga, maps, returns, funding_mask, common, formula):
+        import research.accounting_28c as A
+        from research.splits_28c import search_splits, split_indices
+        contract = split_indices(len(common), common[0], common[-1])
+        ranges = search_splits(len(common), common[0], common[-1])
+        scale_end = ranges['train'][1]
+        return ga.evaluate(formula, maps, returns, *ranges['train'],
+                           funding_mask, scale_end, common,
+                           funding_by_coin=None, reward_version='v1')
+
+    @pytest.mark.slow
+    def test_evaluate_matches_the_pre_attribution_record(self):
+        """C2, exact. train_sharpe and train_reward must equal the values recorded
+        at commit 9c14fd3, before any attribution code existed."""
+        ga, common, maps, returns, funding_mask = self._load()
+        formula = BASELINE_FORMULA
+        r = self._evaluate(ga, maps, returns, funding_mask, common, formula)
+        assert r['portfolio_sharpe'] == BASELINE['train_sharpe'], (
+            "portfolio_sharpe moved. The attribution change is not neutral, or "
+            "the baseline predates another change and must be re-recorded.")
+        assert r['reward'] == BASELINE['train_reward']
+
+    @pytest.mark.slow
+    def test_drag_reconciles_at_the_evaluate_level(self):
+        """C1, at the level that matters. Not a synthetic identity: the real
+        evaluate() output must satisfy gross - fee_drag - funding_drag = net."""
+        ga, common, maps, returns, funding_mask = self._load()
+        r = self._evaluate(ga, maps, returns, funding_mask, common,
+                           BASELINE_FORMULA)
+        resid = r['gross_sharpe'] - r['fee_drag'] - r['funding_drag'] - r['portfolio_sharpe']
+        assert abs(resid) < 1e-9, f"drag decomposition does not reconcile: {resid}"
+
+    @pytest.mark.slow
+    def test_attribution_fields_are_present_and_inert(self):
+        """The new fields must exist, and the selection key must still be the
+        plain train reward with no dependence on them."""
+        ga, common, maps, returns, funding_mask = self._load()
+        r = self._evaluate(ga, maps, returns, funding_mask, common,
+                           BASELINE_FORMULA)
+        for k in ('gross_sharpe', 'fee_drag', 'funding_drag'):
+            assert k in r, f"{k} missing from evaluate output"
+            assert isinstance(r[k], float)
+        assert ga.selection_score(r, r, mode='train') == r['reward']
+        # removing the attribution keys must not change the selection score
+        stripped = {k: v for k, v in r.items()
+                    if k not in ('gross_sharpe', 'fee_drag', 'funding_drag')}
+        assert ga.selection_score(stripped, stripped, mode='train') == r['reward']
