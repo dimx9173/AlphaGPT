@@ -194,3 +194,38 @@ constant-position runs have a median position of 0.2493 and the varying ones
 This is the clearest statement of the finding. It is not that the search picked a
 bad formula. It is that seven times out of ten the search converged on holding,
 and the only thing it optimised was how much.
+
+
+## 8. The space can express timing; the search selects against it
+
+250 random formulas, each evaluated into a portfolio position across the 28
+coins through the same evaluator the search uses:
+
+    position std        median 0.03206   max 0.12116
+    std < 0.001          9 / 250   (3.6%)
+    std < 0.01           84 / 250
+    mean position       median +0.0003
+
+Against the ten selected formulas:
+
+    position std        median 0.00045
+    std < 0.001          7 / 10   (70%)
+
+This changes the diagnosis again, and in a way that matters. Ninety-six per cent
+of random formulas produce a position that moves. The hypothesis space is not
+incapable of expressing a timing strategy; variation is there for the taking.
+
+The search picks a constant position nineteen times more often than a random draw
+does. Whatever the reward is doing, it is not failing to find movement because
+movement is scarce. It is selecting against movement.
+
+That points at the objective rather than the space or the operators, and it is
+consistent with everything else measured here: argmax_margin of 0.009 against a
+0.70 fold-to-fold scatter, a validation rank-IC that collapses to zero in 32 of
+90 folds, and a composite reward whose top-9-of-90 selection lands at +0.00216
+against a +0.00115 random baseline.
+
+It also explains why the three PRPs could not have worked. PRP-1 adds freedom to
+move, against an objective that prefers not moving. PRP-2 penalises legs that
+disagree, which flattens the position. PRP-3 reprices turnover, which is the
+one quantity that distinguishes a moving position from a constant one.

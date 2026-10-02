@@ -142,3 +142,22 @@ Rebuilding the portfolio position each selected formula produces on the holdout:
 Seven times out of ten the search converged on holding, and the only thing it
 optimised was how much. That is the finding behind all three NO-GOs, and it is
 visible without any statistical test.
+
+
+## Why the space is not the constraint
+
+250 random formulas through the same evaluator:
+
+    position std   median 0.03206
+    std < 0.001     9/250  (3.6%)
+
+The ten selected formulas:
+
+    position std   median 0.00045
+    std < 0.001     7/10   (70%)
+
+Ninety-six per cent of random formulas move. The space can express a timing
+strategy, and the search picks a constant position nineteen times more often than
+a random draw. The constraint is the objective, not the space and not the
+operators, which is also why PRP-1 (more freedom), PRP-2 (flatter legs) and
+PRP-3 (reprice turnover) could not have helped.
