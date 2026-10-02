@@ -36,6 +36,63 @@ FEATURE_CACHE_VERSION='amihud-log-f1-v2'
 # same number so selection and the gate are not scoring different things.
 BREADTH_TARGET=24/28
 
+# --- pilot meter repair (2026-10-01, docs/GA_SEARCH_RELIABILITY_2026-10-01.md) ---
+# ACTIVITY_TARGET is the old hard cliff. INACTIVITY_WEIGHT is the slope of the
+# replacement penalty, and it is deliberately set so the repaired reward stays on
+# the SAME scale as the recorded v1 reward rather than being rescaled underneath
+# the A/B: the old cliff scored a dead genome -50, and the non-cliff reward of a
+# dead genome was already about -1.0, so the gap between "dead" and "worst
+# passing" was roughly 49 reward units. The repaired reward spans about 1.7 units
+# across the same inputs. Those scales are not comparable and are not meant to be;
+# verify_pilot_meter_repair.py therefore compares real-vs-null INSIDE one meter,
+# never across meters, and reports the rankable-run std rather than the raw pooled
+# std. Choosing a weight to make the numbers look comparable would be fitting the
+# scale to the batch it is scoring.
+ACTIVITY_TARGET = 0.01
+INACTIVITY_WEIGHT = 0.5
+
+# PEER_BASELINE: a fixed external Sharpe used as psh_peer so the split-divergence
+# term is live. None until the pilot supplies it, because any constant chosen
+# after seeing the runs would be fitted to the batch it is scoring.
+PEER_BASELINE = None
+
+# --- PRP-0: validation-window selection leak (2026-10-01) ---
+# DEFAULT_SELECT_ON is "train". "val_weighted" reproduces the pre-PRP behaviour
+# and exists ONLY so the recorded historical batches stay reproducible; it must
+# never be used to produce a reportable result.
+DEFAULT_SELECT_ON = "train"
+SELECT_ON_CHOICES = ("train", "val_weighted")
+
+
+def selection_score(a, b, mode=DEFAULT_SELECT_ON):
+    """The score the GA ranks, elits and picks parents on.
+
+    "train"        -> the train reward alone. The validation split cannot reach
+                      selection by any route.
+    "val_weighted" -> 0.5*train + 0.5*validation. This is the historical key and
+                      it leaked: the validation window was re-scored every
+                      generation (pop x generations times per fold, 3,600 times at
+                      pilot settings) and carried half the key.
+
+    SCOPE, stated precisely because it is easy to over-claim:
+      val_weighted restores the SELECTION KEY only. It does not restore the
+      historical NUMBERS, because two separate changes landed in the same working
+      tree: this leak fix, and the meter repair that replaced the -50 cliff with a
+      continuous activity penalty. A batch recorded before either change is not
+      reproducible from this file at all. To reproduce one, check out the commit
+      that produced it.
+
+      So --select-on val_weighted means "isolate the selection-key question",
+      not "reproduce history". Any number it produces is a diagnostic, never a
+      result.
+
+    Pinned by tests/test_validation_selection_leak.py, including a scan that fails
+    if any weighted expression reappears in an active code path.
+    """
+    if mode == "val_weighted":
+        return 0.5 * a["reward"] + 0.5 * b["reward"]
+    return a["reward"]
+
 
 def load_data(null='none', null_seed=0, null_block=48):
     """Aligned bars, features and returns for the 28c contract.
@@ -352,8 +409,20 @@ def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
     Sharpe. A selection score that cannot see breadth will keep selecting
     formulas that fail the gate.
     """
-    if mean_act_guard(mean_turn):
-        return -50.0
+    # Activity guard: log-only. It used to return -50.0, which is a cliff, not a
+    # gradient. Two runs recorded with the cliff still standing showed it firing
+    # on 5/10 real and 6/10 null seeds, and it fired on mean_act < 0.01 in every
+    # one of those cases while turnover was mostly above the guard line. A cliff
+    # that fires more often on the arm that wins Sharpe is not a neutral filter.
+    # Inactivity is now priced continuously by the caller's linear penalty instead.
+    #
+    # psh_peer: BOTH call sites passed psh_peer=None, which made peer == psh, which
+    # made gap == softplus(0) == 0.0 exactly, for every genome, forever. The
+    # -0.30*gap term was dead code and the split-divergence penalty never fired.
+    # The caller must now supply a fixed external baseline (see PEER_BASELINE);
+    # falling back to psh restores the old dead-code behaviour on purpose, so a
+    # caller that forgets is visibly no worse than before rather than silently
+    # gaining a term the A/B was not calibrated for.
     peer = psh if psh_peer is None else psh_peer
     # Fragmentation: credit the worse of the two splits, not their average, so a
     # formula that only works on one split earns nothing from the good one.
@@ -461,26 +530,40 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
     mean_ic = float(np.mean(leg_ic)) if leg_ic else 0.
     mean_act = float(np.mean(activity)) if activity else 0.
     mean_turn = float(np.mean(leg_turn)) if leg_turn else 0.
-    if mean_act < 0.01 or mean_turn < 1e-5:
-        reward = -50.0
-    else:
-        breadth = sum(x > 0 for x in leg_sh) / len(leg_sh) if leg_sh else 0.0
-        reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
-                              breadth=breadth, version=reward_version,
-                              excess=active_sh)
+    # Inactivity used to return the constant -50.0, a cliff with no gradient:
+    # every genome below the threshold scored identically, so selection had
+    # nothing to rank on inside that region. It is now a continuous penalty that
+    # is zero at or above the old 0.01 activity level, so a formula that clears
+    # the bar is scored exactly as before and only the dead region gains a slope.
+    #
+    # This is the only behavioural change in the pilot. Evaluator math, genome,
+    # weights, costs, universe, seeds and windows are untouched, so a real-vs-null
+    # comparison across this commit measures the meter, not the engine.
+    activity_penalty = -INACTIVITY_WEIGHT * max(0.0, 1.0 - mean_act / ACTIVITY_TARGET)
+    breadth = sum(x > 0 for x in leg_sh) / len(leg_sh) if leg_sh else 0.0
+    reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
+                          breadth=breadth, version=reward_version,
+                          excess=active_sh) + activity_penalty
     return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd,
             'buy_and_hold_sharpe': bh_sh, 'excess_sharpe_vs_buy_and_hold': active_sh,
             'mean_position': float(np.mean([float(np.mean(p[start:end])) for c in COINS_28C])) if COINS_28C else 0.0, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
 def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
                      folds, rng, scale_end_hint):
-    """Run the search fold by fold, giving each validation window one pass.
+    """Run the search fold by fold.
 
     The single train/validation/lockbox contract lets a search look at one
     validation window tens of thousands of times. This walks forward instead:
-    fold i selects on its own training window, scores once on its own
-    validation window, and that validation window then becomes part of fold
-    i+1's training data. No window is ever scored twice, and the final fold is
-    never trained on.
+    fold i selects on its own training window, and that validation window then
+    becomes part of fold i+1's training data. The final fold is never trained on.
+
+    PRP-0 correction. This docstring previously claimed "No window is ever scored
+    twice", and that was false. The selection key was 0.5*train + 0.5*validation
+    and was recomputed inside the generation loop, so each fold's validation
+    window was read pop x generations times (400 at pilot settings, 3,600 across
+    the nine selection folds). Selection now keys on the train reward only; see
+    selection_score(). The validation split is still evaluated each generation
+    because the fold record needs its Sharpe, but it is an observation now, not a
+    selector input.
 
     Returns the per-fold record and the formula that the final selection fold
     produced, which is the only one that goes near the holdout.
@@ -528,6 +611,11 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
         pop = (seed_formulas()
                + [random_formula(rng) for _ in range(max(0, args.population - len(seed_formulas())))])[:args.population]
         fold_best = None
+        # PRP-0 F5: the runner-up is tracked across generations so argmax_margin
+        # measures how much the winner actually beat the field on train. A thin
+        # margin combined with a large validation drop is the winner's-curse
+        # signature, and it is invisible unless it is recorded.
+        fold_runner_up = None
         for gen in range(args.generations):
             scored = []
             for f in pop:
@@ -537,13 +625,24 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
                 b = evaluate(f, maps, returns, va_s, va_e, funding_mask, fold_scale_end,
                              common, funding_by_coin=funding_by_coin,
                              reward_version=args.reward_version)
-                # The validation window contributes to the selection score, but
-                # only for this one pass. It is never revisited.
-                sel = 0.5 * a['reward'] + 0.5 * b['reward']
+                # PRP-0: the validation window is NOT part of the selection key.
+                #
+                # This used to read 0.5*train + 0.5*validation, evaluated inside
+                # the generation loop, which re-scored the validation window
+                # pop x generations times per fold (3,600 times at pilot settings)
+                # and let half the key come from held-out data. The comment here
+                # previously claimed the window "is never revisited", which was
+                # false.
+                #
+                # b is still evaluated because the fold record and the per-fold
+                # print both need its Sharpe. It is an observation now, not a
+                # selector input.
+                sel = selection_score(a, b, args.select_on)
                 scored.append((sel, f, a, b))
             scored.sort(key=lambda z: z[0], reverse=True)
             if fold_best is None or scored[0][0] > fold_best[0]:
                 fold_best = scored[0]
+                fold_runner_up = scored[1][0] if len(scored) > 1 else None
             elites = [x[1] for x in scored[:max(2, args.population // 10)]]
             new = list(elites)
             while len(new) < args.population:
@@ -563,6 +662,19 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
             'validation_sharpe': fold_best[3]['portfolio_sharpe'],
             'train_positive_coins': fold_best[2]['positive_coins'],
             'validation_positive_coins': fold_best[3]['positive_coins'],
+            # PRP-0 F5 diagnostics.
+            'select_on': args.select_on,
+            'train_reward': float(fold_best[2]['reward']),
+            'validation_reward': float(fold_best[3]['reward']),
+            # Negative means validation scored the winner below train, which is
+            # the ordinary case for an honestly selected genome. A large negative
+            # number is overfit; a positive one is not an error by itself.
+            'overfit_gap': float(fold_best[3]['reward'] - fold_best[2]['reward']),
+            'argmax_margin': (float(fold_best[0] - fold_runner_up)
+                              if fold_runner_up is not None else None),
+            'mean_ic': float(fold_best[2]['mean_ic']),
+            'validation_mean_ic': float(fold_best[3]['mean_ic']),
+            'turnover': float(fold_best[2]['turnover']),
         })
         print(f'[wf] fold {fold["index"]}: train {fold_best[2]["portfolio_sharpe"]:+.3f} '
               f'val {fold_best[3]["portfolio_sharpe"]:+.3f}', flush=True)
@@ -589,7 +701,12 @@ def main():
      'xsec: each coin paired with a neighbour bars. Both are false-positive '
      'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2','v3'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
      'walkforward: expanding folds, one selection pass per validation window, '
-     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); args=ap.parse_args()
+     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); args=ap.parse_args()
+    if args.select_on == 'val_weighted':
+        print('[select-on] WARNING: val_weighted restores the pre-PRP-0 selection key, NOT the '
+              'pre-PRP-0 numbers (the meter repair also changed shape_reward in this tree). '
+              'Validation carries half the key and is re-scored pop x generations times '
+              'per fold. Diagnostic only; never reportable.', flush=True)
     global GRAMMAR
     GRAMMAR=args.grammar
     print(f'[grammar] {GRAMMAR}: {_spec()["max_token"]} tokens, '
@@ -618,7 +735,7 @@ def main():
         wf_scale_end=folds[0]['train'][1]
         wf_records,wf_selected=run_walkforward(
             args,maps,returns,common,funding_mask,funding_by_coin,folds,rng,wf_scale_end)
-        out={'status':'ga_paper_only','live_adopted':False,'mode':'walkforward',
+        out={'status':'ga_paper_only','live_adopted':False,'mode':'walkforward','select_on':args.select_on,
              'grammar':GRAMMAR,'null_data':args.null,'reward_version':args.reward_version,
              'funding_source':args.funding,'accounting_version':funding_version,
              'seed':args.seed,'generations':args.generations,'population':args.population,
@@ -643,7 +760,7 @@ def main():
         scored=[]
         for f in pop:
             a=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version); b=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version)
-            sel=0.5*a['reward']+0.5*b['reward']; scored.append((sel,f,a,b))
+            sel=selection_score(a,b,args.select_on); scored.append((sel,f,a,b))
         scored.sort(key=lambda z:z[0],reverse=True); best=scored[0] if best is None or scored[0][0]>best[0] else best
         history.append({'generation':gen,'best_select_score':scored[0][0],'avg_select_score':float(np.mean([x[0] for x in scored])),'best_formula':list(scored[0][1])})
         print(f'gen={gen} best={scored[0][0]:.3f} avg={np.mean([x[0] for x in scored]):.3f}',flush=True)
@@ -692,7 +809,7 @@ def main():
     # old name under acceptance/ would let a reader treat it as a live gate.
     diagnostics={NEW_KEY: oos['portfolio_sharpe']>gates['min_oos_portfolio_sharpe']}
     out={
-        'status': 'ga_paper_only',
+        'status': 'ga_paper_only', 'select_on': args.select_on,
         'live_adopted': derive_live_adopted(acceptance),
         'grammar': GRAMMAR,
         'formula': list(f),

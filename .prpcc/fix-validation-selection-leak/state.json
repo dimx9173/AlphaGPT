@@ -1,0 +1,11 @@
+{
+  "feature": "fix-validation-selection-leak",
+  "phase": "code",
+  "tasks": [],
+  "history": [
+    {
+      "phase": "start",
+      "note": "raised by Codex PRP-1 review R1; blocks PRP-1/2/3"
+    }
+  ]
+}
