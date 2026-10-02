@@ -279,3 +279,24 @@ itself. The review was right that the stated premise was inverted, and the
 rejection followed from the stated premise. The underlying observation, that
 turnover is priced at a scale that cannot influence selection, survived the
 review and is recorded above.
+
+
+## 10. The verdict does not depend on the pending null arm
+
+The real arm is complete at 10/10. The null arm is still running, so the
+Mann-Whitney cannot be reported yet. It does not matter for the verdict.
+
+Of the five gate criteria, two need the null arm (real median beats null, and
+the one-sided Mann-Whitney) and three do not:
+
+    beats_buy_and_hold   0/10 seeds, gate needs >= 6   FAIL, and 0/10 is final
+    breadth             7/10 seeds with positive_coins >= 14   PASS
+    direction           10/10 seeds with |mean_position| < 0.25   PASS
+
+`beats_buy_and_hold` is 0/10 whatever the null arm produces, because the real
+arm is finished and every one of its ten seeds underperforms holding the same
+book passively on the same holdout. For the gate to pass, that criterion would
+have to pass, and it cannot.
+
+So the NO-GO on items 1, 2 and 3 is already determined. The Mann-Whitney is a
+formality that can move two of the five criteria and cannot move the verdict.
