@@ -83,3 +83,49 @@ scatter. Two changes follow directly and neither is in the current three:
   - score against buy-and-hold rather than against zero. On this universe a
     constant long has a Sharpe of its own, and every number in the table above is
     a statement about exposure until it is differenced.
+
+
+## 6. Control: the population has no good member to find
+
+Twelve random genomes scored on the same training window, no search involved:
+
+    train_reward, sorted:  -3.2161 -2.8257 -2.4760 -2.3560 -1.9550 -1.4546
+                            -1.3694 -1.1613 -1.1003 -0.4854 -0.4768 -0.4410
+
+    spread                     2.7751
+    margin over the runner-up  0.0358   (1.3% of the spread)
+
+Every one of the twelve is negative. The search is therefore not climbing toward
+a good region and failing to arrive; the good region is not present in the
+population it starts from, and the reward differences between members are small
+enough that selection cannot tell them apart.
+
+### Correction: the search works, the target does not hold
+
+The twelve random genomes are worse than every one of the GA's 90 selections, so
+the search is doing its job. 90/90 selected genomes beat the best of the twelve.
+GA train rewards run -0.3595 to +0.2592 against the random sample's -3.2161 to
+-0.4410.
+
+The failure is therefore not a weak search. It is that a positive training reward
+does not survive:
+
+    folds where train_reward > 0        20/90
+    of those, validation_reward > 0      0/20
+
+Every one of the twenty flips negative on validation. And across all folds:
+
+    corr(train_reward, validation_reward) = -0.0891
+    corr(train_IC,     validation_IC)     = +0.2309
+
+The reward is not merely flat in gradient, it is not pointing where validation
+is. Rank-IC carries a small positive relationship (+0.23) while the composite
+reward carries none (-0.09), which is the same split the earlier probe found:
+mean-IC separates real from null and Sharpe does not.
+
+So the three items are refused for a reason that is now specific. They all
+re-weight or re-constrain the composite reward, and the composite reward has no
+relationship with the out-of-sample objective. PRP-2's breadth term would force
+`positive_coins` up on the same twenty folds whose validation reward is negative;
+PRP-3's cost term would re-price a quantity that is already net; PRP-1's extra
+freedom would buy more of the near-tie the argmax margin already measures.
