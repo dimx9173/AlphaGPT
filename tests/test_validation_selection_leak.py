@@ -143,7 +143,8 @@ class TestLoopLevelWiring:
         calls = {"n": 0}
 
         def fake(formula, maps, returns, start, end, funding_mask, scale_end, bars,
-                 psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None):
+                 psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None,
+                 objective=None):
             # walk the call order: train first, then validation, per genome
             is_val = calls["n"] % 2 == 1
             calls["n"] += 1
@@ -286,7 +287,8 @@ class TestStandardModeWiring:
         calls = {"n": 0}
 
         def fake(formula, maps, returns, start, end, funding_mask, scale_end, bars,
-                 psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None):
+                 psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None,
+                 objective=None):
             is_val = calls["n"] % 2 == 1
             calls["n"] += 1
             tr = float(formula[0])

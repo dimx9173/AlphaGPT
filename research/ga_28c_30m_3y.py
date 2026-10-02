@@ -673,7 +673,7 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
                 break
             h = evaluate(selected, maps, returns, va_s, va_e, funding_mask,
                          scale_end_hint, common, funding_by_coin=funding_by_coin,
-                         objective=OBJECTIVES[args.objective])
+                         objective=OBJECTIVES[getattr(args, 'objective', 'v3')])
             records.append({
                 'fold': fold['index'], 'is_holdout': True,
                 'validation': (va_s, va_e),
@@ -710,10 +710,10 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
             for f in pop:
                 a = evaluate(f, maps, returns, tr_s, tr_e, funding_mask, fold_scale_end,
                              common, funding_by_coin=funding_by_coin,
-                             objective=OBJECTIVES[args.objective])
+                             objective=OBJECTIVES[getattr(args, 'objective', 'v3')])
                 b = evaluate(f, maps, returns, va_s, va_e, funding_mask, fold_scale_end,
                              common, funding_by_coin=funding_by_coin,
-                             objective=OBJECTIVES[args.objective])
+                             objective=OBJECTIVES[getattr(args, 'objective', 'v3')])
                 # PRP-0: the validation window is NOT part of the selection key.
                 #
                 # This used to read 0.5*train + 0.5*validation, evaluated inside
@@ -790,10 +790,10 @@ def run_standard_selection(args, maps, returns, ranges, scale_end, common,
         for f in pop:
             a = evaluate(f, maps, returns, *ranges['train'], funding_mask, scale_end,
                          common, funding_by_coin=funding_by_coin,
-                          objective=OBJECTIVES[args.objective])
+                          objective=OBJECTIVES[getattr(args, 'objective', 'v3')])
             b = evaluate(f, maps, returns, *ranges['validation'], funding_mask, scale_end,
                          common, funding_by_coin=funding_by_coin,
-                          objective=OBJECTIVES[args.objective])
+                          objective=OBJECTIVES[getattr(args, 'objective', 'v3')])
             sel = selection_score(a, b, args.select_on)
             scored.append((sel, f, a, b))
         scored.sort(key=lambda z: z[0], reverse=True)
