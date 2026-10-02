@@ -121,9 +121,7 @@ def accounting_bar_returns(
     nothing could say how much of a run is price movement versus accounting.
 
     `out` is additive. When it is None the executed statements and their order
-    are exactly as before, and the returned array is bit-identical. That matters
-    because roughly twenty callers across research/, tools/ and tests/ pass no
-    `out`, and the search selects on the resulting values.
+    are exactly as before, and the returned array is bit-identical.
     """
     # Validate inputs
     if not np.all(np.isfinite(position)) or not np.all(np.isfinite(asset_return)) or not np.all(np.isfinite(funding_rate)):
