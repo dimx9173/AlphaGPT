@@ -229,3 +229,94 @@ class TestEvaluateLevelNeutrality:
         stripped = {k: v for k, v in r.items()
                     if k not in ('gross_sharpe', 'fee_drag', 'funding_drag')}
         assert ga.selection_score(stripped, stripped, mode='train') == r['reward']
+
+
+class TestAttributionConventionIsPinned(TestEvaluateLevelNeutrality):
+    """Blocking 1 from review 2: the identity
+    gross - fee_drag - funding_drag - net == 0 holds for ANY ordering of the drag
+    chain, so the identity test cannot detect a chain that charges funding before
+    fee. The convention is fee-first to match `gross - fee - funding_cost` inside
+    the accounting, and that convention needs its own assertion.
+    """
+
+    @pytest.mark.slow
+    def test_drag_order_is_fee_first_then_funding(self):
+        """fee_drag must be the loss from removing fees ALONE, and funding_drag the
+        loss from removing funding from what is left. If the chain were swapped,
+        fee_drag would instead be the mid-funding Sharpe drop and this fails."""
+        ga, common, maps, returns, funding_mask = self._load()
+        r = self._evaluate(ga, maps, returns, funding_mask, common, BASELINE_FORMULA)
+
+        # recompute the chain independently, in the documented order
+        import numpy as np
+        from research import accounting_28c as A
+        from research.splits_28c import search_splits, split_indices
+        ranges = search_splits(len(common), common[0], common[-1])
+        contract = split_indices(len(common), common[0], common[-1])
+        # rebuild the portfolio series the same way evaluate does
+        import research.causal_12f as C
+        from model_core.vm import StackVM
+        from model_core.factors import FeatureEngineer
+        from research.universe_28c import COINS_28C
+
+        leg_g, leg_f, leg_u, leg_n = [], [], [], []
+        s, e = ranges['train']
+        for c in COINS_28C:
+            sig = ga.formula_signal(list(BASELINE_FORMULA), maps, c)
+            fit = float(np.std(sig[:ranges['train'][1]])) if ranges['train'][1] > 0 else 0.0
+            raw = np.tanh(sig / (fit + 1e-6)) if fit > 1e-8 else np.zeros_like(sig)
+            pos = 0.25 * ga.smooth_causal(raw, 5)
+            pos = np.roll(pos, 1); pos[0] = 0
+            r_ = returns[c][s:e]
+            pos = pos[s:e]
+            ts_full = common[s:e]
+            comp = {}
+            fnd_ = funding_mask[s:e] * ga.FUND_RATE
+            net = A.accounting_bar_returns(pos, r_, ga.FEE, fnd_, ga.LEV, out=comp)
+            leg_n.append(net); leg_g.append(comp['gross']); leg_f.append(comp['fee'])
+            leg_u.append(comp['funding_cost'])
+        pg = np.mean(np.stack(leg_g), axis=0)
+        pf = np.mean(np.stack(leg_f), axis=0)
+        pu = np.mean(np.stack(leg_u), axis=0)
+        pn = np.mean(np.stack(leg_n), axis=0)
+        m = lambda x: A.metrics(x, ts_full)['sharpe']
+
+        fee_first = m(pg) - m(pg - pf)                     # documented
+        funding_first = m(pg) - m(pg - pu)                 # the violation
+        assert abs(fee_first - r['fee_drag']) < 1e-12, (
+            "fee_drag is not the fee-first quantity; the chain order changed")
+        assert abs(funding_first - r['fee_drag']) > 1e-6, (
+            "fee_drag and the funding-first quantity coincide, so this test "
+            "cannot distinguish the two chains")
+
+
+class TestSelectionPathScan(TestEvaluateLevelNeutrality):
+    """Blocking 2 from review 2: a consumer ranking on gross_sharpe outside
+    evaluate() would pass every behavioural test. This scans the source instead.
+    """
+
+    def test_attribution_keys_never_reach_a_selection_path(self):
+        import re
+        src = open(os.path.join(ROOT, "research", "ga_28c_30m_3y.py")).read()
+
+        # isolate the function bodies that make selection decisions
+        for fn in ("selection_score", "shape_reward", "run_standard_selection",
+                   "run_walkforward"):
+            i = src.index("def " + fn + "(")
+            j = src.find("\ndef ", i + 10)
+            body = src[i:j if j > 0 else len(src)]
+            for key in ("gross_sharpe", "fee_drag", "funding_drag"):
+                # allowed only as a pass-through into a results dict
+                for line in body.splitlines():
+                    stripped = line.strip()
+                    if key not in stripped:
+                        continue
+                    assert stripped.startswith("'") or stripped.startswith('"') \
+                        or stripped.startswith("'"), (
+                        f"{key} used in a non-literal context inside {fn}: {stripped}")
+
+    def test_selection_score_ignores_extra_keys(self):
+        import research.ga_28c_30m_3y as ga
+        a = {"reward": 2.0, "gross_sharpe": 99.0, "fee_drag": -50.0}
+        b = {"reward": 1.0, "gross_sharpe": -99.0, "fee_drag": 50.0}
+        assert ga.selection_score(a, b, mode="train") == pytest.approx(2.0)
