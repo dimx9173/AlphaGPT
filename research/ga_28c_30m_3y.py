@@ -613,9 +613,16 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
     # comparison across this commit measures the meter, not the engine.
     activity_penalty = -INACTIVITY_WEIGHT * max(0.0, 1.0 - mean_act / ACTIVITY_TARGET)
     breadth = sum(x > 0 for x in leg_sh) / len(leg_sh) if leg_sh else 0.0
+    # rank_ic and excess_bh are the SAME quantities already computed for the
+    # v3 terms, exposed under the names the objective presets use. Wiring them
+    # here is what makes the presets other than v3 actually change anything:
+    # without this they zeroed w_mean_ic and w_psh and silently became an
+    # empty objective, which is why the first sweep gave three presets identical
+    # numbers.
     reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
                           breadth=breadth, version=reward_version,
                           excess=active_sh,
+                          rank_ic=mean_ic, excess_bh=active_sh,
                           **(objective or {})) + activity_penalty
     return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd,
             'buy_and_hold_sharpe': bh_sh, 'excess_sharpe_vs_buy_and_hold': active_sh,
