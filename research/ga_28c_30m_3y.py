@@ -501,6 +501,19 @@ def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
             - w_gap * gap
             - w_turn * mean_turn
             - 0.10 * softplus((LEG_FLOOR - min_leg) / 0.5))
+
+    # The new objective terms are applied at EVERY version, not only v3.
+    #
+    # This was a real defect: they sat after the `if version == 'v1': return
+    # base` guard, so with the default reward-version v1 they could never fire.
+    # Every non-v3 preset was therefore measuring an empty objective, which is
+    # why three of them produced byte-identical numbers in the first sweep and
+    # why wiring rank_ic and excess_bh alone did not change anything.
+    if rank_ic is not None and w_rank_ic:
+        base = base + w_rank_ic * rank_ic
+    if excess_bh is not None and w_excess_bh:
+        base = base + w_excess_bh * excess_bh
+
     if version == 'v1':
         return base
     short = max(0.0, BREADTH_TARGET - breadth)
@@ -523,10 +536,6 @@ def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
     # null companion is what says whether v3 found anything or merely learned
     # to look like a long.
     base = base + w_excess * excess
-    if rank_ic is not None:
-        base = base + w_rank_ic * rank_ic
-    if excess_bh is not None:
-        base = base + w_excess_bh * excess_bh
     return base
 
 def mean_act_guard(mean_turn):

@@ -152,6 +152,28 @@ class TestPilotFreeze:
         assert got == pytest.approx(expected, abs=1e-12), (
             f"default reward {got} != pre-v4 expression {expected}")
 
+    def test_new_objectives_fire_at_reward_version_v1(self):
+        """Regression for a real defect found by the first objective sweep.
+
+        The rank-IC and excess-over-hold terms were placed after the
+        `if version == 'v1': return base` guard, so with the default reward
+        version they could never fire. Every non-v3 preset was silently an
+        empty objective and three of them produced byte-identical numbers.
+
+        The freeze default is reward-version v1, so this is the version that
+        matters for every recorded batch.
+        """
+        import research.ga_28c_30m_3y as m
+        args = (1.3, 0.9, -0.4, 0.011, 3.1e-3)
+        kw = dict(breadth=0.75, version="v1", excess=0.22,
+                  rank_ic=0.011, excess_bh=0.22)
+        v3 = m.shape_reward(*args, **kw, **m.OBJECTIVES["v3"])
+        for name in ("rank_ic", "excess_bh", "rank_ic_excess_bh"):
+            got = m.shape_reward(*args, **kw, **m.OBJECTIVES[name])
+            assert got != v3, (
+                f"{name} produces the same reward as v3 at version v1; its "
+                "weight is not reaching the objective")
+
     def test_new_objectives_are_off_by_default(self):
         """rank-IC and excess-over-hold are opt-in. If they were ever on by
         default, every recorded batch would silently be non-comparable."""
