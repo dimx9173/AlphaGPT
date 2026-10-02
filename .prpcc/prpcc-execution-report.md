@@ -96,9 +96,18 @@ positive training reward and none of the twenty carries a positive validation
 reward, and corr(train_reward, validation_reward) is -0.0891 against
 +0.2309 for rank-IC alone.
 
-The reward is not pointing where validation is. All three items re-weight or
-re-constrain that composite reward, so all three operate on an objective with no
-out-of-sample relationship.
+The reward is flat rather than reversed. A further test, run over the same 90
+real-arm folds, shows the composite reward is not worse than rank-IC as a
+selector within this regime: taking the top 9 of 90 by each key, the composite
+gives a mean validation rank-IC of +0.00216 against rank-IC's +0.00027 and a
+random baseline of +0.00115. An earlier claim in the diagnosis that rank-IC
+"carries the signal while the reward points the wrong way" conflated robustness
+across data regimes with selection quality within one regime, and does not
+survive that test.
+
+So all three items re-weight or re-constrain a reward that has no measurable
+out-of-sample relationship, and the best available selector is barely above
+chance.
 
 ## Summary
 

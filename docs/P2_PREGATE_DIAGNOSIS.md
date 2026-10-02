@@ -118,10 +118,29 @@ Every one of the twenty flips negative on validation. And across all folds:
     corr(train_reward, validation_reward) = -0.0891
     corr(train_IC,     validation_IC)     = +0.2309
 
-The reward is not merely flat in gradient, it is not pointing where validation
-is. Rank-IC carries a small positive relationship (+0.23) while the composite
-reward carries none (-0.09), which is the same split the earlier probe found:
-mean-IC separates real from null and Sharpe does not.
+The reward is flat rather than reversed. -0.09 at n=90 is indistinguishable
+from no relationship.
+
+Correction to an earlier claim in this file. I had written that the composite
+reward "points the wrong way while rank-IC carries the signal". Testing that
+directly inside the real regime does not support it. Over the same 90 folds:
+
+    composite reward -> validation reward    -0.065
+    composite reward -> validation mean_IC   +0.056
+    mean_IC          -> validation mean_IC   +0.199
+    mean_IC          -> validation reward    -0.254
+
+and on the practical test, taking the top 9 of 90 by each key and looking at the
+mean validation rank-IC of those folds:
+
+    by composite reward   +0.00216
+    by mean_IC           +0.00027
+    random baseline      +0.00115
+
+The composite reward selects the better set. The earlier statement conflated two
+different questions. Rank-IC is more robust ACROSS data regimes, which is what
+the real-versus-null probe measured; that is not the same as being a better
+selector WITHIN one regime.
 
 So the three items are refused for a reason that is now specific. They all
 re-weight or re-constrain the composite reward, and the composite reward has no
