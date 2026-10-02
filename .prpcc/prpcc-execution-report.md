@@ -129,3 +129,16 @@ chance.
 
 Two things shipped, three were refused, and the refusal is backed by measurement
 rather than by the reviews declining to sign off.
+
+
+## The clearest single measurement
+
+Rebuilding the portfolio position each selected formula produces on the holdout:
+
+    7 of 10 seeds hold a FIXED long position for every bar (std < 0.001),
+    three of them at the 0.25 cap.
+    3 of 10 vary, and they carry the three lowest holdout Sharpe values.
+
+Seven times out of ten the search converged on holding, and the only thing it
+optimised was how much. That is the finding behind all three NO-GOs, and it is
+visible without any statistical test.

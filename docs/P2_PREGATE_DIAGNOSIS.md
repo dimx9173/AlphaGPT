@@ -162,3 +162,35 @@ relationship with the out-of-sample objective. PRP-2's breadth term would force
 `positive_coins` up on the same twenty folds whose validation reward is negative;
 PRP-3's cost term would re-price a quantity that is already net; PRP-1's extra
 freedom would buy more of the near-tie the argmax margin already measures.
+
+
+## 7. Direct check: what position does the search actually hold?
+
+Rebuilt the portfolio position the evaluator would produce for each selected
+formula, on the holdout window, across the 28 coins:
+
+    seed    mean    std     min     max   frac long  frac active
+    101   0.0714 0.0002  0.066  0.071     1.000       1.000
+    102   0.2493 0.0005  0.247  0.250     1.000       1.000
+    103   0.0405 0.1062 -0.215  0.231     0.650       1.000
+    104   0.1262 0.0930 -0.135  0.241     0.865       1.000
+    105   0.2497 0.0005  0.246  0.250     1.000       1.000
+    106   0.2033 0.0534 -0.105  0.243     0.988       1.000
+    107   0.0714 0.0004  0.068  0.071     1.000       1.000
+    108   0.2500 0.0000  0.250  0.250     1.000       1.000
+    109   0.2499 0.0003  0.246  0.250     1.000       1.000
+    110   0.1429 0.0000  0.143  0.143     1.000       1.000
+
+Seven of the ten selected "strategies" hold a fixed long position for every bar
+of the holdout, with a standard deviation below 0.001. Three sit at the 0.25
+position cap. These are not strategies; they are levered buy-and-holds whose
+size the search chose.
+
+Only three seeds vary at all (103, 104, 106), and they carry the three lowest
+holdout Sharpe values in the batch. The relationship runs the wrong way: the
+constant-position runs have a median position of 0.2493 and the varying ones
+0.1262.
+
+This is the clearest statement of the finding. It is not that the search picked a
+bad formula. It is that seven times out of ten the search converged on holding,
+and the only thing it optimised was how much.
