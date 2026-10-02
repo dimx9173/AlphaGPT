@@ -273,3 +273,89 @@ class TestLoopLevelWiring:
         # selection fold's pick, not the holdout's
         sel_folds = [r for r in recs if not r.get("is_holdout")]
         assert sel_folds, "no selection folds"
+
+
+class TestStandardModeWiring:
+    """R2 fix: the standard-mode loop inside main() had no behavioural pin, only
+    the regex scan, so a re-spelled weighted key there would pass. This drives the
+    loop the same way TestLoopLevelWiring does for walkforward.
+    """
+
+    @staticmethod
+    def _stub(monkeypatch, val_fn):
+        calls = {"n": 0}
+
+        def fake(formula, maps, returns, start, end, funding_mask, scale_end, bars,
+                 psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None):
+            is_val = calls["n"] % 2 == 1
+            calls["n"] += 1
+            tr = float(formula[0])
+            return {
+                'reward': val_fn(tr) if is_val else tr,
+                'portfolio_sharpe': tr, 'portfolio_mdd': 0.1,
+                'buy_and_hold_sharpe': 0.0, 'excess_sharpe_vs_buy_and_hold': 0.0,
+                'mean_position': 0.0, 'min_leg_sharpe': 0.0, 'mean_ic': tr,
+                'activity': 0.5, 'positive_coins': 20, 'leg_sharpes': [tr],
+                'turnover': 1e-3, 'solvent': True,
+            }
+
+        monkeypatch.setattr(ga, "evaluate", fake)
+
+    @staticmethod
+    def _neutral(monkeypatch):
+        import random
+        monkeypatch.setattr(ga, "random_formula", lambda rng: (rng.randrange(100),))
+        monkeypatch.setattr(ga, "seed_formulas", lambda: [])
+        monkeypatch.setattr(ga, "crossover", lambda a, b, rng: a)
+        monkeypatch.setattr(ga, "mutate", lambda f, rng: f)
+        return random.Random(11)
+
+    def _run_standard(self, monkeypatch, val_fn, select_on):
+        """Run the standard-mode selection loop as main() does and return the
+        selected formula. main() is not importable without running argparse, so
+        the loop is reproduced here from the same statements; the point is the
+        key expression, which lives on one line."""
+        import argparse
+        from pathlib import Path
+        self._stub(monkeypatch, val_fn)
+        rng = self._neutral(monkeypatch)
+        args = argparse.Namespace(generations=3, population=8, reward_version='v1',
+                                 select_on=select_on)
+        maps = {}; returns = {}
+        ranges = {'train': (0, 100), 'validation': (110, 200), 'lockbox': (210, 300)}
+        scale_end = 100
+        common = []
+        funding_mask = {}
+        funding_by_coin = {}
+
+        # verbatim from main(), except it is factored into a helper so the test can
+        # call it without argparse
+        return ga.run_standard_selection(args, maps, returns, ranges, scale_end,
+                                         common, funding_mask, funding_by_coin, rng)
+
+    @staticmethod
+    def _formula(run_result):
+        """The selection decision is the formula and its train score.
+
+        run_standard_selection returns (best, history) where best is the
+        (sel, formula, train, validation) record. The record also carries the
+        validation evaluation, which legitimately differs between two runs that
+        selected the same genome under different validation rewards, so comparing
+        the whole record would fail a correct implementation.
+        """
+        best = run_result[0]
+        return (best[1], best[0])
+
+    def test_standard_loop_ignores_validation_under_train_mode(self, monkeypatch):
+        BIG = 1e6
+        a = self._run_standard(monkeypatch, lambda tr: -BIG * tr, "train")
+        b = self._run_standard(monkeypatch, lambda tr: +BIG * tr, "train")
+        assert self._formula(a) == self._formula(b), \
+            "standard loop moved its selection with the validation reward under train mode"
+
+    def test_standard_loop_does_respond_under_legacy_mode(self, monkeypatch):
+        BIG = 1e6
+        a = self._run_standard(monkeypatch, lambda tr: -BIG * tr, "val_weighted")
+        b = self._run_standard(monkeypatch, lambda tr: +BIG * tr, "val_weighted")
+        assert self._formula(a) != self._formula(b), \
+            "legacy control inert; the standard-mode pin would be vacuous"

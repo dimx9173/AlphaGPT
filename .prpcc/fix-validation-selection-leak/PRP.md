@@ -55,8 +55,13 @@ This defect was found by Codex during the PRP-1 feasibility review
       JSON for every fold.
 - [ ] C4. Regression: a 2-fold, 2-generation smoke run completes and writes C5/C3
       fields.
-- [ ] C5. Historical batches remain reproducible via `--select-on val_weighted`,
-      asserted by a test on one recorded seed.
+- [ ] C5. KEY ARITHMETIC ONLY, amended after review. `--select-on val_weighted`
+      reproduces the legacy selection KEY, asserted by a unit test on the helper.
+      It does NOT reproduce historical batch NUMBERS: the meter repair also
+      changed `shape_reward` in this tree, and results/wf_real contains no
+      seed101 fixture to compare against in any case. Full numerical reproduction
+      requires the original commit, which is the honest statement in section 6. The
+      recorded-batch fixture is WAIVED for this PRP.
 
 ## 4. Test Plan
 

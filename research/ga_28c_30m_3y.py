@@ -681,6 +681,48 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
     return records, selected
 
 
+def run_standard_selection(args, maps, returns, ranges, scale_end, common,
+                            funding_mask, funding_by_coin, rng):
+    """Standard-mode selection loop, factored out of main() so it can be tested.
+
+    Same statements and same order as before; the only change is that the loop
+    lives in a named function instead of inline in main(). main() now calls this
+    and prints the returned history, so there is one implementation, not two.
+
+    Returns (best_record, history) where best_record is the (sel, formula, train,
+    validation) tuple carried across generations.
+    """
+    seeds = seed_formulas()
+    pop = (seeds + [random_formula(rng) for _ in range(max(0, args.population - len(seeds)))])[:args.population]
+    history = []
+    best = None
+    for gen in range(args.generations):
+        scored = []
+        for f in pop:
+            a = evaluate(f, maps, returns, *ranges['train'], funding_mask, scale_end,
+                         common, funding_by_coin=funding_by_coin,
+                         reward_version=args.reward_version)
+            b = evaluate(f, maps, returns, *ranges['validation'], funding_mask, scale_end,
+                         common, funding_by_coin=funding_by_coin,
+                         reward_version=args.reward_version)
+            sel = selection_score(a, b, args.select_on)
+            scored.append((sel, f, a, b))
+        scored.sort(key=lambda z: z[0], reverse=True)
+        best = scored[0] if best is None or scored[0][0] > best[0] else best
+        history.append({'generation': gen, 'best_select_score': scored[0][0],
+                        'avg_select_score': float(np.mean([x[0] for x in scored])),
+                        'best_formula': list(scored[0][1])})
+        elites = [x[1] for x in scored[:max(2, args.population // 10)]]
+        new = list(elites)
+        while len(new) < args.population:
+            p1 = scored[rng.randrange(min(5, len(scored)))][1]
+            p2 = scored[rng.randrange(min(5, len(scored)))][1]
+            child = crossover(p1, p2, rng) if rng.random() < 0.5 else mutate(p1, rng)
+            new.append(child)
+        pop = new
+    return best, history
+
+
 def seed_formulas():
     # Baseline seeds from the rank-IC scan: HL_RANGE, LOG_VOL, FOMO, VOL_TREND.
     # A bare factor wrapped in the grammar's unary operator is legal at length
@@ -755,21 +797,11 @@ def main():
         with args.out.open('w') as f_: json.dump(out,f_,indent=1)
         print(json.dumps(out.get('holdout',{}),indent=1))
         return 0
-    seeds=seed_formulas(); pop=(seeds+[random_formula(rng) for _ in range(max(0,args.population-len(seeds)))])[:args.population]; history=[]; best=None
-    for gen in range(args.generations):
-        scored=[]
-        for f in pop:
-            a=evaluate(f,maps,returns,*ranges['train'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version); b=evaluate(f,maps,returns,*ranges['validation'],funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version)
-            sel=selection_score(a,b,args.select_on); scored.append((sel,f,a,b))
-        scored.sort(key=lambda z:z[0],reverse=True); best=scored[0] if best is None or scored[0][0]>best[0] else best
-        history.append({'generation':gen,'best_select_score':scored[0][0],'avg_select_score':float(np.mean([x[0] for x in scored])),'best_formula':list(scored[0][1])})
-        print(f'gen={gen} best={scored[0][0]:.3f} avg={np.mean([x[0] for x in scored]):.3f}',flush=True)
-        elites=[x[1] for x in scored[:max(2,args.population//10)]]
-        new=list(elites)
-        while len(new)<args.population:
-            p1=scored[rng.randrange(min(5,len(scored)))][1]; p2=scored[rng.randrange(min(5,len(scored)))][1]
-            child=crossover(p1,p2,rng) if rng.random()<0.5 else mutate(p1,rng); new.append(child)
-        pop=new
+    best, history = run_standard_selection(args, maps, returns, ranges, scale_end,
+                                           common, funding_mask, funding_by_coin, rng)
+    for h_ in history:
+        print(f"gen={h_['generation']} best={h_['best_select_score']:.3f} "
+              f"avg={h_['avg_select_score']:.3f}", flush=True)
     # Use shared accounting for all evaluations
     f=best[1]
     oos=evaluate(f,maps,returns,*lockbox_range,funding_mask,scale_end,common,funding_by_coin=funding_by_coin,reward_version=args.reward_version)
