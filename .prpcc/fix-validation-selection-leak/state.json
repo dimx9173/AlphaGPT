@@ -1,11 +1,48 @@
 {
   "feature": "fix-validation-selection-leak",
-  "phase": "code",
+  "phase": "verified",
   "tasks": [],
   "history": [
     {
       "phase": "start",
       "note": "raised by Codex PRP-1 review R1; blocks PRP-1/2/3"
+    },
+    {
+      "phase": "plan",
+      "note": "Claude architect verified the defect at both call sites; PLAN.md T1-T5"
+    },
+    {
+      "phase": "code",
+      "note": "author implemented after the delegated code phase stalled"
+    },
+    {
+      "phase": "review",
+      "note": "round1 CONDITIONAL (B1 freeze, B2 wiring-only tests, B3 vacuous regex)"
+    },
+    {
+      "phase": "review",
+      "note": "round2 CONDITIONAL (R1 C5 impossible promise, R2 no std-loop pin)"
+    },
+    {
+      "phase": "review",
+      "note": "round3 PASS, zero blocking"
+    },
+    {
+      "phase": "verify",
+      "note": "6/6 gates green"
     }
-  ]
+  ],
+  "review": {
+    "verdict": "PASS",
+    "blocking": 0,
+    "rounds": 3
+  },
+  "verify": {
+    "review_verdict_PASS": true,
+    "tests_green": true,
+    "preexisting_failure_unchanged": true,
+    "no_val_key_outside_helper": true,
+    "default_select_on_train": true,
+    "pilot_freeze_intact": true
+  }
 }

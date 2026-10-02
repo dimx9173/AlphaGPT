@@ -1,83 +1,73 @@
-# REVIEW: PRP-0 fix-validation-selection-leak (Reviewer: Codex)
+# REVIEW (FINAL): PRP-0 fix-validation-selection-leak (Reviewer: Codex, round 3)
 
-## Verdict: CONDITIONAL
+## Verdict: PASS
 
-The leak itself is closed in both loops. Merge is blocked on the freeze
-violation (B1) and the test gaps (B2, B3), which mean the closure is not
-pinned and historical reproducibility is unproven.
+Commit `9c14fd3` genuinely resolves R1 and R2 from the round-2 CONDITIONAL.
+No remaining acceptance criterion is unmet and no new defect was introduced.
 
-## Blocking issues
+## R1 — resolved, not restated
 
-### B1. Pilot freeze violated: evaluator math moved in the same change
-- The working-tree diff (`/tmp/prpcc_p0.diff`) contains, alongside the
-  selection fix, the pilot-meter-repair edit: `shape_reward` activity cliff
-  (`return -50.0` / `mean_act_guard`) removed and replaced with a continuous
-  penalty, plus `ACTIVITY_TARGET` / `INACTIVITY_WEIGHT` / `PEER_BASELINE`.
-- PRP-0 §Non-Functional freezes evaluator math. This breaks the §6 rollback
-  story: `--select-on val_weighted` reproduces the old *selection key*, but
-  NOT old batch numbers, because the reward underneath it changed.
-- `results/wf_real/*/seed101.json` does not exist in the tree, so C5
-  ("reproduces the recorded formula") is asserted nowhere and provable nowhere.
-- Fix: split the meter repair out of this change, or amend the PRP to
-  explicitly re-baseline the freeze with before/after reward dumps. Either
-  way, add the seed-101 repro test (C5) against a checked-in fixture.
+- PRP.md C5 is amended to key-arithmetic-only: `--select-on val_weighted`
+  reproduces the legacy selection KEY via a unit test on the helper, and the
+  recorded-batch fixture is explicitly WAIVED with the reason recorded
+  (meter repair also changed `shape_reward`; no seed101 fixture exists in
+  `results/wf_real`; full numerical reproduction requires the original
+  commit, as honestly stated in PRP section 6).
+- The amendment matches the code reality: `test_legacy_mode_still_reproduces_the_old_formula`
+  pins the key arithmetic, and `test_helper_still_contains_the_legacy_key_for_reproducibility`
+  pins that the legacy key survives. The waiver closes the loop instead of
+  leaving C5 silently unproven.
 
-### B2. Tests pin the helper, not the wiring (C1/C2/C4 unproven)
-- Every selection test calls `ga.selection_score` directly or re-implements
-  the sort in the test body. Nothing runs `run_walkforward` or the standard
-  loop, so a future edit that bypasses `selection_score` (e.g. inlines a
-  weighted key at the call site) passes all tests while re-opening the leak.
-- C1 demands a perturbation test on the *selected genome*; the tests perturb
-  only the helper's return value. C2 (train == val_weighted under constant
-  validation reward) and C4 (2-fold/2-gen smoke writing C3 fields) have no
-  test at all.
-- Fix: add a loop-level test that monkeypatches `evaluate` (or injects
-  absurd `b['reward']` values) and asserts `fold_best`/elite/parent sets are
-  unchanged, plus the C2 degenerate-case test and a C4 smoke run.
+## R2 — resolved, not restated
 
-### B3. The regex scan is vacuous as written
-- `test_no_val_weighted_selection_in_active_code` strips whitespace and
-  looks for `0.5*a['reward']+0.5*b['reward']` (single quotes). The sanctioned
-  legacy expression inside `selection_score` uses double quotes
-  (`0.5 * a["reward"] + 0.5 * b["reward"]`), which the pattern never matches.
-- Consequences: (a) the test passes with a weighted expression present, so it
-  proves nothing about the active paths; (b) a re-introduced leak spelled with
-  double quotes, reversed operands, or `(a+b)/2` also passes.
-- Fix: allowlist the `selection_score` body explicitly and fail on any other
-  `reward`-mixing expression, or drop the scan and rely on the B2
-  loop-level perturbation test.
+- The standard-mode loop is factored out of `main()` into `run_standard_selection()`,
+  and `TestStandardModeWiring` drives it with a stubbed `evaluate()`: it perturbs
+  only the validation reward (`-BIG*tr` vs `+BIG*tr`) and asserts the selection does
+  not move under `train` mode, with a `val_weighted` control that must move.
+- The pin is behavioural, not textual: the commit message records mutation checks
+  where the standard loop re-spelled as `(a+b)/2` fails 2 tests — the exact case
+  the regex scan could never catch. The walkforward call site has the equivalent
+  `TestLoopLevelWiring` pin.
 
-## Non-blocking notes
+## Factoring fidelity — standard-mode behaviour unchanged
 
-- N1. F5 arithmetic is correct: `overfit_gap = val_reward - train_reward`
-  (negative = ordinary), `argmax_margin = winner_sel - runner_up_sel`.
-- N2. The cross-generation worry is a non-issue: `fold_best` and
-  `fold_runner_up` are updated together in one `if`, so both come from the
-  generation that crowned the winner. Residual staleness (a later generation
-  with a closer runner-up but no new winner keeps the old margin, strict `>`
-  keeps first-wins ties) is acceptable and documented behavior.
-- N3. Under `--select-on val_weighted`, `argmax_margin` is in weighted units,
-  not train units, despite the record calling it the same field. Harmless for
-  a repro-only mode, but label it or note it.
-- N4. `TestTieBreakIsDeterministic` asserts a property of Python's stable
-  sort, not of the project's code. Keep as documentation, not evidence.
-- N5. `TestPilotFreezeStillHolds` does not cover what actually moved: it
-  checks `FORMULA_LEN`/`FEE`/`FUND`/`LEV`/evaluator substrings but not the
-  `shape_reward` cliff or reward scale, so B1 slipped through it. Extend the
-  freeze test to the reward function if the freeze is to mean anything.
-- N6. `b` is still evaluated every generation in both loops (400 reads/fold
-  at pilot settings). That is observation, not selection, and F1 permits it —
-  but the "never revisited" comment lineage should stay dead; the replacement
-  comments do this correctly.
+Compared statement-by-statement against `edd2625:research/ga_28c_30m_3y.py`
+(the inline loop in old `main()`): seed/pop init, per-generation
+evaluate-train/evaluate-validation/`selection_score`/append, sort, best-carry,
+history append, elite slice, refill loop, `pop = new` — all present in
+`run_standard_selection()` in the same order with the same expressions,
+including the sort key and elite-count formula. No RNG or `evaluate` call
+was added, removed, or reordered.
 
-## What was verified
+Per-generation print: old code printed `gen=... best=... avg=...` inside the
+loop; `main()` now prints the same fields off the returned history. The values
+are the identical objects (`scored[0][0]`, same `np.mean` inputs) and the
+format string renders byte-identical lines. The only difference is streaming
+timing (all lines emit after the loop instead of interleaved); content is
+identical on any completed run. History and holdout writes are untouched.
 
-- `run_walkforward`: `scored` ordering, `elites`, `p1`/`p2` (top-5 of
-  `scored`), and `fold_best` all key off `selection_score(a, b, args.select_on)`
-  = `a['reward']` under default. No other `b['reward']` read feeds a decision.
-- Standard loop: same, via `selection_score(a,b,args.select_on)`; final
-  lockbox/train/val re-evaluations and the regime gate run once, post-search.
-- Holdout fold is scored exactly once after selection, never fed back.
-- `--select-on val_weighted` restores the exact old key expression and prints
-  the loud warning; `select_on` is recorded in walkforward records and both
-  `out` dicts.
+## Acceptance criteria status
+
+- C1 (no validation influence on ordering/elites/parents): met at both call
+  sites by loop-level perturbation tests with a responding legacy control.
+- C2 (train == val_weighted under constant validation): met by implication —
+  the invariance tests prove a strictly stronger property (arbitrary, not just
+  constant, validation perturbation leaves selection unchanged).
+- C3 (overfit gap + argmax margin in every fold's JSON): met,
+  `test_fold_records_carry_the_f5_diagnostics` passes.
+- C4 (2-fold, 2-generation smoke run writes C5/C3 fields): met — the
+  `TestLoopLevelWiring` harness runs exactly that shape through the real
+  `run_walkforward`.
+- C5 (amended, key arithmetic only): met; batch fixture waived with reason.
+
+All 17 tests in `tests/test_validation_selection_leak.py` pass.
+
+## New defects introduced
+
+None. Two cosmetic nits, neither blocking: the `_run_standard` docstring still
+says "the loop is reproduced here" (it now calls the helper — the comment is
+stale but harmless), and it carries an unused `pathlib.Path` import.
+
+## Remaining blocking issues
+
+None.

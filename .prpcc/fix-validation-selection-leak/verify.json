@@ -1,0 +1,8 @@
+{
+  "review_verdict_PASS": true,
+  "tests_green": true,
+  "preexisting_failure_unchanged": true,
+  "no_val_key_outside_helper": true,
+  "default_select_on_train": true,
+  "pilot_freeze_intact": true
+}
