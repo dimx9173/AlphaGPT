@@ -56,12 +56,58 @@ INACTIVITY_WEIGHT = 0.5
 # after seeing the runs would be fitted to the batch it is scoring.
 PEER_BASELINE = None
 
+# Turnover price inside shape_reward.
+#
+# Extracted from an inline 0.02 so a probe can sweep it. The value is NOT
+# arbitrary and was not tuned: at 0.02 the term's entire dynamic range across
+# 90 recorded selections was 0.000502 reward units against a total reward spread
+# of 0.6187, i.e. 0.0812%. It is the only term that would penalise trading and
+# it cannot. Whether a larger weight helps is an open question measured by
+# research/turnover_weight_probe_28c.py, not assumed here.
+#
+# The env override exists ONLY so that probe can sweep the weight without editing
+# the search between runs. It is not a runtime knob: any value other than the
+# default makes the run non-comparable with every recorded batch, and
+# tests/test_pilot_meter_repair.py pins the default.
+TURNOVER_WEIGHT = float(os.getenv("ALPHAGPT_TURNOVER_WEIGHT", "0.02"))
+
 # --- PRP-0: validation-window selection leak (2026-10-01) ---
 # DEFAULT_SELECT_ON is "train". "val_weighted" reproduces the pre-PRP behaviour
 # and exists ONLY so the recorded historical batches stay reproducible; it must
 # never be used to produce a reportable result.
 DEFAULT_SELECT_ON = "train"
 SELECT_ON_CHOICES = ("train", "val_weighted")
+
+# Objective presets, each a kwargs dict for shape_reward.
+#
+# These exist because the sweep measured that v3 has no out-of-sample gradient:
+# argmax_margin 0.009 against 0.70 of fold-to-fold scatter, 7 of 10 selected
+# formulas holding a constant position, and 0 of 10 beating buy-and-hold. The
+# turnover weight was measured across 0.02 to 200 and none of them helped, so
+# the objective itself is what needs trying, not a scale factor on it.
+#
+# Every preset is opt-in and the default stays the frozen v3 arithmetic.
+OBJECTIVES = {
+    # The frozen baseline. Present so a sweep can name it explicitly.
+    "v3": {},
+    # Rank-IC as the primary selector. It is the only measured quantity that
+    # separates real from null across regimes: +0.6188 against +0.4297, a gap of
+    # +0.1891, while Sharpe manages +0.8545 against +0.8758, a gap of -0.0214.
+    # Sharpe is dropped to near zero because it is the term that measures drift.
+    "rank_ic": {"w_mean_ic": 0.0, "w_psh": 0.0,
+                "w_rank_ic": 25.0},
+    # Excess over buy-and-hold as the primary objective. This is what the gate
+    # tests and what v3 already priced at 0.30; here it is the whole objective.
+    "excess_bh": {"w_mean_ic": 0.0, "w_psh": 0.0,
+                  "w_excess_bh": 1.0},
+    # Rank-IC and excess-over-hold together, keeping a small Sharpe floor so a
+    # book with no per-leg edge cannot win on breadth alone.
+    "rank_ic_excess_bh": {"w_mean_ic": 0.0, "w_psh": 0.02,
+                          "w_rank_ic": 25.0, "w_excess_bh": 1.0},
+    # v3 with a turnover weight large enough to matter. Measured separately:
+    # 0.02 contributes 0.0812% of the reward spread, so movement is free.
+    "v3_turn20": {"w_turn": 20.0},
+}
 
 
 def selection_score(a, b, mode=DEFAULT_SELECT_ON):
@@ -392,7 +438,10 @@ GAP_TAU = 1.0
 LEG_FLOOR = 0.0
 
 def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
-                 breadth=None, version='v1', excess=None):
+                 breadth=None, version='v1', excess=None,
+                 w_mean_ic=1.0, w_psh=0.10, w_gap=0.30, w_turn=0.02,
+                 w_breadth=2.0, w_excess=0.30, w_rank_ic=0.0, w_excess_bh=0.0,
+                 rank_ic=None, excess_bh=None):
     """Turn raw split diagnostics into a selection score.
 
     psh is this split's own portfolio Sharpe; psh_peer is the other selection
@@ -408,6 +457,24 @@ def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
     so every run failed on that criterion while reporting a positive portfolio
     Sharpe. A selection score that cannot see breadth will keep selecting
     formulas that fail the gate.
+
+    v3 adds excess-over-buy-and-hold as a direct objective. The gate tests
+    EXCESS over a constant levered long on the same bars. Those are different
+    objectives and nothing connected them, so the search maximised the wrong
+    thing for two full iterations: it pushed absolute Sharpe up, which on this
+    universe means matching drift, while the gate kept rejecting every result
+    for failing to beat the hold.
+
+    Weight is 0.30 against the 0.10 already applied to the worst split, so
+    beating the hold is worth roughly three times as much as a one-Sharpe
+    improvement in absolute terms. It is a reward, not a hard constraint: a
+    formula that is short and loses is still scored on its own legs, and the
+    null companion is what says whether v3 found anything or merely learned
+    to look like a long.
+
+    New optional components (disabled by default, enabled via weights):
+    - w_rank_ic * rank_ic: rank-IC as a selector within a regime
+    - w_excess_bh * excess_bh: excess over buy-and-hold as direct objective
     """
     # Activity guard: log-only. It used to return -50.0, which is a cliff, not a
     # gradient. Two runs recorded with the cliff still standing showed it firing
@@ -429,15 +496,15 @@ def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
     psh_worst = min(psh, peer)
     # Divergence: charge for the gap instead of averaging it away.
     gap = softplus((psh - peer) / GAP_TAU) * GAP_TAU
-    base = (mean_ic
-            + 0.10 * psh_worst
-            - 0.30 * gap
-            - 0.02 * mean_turn
+    base = (w_mean_ic * mean_ic
+            + w_psh * psh_worst
+            - w_gap * gap
+            - w_turn * mean_turn
             - 0.10 * softplus((LEG_FLOOR - min_leg) / 0.5))
     if version == 'v1':
         return base
     short = max(0.0, BREADTH_TARGET - breadth)
-    base = base - 2.0 * short
+    base = base - w_breadth * short
     if version == 'v2' or excess is None:
         return base
     # v3: charge the search for what the ACCEPT GATE actually tests.
@@ -455,14 +522,19 @@ def shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
     # formula that is short and loses is still scored on its own legs, and the
     # null companion is what says whether v3 found anything or merely learned
     # to look like a long.
-    return base + 0.30 * excess
-
+    base = base + w_excess * excess
+    if rank_ic is not None:
+        base = base + w_rank_ic * rank_ic
+    if excess_bh is not None:
+        base = base + w_excess_bh * excess_bh
+    return base
 
 def mean_act_guard(mean_turn):
     return mean_turn < 1e-5
 
 
-def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None):
+
+def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None, objective=None):
     grammar=resolve_grammar(formula,grammar)
     leg_net = []; leg_sh = []; leg_turn = []; leg_ic = []; activity = []; leg_bh = []
     timestamps = bars[start:end]
@@ -543,7 +615,8 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
     breadth = sum(x > 0 for x in leg_sh) / len(leg_sh) if leg_sh else 0.0
     reward = shape_reward(psh, psh_peer, min_leg, mean_ic, mean_turn,
                           breadth=breadth, version=reward_version,
-                          excess=active_sh) + activity_penalty
+                          excess=active_sh,
+                          **(objective or {})) + activity_penalty
     return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd,
             'buy_and_hold_sharpe': bh_sh, 'excess_sharpe_vs_buy_and_hold': active_sh,
             'mean_position': float(np.mean([float(np.mean(p[start:end])) for c in COINS_28C])) if COINS_28C else 0.0, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
@@ -584,7 +657,7 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
                 break
             h = evaluate(selected, maps, returns, va_s, va_e, funding_mask,
                          scale_end_hint, common, funding_by_coin=funding_by_coin,
-                         reward_version=args.reward_version)
+                         objective=OBJECTIVES[args.objective])
             records.append({
                 'fold': fold['index'], 'is_holdout': True,
                 'validation': (va_s, va_e),
@@ -621,10 +694,10 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
             for f in pop:
                 a = evaluate(f, maps, returns, tr_s, tr_e, funding_mask, fold_scale_end,
                              common, funding_by_coin=funding_by_coin,
-                             reward_version=args.reward_version)
+                             objective=OBJECTIVES[args.objective])
                 b = evaluate(f, maps, returns, va_s, va_e, funding_mask, fold_scale_end,
                              common, funding_by_coin=funding_by_coin,
-                             reward_version=args.reward_version)
+                             objective=OBJECTIVES[args.objective])
                 # PRP-0: the validation window is NOT part of the selection key.
                 #
                 # This used to read 0.5*train + 0.5*validation, evaluated inside
@@ -701,10 +774,10 @@ def run_standard_selection(args, maps, returns, ranges, scale_end, common,
         for f in pop:
             a = evaluate(f, maps, returns, *ranges['train'], funding_mask, scale_end,
                          common, funding_by_coin=funding_by_coin,
-                         reward_version=args.reward_version)
+                          objective=OBJECTIVES[args.objective])
             b = evaluate(f, maps, returns, *ranges['validation'], funding_mask, scale_end,
                          common, funding_by_coin=funding_by_coin,
-                         reward_version=args.reward_version)
+                          objective=OBJECTIVES[args.objective])
             sel = selection_score(a, b, args.select_on)
             scored.append((sel, f, a, b))
         scored.sort(key=lambda z: z[0], reverse=True)
@@ -743,7 +816,7 @@ def main():
      'xsec: each coin paired with a neighbour bars. Both are false-positive '
      'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2','v3'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
      'walkforward: expanding folds, one selection pass per validation window, '
-     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); args=ap.parse_args()
+     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); ap.add_argument('--objective',choices=tuple(OBJECTIVES),default='v3',help='Selection objective preset. v3 is the frozen baseline. rank_ic makes rank-IC the primary selector. excess_bh optimises excess over buy-and-hold, which is what the gate tests. rank_ic_excess_bh combines them. v3_turn20 is v3 with a turnover weight large enough to matter. Every non-v3 preset is experimental and has no recorded batch behind it.'); args=ap.parse_args()
     if args.select_on == 'val_weighted':
         print('[select-on] WARNING: val_weighted restores the pre-PRP-0 selection key, NOT the '
               'pre-PRP-0 numbers (the meter repair also changed shape_reward in this tree). '
