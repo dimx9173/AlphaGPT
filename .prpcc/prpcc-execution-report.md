@@ -161,3 +161,20 @@ strategy, and the search picks a constant position nineteen times more often tha
 a random draw. The constraint is the objective, not the space and not the
 operators, which is also why PRP-1 (more freedom), PRP-2 (flatter legs) and
 PRP-3 (reprice turnover) could not have helped.
+
+
+## The mechanism, in one number
+
+    mean_ic term      spread 0.02570   weight 1.00
+    0.02 * turnover   spread 0.000502  weight 0.02
+    total reward      spread 0.6187
+
+The turnover term's whole dynamic range is 0.0812% of the reward's total spread.
+It is the only part of `shape_reward` that would penalise trading and it is far
+too small to do so. Movement is free, and with an argmax margin of 0.009 against
+0.70 of fold-to-fold scatter the selection has no reason to prefer it.
+
+Note on the PRP-3 review: it was right that the stated premise was inverted, and
+the rejection followed from that premise. The underlying observation, that
+turnover is priced at a scale incapable of influencing selection, was not what
+the review examined and is recorded here as a limitation rather than a vindication.

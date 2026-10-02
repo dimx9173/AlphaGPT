@@ -229,3 +229,53 @@ It also explains why the three PRPs could not have worked. PRP-1 adds freedom to
 move, against an objective that prefers not moving. PRP-2 penalises legs that
 disagree, which flattens the position. PRP-3 reprices turnover, which is the
 one quantity that distinguishes a moving position from a constant one.
+
+
+## 9. The mechanism: the only term that could penalise trading is four orders too small
+
+Section 8 said the search selects against movement. That is the right
+observation but the wrong mechanism, and the follow-up corrects it.
+
+Across the 90 real-arm selection folds:
+
+    corr(position_std, reward)     +0.119   (weakly POSITIVE)
+    corr(position_std, train_IC)   +0.531   (positive)
+    corr(turnover,      train_IC)  +0.866   (strongly positive)
+
+The reward does not penalise movement. If anything it mildly rewards it. So the
+constant positions are not the reward's preference, and section 8's framing is
+withdrawn.
+
+The scale of each reward term is the mechanism:
+
+    mean_ic term          spread 0.02570   weight 1.00
+    0.02 * turnover       spread 0.000502  weight 0.02
+    total reward          spread 0.6187
+
+The turnover term's entire dynamic range is 0.0812% of the reward's total
+spread. It is the only term in `shape_reward` that would penalise trading, and it
+is roughly four orders of magnitude too small to do anything.
+
+Movement is therefore free. Given movement is free and the argmax margin is
+0.009 against a 0.70 fold-to-fold scatter, the selection has no reason to prefer
+a moving position and lands on a constant one whenever the near-ties happen to
+include one. The GA is not choosing to hold. It is choosing arbitrarily, and a
+constant position is the modal shape of a near-tie in this space.
+
+This is the precise reason all three items fail, and it is a single number rather
+than a judgement:
+
+  - PRP-1 adds freedom to move. The objective already permits it freely, so more
+    freedom changes nothing.
+  - PRP-2 penalises legs that disagree. Flattening the position is the same
+    thing that is already happening, for free.
+  - PRP-3 reprices turnover. This is the only one that touches the actual
+    mechanism, and it was rejected because its premise was wrong: the Sharpe it
+    reprices is already net of costs, and the `-0.02 * mean_turn` term it would
+    have touched is the same negligibly weighted term identified here.
+
+That last point is a real limitation of the PRP-3 review rather than of PRP-3
+itself. The review was right that the stated premise was inverted, and the
+rejection followed from the stated premise. The underlying observation, that
+turnover is priced at a scale that cannot influence selection, survived the
+review and is recorded above.
