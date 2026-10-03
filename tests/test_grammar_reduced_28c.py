@@ -278,7 +278,7 @@ def test_can_finish_agrees_with_brute_force():
     def brute(depth, slots):
         if slots == 0:
             return depth == 1
-        if depth < 1 or depth > 12 or depth > slots + 1:
+        if depth < 1 or depth > 20 or depth > slots + 1:
             return False
         for t in range(REDUCED_TOKENS):
             if t < 12:
@@ -302,4 +302,5 @@ def test_decode_names_every_token():
     f = G.random_formula(rng)
     text = decode(f)
     assert text and "UNK" not in text
-    assert len(text.split()) == 12
+    # variable-length formulas: 6-20 tokens
+    assert 6 <= len(text.split()) <= 20

@@ -11,7 +11,6 @@ ALL_TOKENS=FEATURE_COUNT+len(OPS_CONFIG)
 
 def _can_finish(depth:int, slots:int)->bool:
     if slots==0: return depth==1
-    if depth>12: return False
     if depth<1: return False
     if depth>slots+1: return False
     if _can_finish(depth+1,slots-1): return True

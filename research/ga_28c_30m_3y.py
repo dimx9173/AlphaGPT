@@ -26,7 +26,7 @@ from research.causal_12f import (causal_features, evaluate_formula,
                                 FEATURE_NAMES)
 from research.accounting_28c import scheduled_funding_rates, position_from_signal, accounting_bar_returns, account_portfolio, compound_equity, max_drawdown, daily_sharpe, metrics, ACCOUNTING_VERSION, FUND_RATE, ACCOUNTING_VERSION_REAL, load_real_funding
 
-BPY=17520.0; LEV=2.0; FEE=0.0004; FUND=0.0005; FEATURE_COUNT=12; FORMULA_LEN=12
+BPY=17520.0; LEV=2.0; FEE=0.0004; FUND=0.0005; FEATURE_COUNT=12; FORMULA_MIN_LEN=6; FORMULA_MAX_LEN=20; FORMULA_LEN=12  # backward-compat alias for tests
 DATA_DIR=ROOT/'data'/'data_3y'/'30m'
 CACHE_DIR=ROOT/'data'/'data_3y'/'30m_causal'
 # Bump when causal_features changes meaning; stale caches are then ignored
@@ -255,7 +255,6 @@ def _spec():
 # invalidate all of them.
 def _can_finish_r(depth, slots, n, arity):
     if slots==0: return depth==1
-    if depth>12: return False
     if depth<1: return False
     if depth>slots+1: return False
     if _can_finish_r(depth+1, slots-1, n, arity): return True
@@ -289,18 +288,16 @@ def _is_valid_r(formula):
             if t not in _valid_tokens_r(depth, i, len(formula), n, arity): return False
             depth=_step_r(depth, t, n, arity)
     except ValueError:
-        # Stack underflow. Only a malformed program may reach here: an
-        # unexpected exception type means a bug in this module, and swallowing
-        # it would report every formula as invalid instead of raising.
         return False
     return depth==1
 
 
-def _fill_r(prefix, rng, n, arity):
+def _fill_r(prefix, rng, n, arity, target_len):
+    """Fill prefix to exactly target_len tokens, producing a valid RPN formula."""
     f=list(prefix); depth=0
     for t in f: depth=_step_r(depth, int(t), n, arity)
-    while len(f)<FORMULA_LEN:
-        choices=_valid_tokens_r(depth, len(f), FORMULA_LEN, n, arity)
+    while len(f)<target_len:
+        choices=_valid_tokens_r(depth, len(f), target_len, n, arity)
         if not choices: return None
         t=int(rng.choice(choices)); f.append(t); depth=_step_r(depth, t, n, arity)
     return tuple(f) if depth==1 else None
@@ -308,72 +305,117 @@ def _fill_r(prefix, rng, n, arity):
 
 def _random_formula_reduced(rng):
     n=FEATURE_COUNT; arity=REDUCED_OP_ARITY
+    target_len=rng.randint(FORMULA_MIN_LEN, FORMULA_MAX_LEN)
     for _ in range(200):
-        f=_fill_r([], rng, n, arity)
+        f=_fill_r([], rng, n, arity, target_len)
         if f is not None: return f
     raise RuntimeError('failed to sample a valid reduced-grammar formula')
 
 
 def _mutate_reduced(formula, rng):
     n=FEATURE_COUNT; arity=REDUCED_OP_ARITY
+    L=len(formula)
     for _ in range(50):
-        f=list(formula)
-        pos=rng.randrange(FORMULA_LEN)
-        depth=0
-        for t in f[:pos]: depth=_step_r(depth, int(t), n, arity)
-        choices=_valid_tokens_r(depth, pos, FORMULA_LEN, n, arity)
-        if not choices: continue
-        f[pos]=int(rng.choice(choices))
-        if _is_valid_r(f): return tuple(f)
+        # 80% single-token replacement (length unchanged), 20% length change
+        if rng.random() < 0.8:
+            pos=rng.randrange(L)
+            depth=0
+            f=list(formula)
+            for t in f[:pos]: depth=_step_r(depth, int(t), n, arity)
+            choices=_valid_tokens_r(depth, pos, L, n, arity)
+            if not choices: continue
+            f[pos]=int(rng.choice(choices))
+            if _is_valid_r(f): return tuple(f)
+        else:
+            # Length change: randomly grow or shrink by 1-2 tokens, refill suffix
+            new_len = L + rng.choice([-2, -1, 1, 2])
+            if new_len < FORMULA_MIN_LEN or new_len > FORMULA_MAX_LEN:
+                continue
+            # Pick a cut point, refill to new length
+            cut = rng.randrange(L + 1)
+            prefix = list(formula[:cut])
+            f = _fill_r(prefix, rng, n, arity, new_len)
+            if f is not None and _is_valid_r(f):
+                return f
     return _random_formula_reduced(rng)
 
 
 def _crossover_reduced(a, b, rng):
-    # Repair is uniform resampling at the cut, not a tail-preserving splice.
-    # A tail-preserving repair would depend on the second parent's suffix, and
-    # under the reduced grammar the same token index means a different operator,
-    # so it would not be the same operator.
     n=FEATURE_COUNT; arity=REDUCED_OP_ARITY
-    cut=rng.randrange(1, FORMULA_LEN)
-    f=_fill_r(list(a[:cut]), rng, n, arity)
+    cut=rng.randrange(1, len(a))
+    target=len(b)
+    f=_fill_r(list(a[:cut]), rng, n, arity, target)
     return f if f is not None else _random_formula_reduced(rng)
 
 
 def random_formula(rng):
     if GRAMMAR=='reduced': return _random_formula_reduced(rng)
     seq=[]; depth=0
-    for pos in range(FORMULA_LEN):
-        choices=np.flatnonzero(valid_token_mask(depth,pos,FORMULA_LEN).numpy()).tolist()
+    target_len=rng.randint(FORMULA_MIN_LEN, FORMULA_MAX_LEN)
+    for pos in range(target_len):
+        choices=np.flatnonzero(valid_token_mask(depth,pos,target_len).numpy()).tolist()
         t=rng.choice(choices); seq.append(int(t)); depth=update_depth(depth,int(t))
     return tuple(seq)
 
 
-def mutate(formula,rng):
-    if GRAMMAR=='reduced': return _mutate_reduced(formula,rng)
-    f=list(formula)
-    if rng.random()<0.7:
-        pos=rng.randrange(FORMULA_LEN)
-        depth=0
-        for j in range(pos): depth=update_depth(depth,f[j])
-        choices=np.flatnonzero(valid_token_mask(depth,pos,FORMULA_LEN).numpy()).tolist()
-        f[pos]=rng.choice(choices)
+def _fill_full(prefix, rng, target_len):
+    """Fill prefix to exactly target_len tokens under the FULL grammar."""
+    f = list(prefix); depth = 0
+    for t in f: depth = update_depth(depth, int(t))
+    while len(f) < target_len:
+        pos = len(f)
+        choices = np.flatnonzero(valid_token_mask(depth, pos, target_len).numpy()).tolist()
+        if not choices: return None
+        t = int(rng.choice(choices)); f.append(t)
+        depth = update_depth(depth, t)
+    return tuple(f) if depth == 1 else None
+
+
+def mutate(formula, rng):
+    if GRAMMAR=='reduced': return _mutate_reduced(formula, rng)
+    L = len(formula)
+    roll = rng.random()
+    # 70% token replacement, 20% length change, 10% full resample.
+    # The length branch exists because every historical mutation preserved
+    # the token count, so a fixed-length genome could never grow or
+    # shrink and the search was confined to the factor subsets that fit.
+    if roll < 0.7:
+        f = list(formula)
+        pos = rng.randrange(L)
+        depth = 0
+        for j in range(pos): depth = update_depth(depth, f[j])
+        choices = np.flatnonzero(valid_token_mask(depth, pos, L).numpy()).tolist()
+        if not choices: return random_formula(rng)
+        f[pos] = int(rng.choice(choices))
         if not is_valid(f): return random_formula(rng)
-    else: return random_formula(rng)
-    return tuple(f)
+        return tuple(f)
+    if roll < 0.9:
+        new_len = L + rng.choice([-2, -1, 1, 2])
+        if new_len < FORMULA_MIN_LEN or new_len > FORMULA_MAX_LEN:
+            return random_formula(rng)
+        cut = rng.randrange(L + 1)
+        child = _fill_full(list(formula[:cut]), rng, new_len)
+        if child is not None and is_valid(child): return child
+        return random_formula(rng)
+    return random_formula(rng)
 
 
 def crossover(a,b,rng):
     if GRAMMAR=='reduced': return _crossover_reduced(a,b,rng)
-    cut=rng.randrange(1,FORMULA_LEN); f=list(a[:cut])
+    cut=rng.randrange(1,len(a)); f=list(a[:cut])
     depth=0
     for t in f: depth=update_depth(depth,t)
+    target=len(b)
     for t in b[cut:]:
-        if len(f)>=FORMULA_LEN: break
+        if len(f)>=target: break
         pos=len(f)
-        if bool(valid_token_mask(depth,pos,FORMULA_LEN)[int(t)]):
+        if bool(valid_token_mask(depth,pos,target)[int(t)]):
             f.append(int(t)); depth=update_depth(depth,int(t))
         else:
-            choices=np.flatnonzero(valid_token_mask(depth,pos,FORMULA_LEN).numpy()).tolist(); x=rng.choice(choices); f.append(int(x)); depth=update_depth(depth,int(x))
+            choices=np.flatnonzero(valid_token_mask(depth,pos,target).numpy()).tolist()
+            if not choices:
+                return random_formula(rng)
+            x=rng.choice(choices); f.append(int(x)); depth=update_depth(depth,int(x))
     return tuple(f) if is_valid(f) else random_formula(rng)
 
 
@@ -697,8 +739,9 @@ def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
         # Selection fold. scale_end is this fold's own training end, so the
         # signal normalisation is fit on training data only.
         fold_scale_end = tr_e
-        pop = (seed_formulas()
-               + [random_formula(rng) for _ in range(max(0, args.population - len(seed_formulas())))])[:args.population]
+        seeds = seed_formulas(rng, unbiased=not args.seeded_init)
+        pop = (seeds + [random_formula(rng)
+                        for _ in range(max(0, args.population - len(seeds)))])[:args.population]
         fold_best = None
         # PRP-0 F5: the runner-up is tracked across generations so argmax_margin
         # measures how much the winner actually beat the field on train. A thin
@@ -781,7 +824,7 @@ def run_standard_selection(args, maps, returns, ranges, scale_end, common,
     Returns (best_record, history) where best_record is the (sel, formula, train,
     validation) tuple carried across generations.
     """
-    seeds = seed_formulas()
+    seeds = seed_formulas(rng, unbiased=not args.seeded_init)
     pop = (seeds + [random_formula(rng) for _ in range(max(0, args.population - len(seeds)))])[:args.population]
     history = []
     best = None
@@ -812,7 +855,30 @@ def run_standard_selection(args, maps, returns, ranges, scale_end, common,
     return best, history
 
 
-def seed_formulas():
+def seed_formulas(rng=None, unbiased=False):
+    """Initial population.
+
+    Default is UNBIASED. The four hand-picked factor seeds are still available
+    under `unbiased=False` for reproducing historical batches, because a batch
+    recorded without them is not comparable to one recorded with them.
+
+    Why the default changed: across a 100-seed batch feature 9 appeared in 63%
+    of selected formulas while every other feature sat between 22% and 36%. That
+    is not the factor being better. mutate() replaces a single token, so
+    escaping a factor present in all four seeds takes twelve consecutive
+    generations of it never being reselected, and elitism keeps copying the
+    solutions that contain it. The search was locked to the seeds rather than
+    exploring, which is a different failure from the one the objective sweep was
+    looking for and one no objective change can fix.
+
+    `rng` is required when `unbiased=True`; without it there is no way to draw a
+    random seed, and silently falling back to the biased list would hide the
+    very bias this parameter exists to remove.
+    """
+    if unbiased:
+        if rng is None:
+            raise ValueError("unbiased seeds need an rng")
+        return [random_formula(rng) for _ in range(4)]
     # Baseline seeds from the rank-IC scan: HL_RANGE, LOG_VOL, FOMO, VOL_TREND.
     # A bare factor wrapped in the grammar's unary operator is legal at length
     # 12, and the seeds are revalidated under the active grammar. Token 17 is
@@ -832,14 +898,23 @@ def main():
      'xsec: each coin paired with a neighbour bars. Both are false-positive '
      'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2','v3'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
      'walkforward: expanding folds, one selection pass per validation window, '
-     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); ap.add_argument('--objective',choices=tuple(OBJECTIVES),default='v3',help='Selection objective preset. v3 is the frozen baseline. rank_ic makes rank-IC the primary selector. excess_bh optimises excess over buy-and-hold, which is what the gate tests. rank_ic_excess_bh combines them. v3_turn20 is v3 with a turnover weight large enough to matter. Every non-v3 preset is experimental and has no recorded batch behind it.'); args=ap.parse_args()
+     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); ap.add_argument('--seeded-init',action='store_true',help='Start from the four historical factor seeds (features 9, 5, 3, 11) instead of random formulas. Off by default: across a 100-seed batch feature 9 appeared in 63% of selected formulas against 22-36% for every other feature, because mutate() replaces one token and elitism keeps the seeds alive. Turn this on only to reproduce a historical batch.'); ap.add_argument('--formula-len',choices=('12','varlen'),default='12',help='12: every genome is exactly 12 tokens, the historical setting that every recorded batch used. varlen: sample each genome length uniformly from 6..20, which lifts the reachable factor-subset ceiling from 61.3%% (2510/4096) to 99.7%% (4083/4096). Default 12 so recorded batches stay reproducible; turn on varlen to run the A/B.'); ap.add_argument('--objective',choices=tuple(OBJECTIVES),default='v3',help='Selection objective preset. v3 is the frozen baseline. rank_ic makes rank-IC the primary selector. excess_bh optimises excess over buy-and-hold, which is what the gate tests. rank_ic_excess_bh combines them. v3_turn20 is v3 with a turnover weight large enough to matter. Every non-v3 preset is experimental and has no recorded batch behind it.'); args=ap.parse_args()
     if args.select_on == 'val_weighted':
         print('[select-on] WARNING: val_weighted restores the pre-PRP-0 selection key, NOT the '
               'pre-PRP-0 numbers (the meter repair also changed shape_reward in this tree). '
               'Validation carries half the key and is re-scored pop x generations times '
               'per fold. Diagnostic only; never reportable.', flush=True)
-    global GRAMMAR
+    global GRAMMAR, FORMULA_MIN_LEN, FORMULA_MAX_LEN
     GRAMMAR=args.grammar
+    # The length window is a flag, not a constant change, because every recorded
+    # batch was produced at exactly 12 tokens. Making 6..20 the default would
+    # silently invalidate all of them and break the same reproducibility rule
+    # that forced --select-on and --seeded-init to be opt-in. The A/B for item 2
+    # needs BOTH arms runnable in one tree, which is the actual reason.
+    if args.formula_len == '12':
+        FORMULA_MIN_LEN = FORMULA_MAX_LEN = 12
+    else:
+        FORMULA_MIN_LEN, FORMULA_MAX_LEN = 6, 20
     print(f'[grammar] {GRAMMAR}: {_spec()["max_token"]} tokens, '
           f'{len(_spec()["arity"])} operators', flush=True)
     rng=random.Random(args.seed); common,maps,returns,funding_mask=load_data(null=args.null,null_seed=args.null_seed,null_block=args.null_block);
@@ -868,6 +943,7 @@ def main():
             args,maps,returns,common,funding_mask,funding_by_coin,folds,rng,wf_scale_end)
         out={'status':'ga_paper_only','live_adopted':False,'mode':'walkforward','select_on':args.select_on,
              'grammar':GRAMMAR,'null_data':args.null,'reward_version':args.reward_version,
+             'formula_len':[FORMULA_MIN_LEN,FORMULA_MAX_LEN],'seeded_init':args.seeded_init,
              'funding_source':args.funding,'accounting_version':funding_version,
              'seed':args.seed,'generations':args.generations,'population':args.population,
              'folds':fold_summaries(folds,n),'fold_records':wf_records,

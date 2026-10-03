@@ -185,13 +185,14 @@ class TestLoopLevelWiring:
     def _args(select_on="train", generations=2, population=8):
         import argparse
         return argparse.Namespace(generations=generations, population=population,
-                                 reward_version='v1', select_on=select_on)
+                                 reward_version='v1', select_on=select_on,
+                                 seeded_init=False)
 
     def _run(self, monkeypatch, val_perturb):
         import random
         self._stub_evaluate(monkeypatch, val_perturb)
         monkeypatch.setattr(ga, "random_formula", lambda rng: (rng.randrange(100),))
-        monkeypatch.setattr(ga, "seed_formulas", lambda: [])
+        monkeypatch.setattr(ga, "seed_formulas", lambda rng, unbiased: [])
         monkeypatch.setattr(ga, "crossover", lambda a, b, rng: a)
         monkeypatch.setattr(ga, "mutate", lambda f, rng: f)
         return ga.run_walkforward(
@@ -212,7 +213,7 @@ class TestLoopLevelWiring:
         import random
         self._stub_evaluate(monkeypatch, val_perturb)
         monkeypatch.setattr(ga, "random_formula", lambda rng: (rng.randrange(100),))
-        monkeypatch.setattr(ga, "seed_formulas", lambda: [])
+        monkeypatch.setattr(ga, "seed_formulas", lambda rng, unbiased: [])
         monkeypatch.setattr(ga, "crossover", lambda a, b, rng: a)
         monkeypatch.setattr(ga, "mutate", lambda f, rng: f)
         return ga.run_walkforward(
@@ -307,7 +308,7 @@ class TestStandardModeWiring:
     def _neutral(monkeypatch):
         import random
         monkeypatch.setattr(ga, "random_formula", lambda rng: (rng.randrange(100),))
-        monkeypatch.setattr(ga, "seed_formulas", lambda: [])
+        monkeypatch.setattr(ga, "seed_formulas", lambda rng, unbiased: [])
         monkeypatch.setattr(ga, "crossover", lambda a, b, rng: a)
         monkeypatch.setattr(ga, "mutate", lambda f, rng: f)
         return random.Random(11)
@@ -322,7 +323,8 @@ class TestStandardModeWiring:
         self._stub(monkeypatch, val_fn)
         rng = self._neutral(monkeypatch)
         args = argparse.Namespace(generations=3, population=8, reward_version='v1',
-                                 select_on=select_on)
+                                 select_on=select_on,
+                                 seeded_init=False)
         maps = {}; returns = {}
         ranges = {'train': (0, 100), 'validation': (110, 200), 'lockbox': (210, 300)}
         scale_end = 100
