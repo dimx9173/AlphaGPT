@@ -24,15 +24,17 @@ EFFORTS = (2, 5, 10, 20)
 
 
 def one(job):
-    (gens, data, seed, outdir, pop, folds) = job
+    (gens, data, seed, outdir, pop, folds, objective) = job
     tag = "g%02d_%s_s%d" % (gens, data, seed)
+    if objective != "v3":
+        tag += "_" + objective
     out = Path(outdir) / (tag + ".json")
     null = "iid" if data == "null" else "none"
     cmd = [sys.executable, str(ROOT / "research" / "ga_28c_30m_3y.py"),
            "--mode", "walkforward", "--folds", str(folds),
            "--generations", str(gens), "--population", str(pop),
            "--grammar", "reduced", "--reward-version", "v3",
-           "--objective", "v3", "--select-on", "train",
+           "--objective", objective, "--select-on", "train",
            "--formula-len", "12", "--seed", str(seed),
            "--null", null, "--null-seed", str(seed),
            "--out", str(out)]
@@ -53,10 +55,15 @@ def main():
     ap.add_argument("--workers", type=int, default=8)
     ap.add_argument("--efforts", type=int, nargs="+", default=list(EFFORTS))
     ap.add_argument("--outdir", type=Path, default=ROOT / "results" / "effort_ladder")
+    ap.add_argument("--objective", default="v3", help="reward preset; v3 is the control")
     args = ap.parse_args()
     args.outdir.mkdir(parents=True, exist_ok=True)
+    # The objective is a parameter here so the same harness can run the
+    # reward-vs-gate experiment at one fixed effort level.
+    if args.outdir == ROOT / "results" / "effort_ladder" and args.objective != "v3":
+        args.outdir = ROOT / "results" / ("effort_ladder_" + args.objective)
     seeds = [args.start_seed + i for i in range(args.seeds)]
-    jobs = [(g, d, s, str(args.outdir), args.population, args.folds) for g in args.efforts for d in ("real", "null") for s in seeds]
+    jobs = [(g, d, s, str(args.outdir), args.population, args.folds, args.objective) for g in args.efforts for d in ("real", "null") for s in seeds]
     print(str(len(jobs)) + " runs on " + str(args.workers) + " workers")
     done = []
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
