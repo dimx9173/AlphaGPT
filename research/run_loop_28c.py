@@ -210,7 +210,7 @@ def stage_iterate(loop, args, cycle, null=None):
     cmd = (f'"{PY}" research/ga_28c_30m_3y.py --mode {args.mode} '
            f'--grammar {args.grammar} --generations {args.generations} '
            f'--population {args.population} --seed {args.seed + cycle} '
-           f'--funding real --reward-version {args.reward_version} '
+           f'--funding real --reward-version {args.reward_version} --objective {args.objective} '
            f'--out "{out}"'
            + (f" --null {null}" if null else ""))
     rc, sout, dt = sh(cmd, timeout=args.stage_timeout)
@@ -320,6 +320,16 @@ def main() -> int:
     ap.add_argument("--grammar", choices=["full", "reduced"], default="reduced")
     ap.add_argument("--mode", choices=["standard", "walkforward"],
                     default="walkforward")
+    ap.add_argument("--objective", choices=("v3", "rank_ic", "excess_bh",
+                        "rank_ic_excess_bh", "v3_turn20"),
+                    default="v3",
+                    help="Objective preset for the search. v3 is the frozen "
+                         "baseline. rank_ic uses rank-IC as primary selector, "
+                         "which separates real/null (+0.189 gap). excess_bh "
+                         "optimises excess over buy-and-hold directly, which is "
+                         "what the gate tests. rank_ic_excess_bh combines both "
+                         "with a small Sharpe floor. v3_turn20 uses v3 with a "
+                         "turnover weight large enough to matter.")
     ap.add_argument("--reward-version", default="v1", choices=("v1", "v2", "v3"),
                     help="v1 absolute Sharpe (historical). v2 adds a breadth "
                          "term. v3 additionally rewards EXCESS over a constant "
