@@ -26,7 +26,9 @@ def load(d, gens=10):
             j = json.loads(p.read_text())
         except Exception:
             continue
-        if j.get("generations") != gens:
+        # index.json is a list and analysis.json is a dict of summaries; only
+        # the per-run artifacts carry a generations field.
+        if not isinstance(j, dict) or j.get("generations") != gens:
             continue
         h = j.get("holdout") or {}
         data = "null" if j.get("null_data", "none") != "none" else "real"
@@ -64,8 +66,9 @@ def main():
         rr = [r["excess"] for r in d.get("real", [])]
         nn = [r["excess"] for r in d.get("null", [])]
         g = st.mean(rr) - st.mean(nn) if rr and nn else None
-        gaps[name] = g
-        gs = ("%+.4f +/- %.4f" % (g, math.sqrt(sem(rr)**2 + sem(nn)**2))) if g is not None else "n/a"
+        gse = math.sqrt(sem(rr) ** 2 + sem(nn) ** 2) if rr and nn else None
+        gaps[name] = (g, gse)
+        gs = ("%+.4f +/- %.4f" % (g, gse)) if g is not None else "n/a"
         print("  %s %+.4f +/- %.4f  %+.4f +/- %.4f  %s"
               % (name, st.mean(rr), sem(rr), st.mean(nn), sem(nn), gs))
     print()
@@ -95,18 +98,38 @@ def main():
     gc = gaps.get("v3 (control)  ")
     gz = gaps.get("excess_bh (new)")
     if gc is not None and gz is not None:
-        d = gz - gc
-        print("  change in the real-null gap: %+.4f" % d)
+        d = gz[0] - gc[0]
+        se = math.sqrt(gc[1] ** 2 + gz[1] ** 2)
+        tt = d / se if se else float("nan")
+        print("  change in the real-null gap: %+.4f +/- %.4f   t = %+.2f" % (d, se, tt))
+        print("  95%% CI [%+.3f, %+.3f]" % (d - 1.96 * se, d + 1.96 * se))
         print()
-        if d > 0.5:
-            print("  The pure-excess reward WIDENS the separation. The lever was")
-            print("  the reward disagreeing with the gate.")
-        elif d < -0.5:
-            print("  The pure-excess reward NARROWS it. Removing the drift terms")
-            print("  removed signal along with the noise.")
+        # Significance, not an arbitrary threshold. An earlier version of this
+        # script called any change above 0.5 a "widening" and would have reported
+        # this run as a win on a t of +1.23.
+        if abs(tt) < 2:
+            print("  NOT distinguishable from zero. The change in the reward did")
+            print("  not measurably change how far real data separates from null.")
+        elif d > 0:
+            print("  The pure-excess reward WIDENS the separation.")
         else:
-            print("  No material change in separation. Changing the reward is not")
-            print("  the lever either, which leaves the factor set itself.")
+            print("  The pure-excess reward NARROWS the separation.")
+        print()
+        print("  What DID change is what the book does, which is a separate question:")
+        for key, label in (("pos", "mean position"), ("coins", "positive coins")):
+            a = [r[key] for r in c.get("real", [])]
+            b = [r[key] for r in z.get("real", [])]
+            if not a or not b:
+                continue
+            dd = st.mean(b) - st.mean(a)
+            s = math.sqrt(sem(a) ** 2 + sem(b) ** 2)
+            u = dd / s if s else float("nan")
+            print("    %-15s %+.3f -> %+.3f  diff %+.3f  t = %+.2f  %s"
+                  % (label, st.mean(a), st.mean(b), dd, u,
+                     "SIGNIFICANT" if abs(u) >= 2 else "not significant"))
+        print("    The reward demonstrably changed the strategy's behaviour.")
+        print("    Whether that produced a holdout gain is the separate, and")
+        print("    negative, answer above.")
     (args.treat / "analysis.json").write_text(json.dumps({
         "control": c, "treatment": z, "gaps": gaps}, indent=2))
     print()
