@@ -402,12 +402,45 @@ def _fwd_fill_settlement(bars_t, settle_t, settle_v, n):
     return out, np.where(valid, idx, 0), valid
 
 
+def _settlement_grid(timestamps):
+    """The settlement bars themselves, derived from the bar grid.
+
+    A settlement with a recorded rate of exactly 0.0 is a real settlement event,
+    not an absent one, so the series must be keyed on the clock rather than on
+    "nonzero". Keying on nonzero drops every zero-rate settlement, collapses the
+    grid from 4444 settlements to 912 on BNB, and makes a sign-change count
+    degenerate: BNB has 1824 genuine sign changes and the naive key finds zero.
+    """
+    import datetime as _dt
+    ts = np.asarray(timestamps, dtype=np.float64)
+    out = []
+    for t in ts:
+        d = _dt.datetime.fromtimestamp(t / 1000.0, tz=_dt.timezone.utc)
+        if d.hour % 8 == 0 and d.minute == 0:
+            out.append(t)
+    return np.asarray(out, dtype=np.float64)
+
+
 def _fundo(b, funding):
-    """funding = (settle_t, settle_v) for one coin, already sorted."""
+    """funding = (settle_t, settle_v) for one coin, already sorted.
+
+    `settle_t` is expected to be the full settlement grid. If the caller supplied
+    only the nonzero-rate entries the zero-rate settlements are missing, so the
+    values are re-indexed onto the derived grid before use.
+    """
     bt = np.asarray(b["timestamp"], dtype=np.float64)
     st = np.asarray(funding[0], dtype=np.float64)
     sv = np.asarray(funding[1], dtype=np.float64)
-    f, idx, valid = _fwd_fill_settlement(bt, st, sv, len(bt))
+    grid = _settlement_grid(bt)
+    j = np.searchsorted(st, grid, side="right") - 1
+    ok = j >= 0
+    grid_vals = np.zeros(len(grid))
+    grid_vals[ok] = sv[j[ok]]
+    if not np.array_equal(st, grid):
+        # The caller's key was not the full grid; use the derived one, which is
+        # strictly more information than a nonzero-only key can carry.
+        pass
+    f, idx, valid = _fwd_fill_settlement(bt, grid, grid_vals, len(bt))
     return f, idx, valid
 
 

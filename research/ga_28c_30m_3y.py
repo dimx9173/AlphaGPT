@@ -24,6 +24,11 @@ from research.grammar_reduced_28c import (REDUCED_TOKENS as REDUCED_ALL_TOKENS,
 from research.causal_12f import (causal_features, evaluate_formula,
                                 constant_features, assert_features_vary,
                                 FEATURE_NAMES)
+# The 36-dimension set is opt-in and lives in its own module so the 12-factor
+# path is untouched: every recorded batch was produced against these 12 names at
+# these 12 indices, and silently changing FEATURE_NAMES would invalidate all of
+# them the same way --formula-len would have.
+from research.causal_36f import SHIPPED_24, shipped_with_funding
 from research.accounting_28c import scheduled_funding_rates, position_from_signal, accounting_bar_returns, account_portfolio, compound_equity, max_drawdown, daily_sharpe, metrics, ACCOUNTING_VERSION, FUND_RATE, ACCOUNTING_VERSION_REAL, load_real_funding
 
 BPY=17520.0; LEV=2.0; FEE=0.0004; FUND=0.0005; FEATURE_COUNT=12; FORMULA_MIN_LEN=6; FORMULA_MAX_LEN=20; FORMULA_LEN=12  # backward-compat alias for tests
@@ -140,6 +145,58 @@ def selection_score(a, b, mode=DEFAULT_SELECT_ON):
     return a["reward"]
 
 
+# How many features the active grammar has. Modelled as module state rather
+# than a constant because the 36-factor grammar needs 36 and the reduced
+# operator token indices shift with it; a constant here would silently send a
+# 36-factor search to the 12-factor validator.
+N_FEATURES = 12
+# Per-coin funding series keyed by coin, cached for the run. A dict rather than a
+# reassignable global because load_data fills it from several places and
+# rebinding would need `global` in every one of them.
+_FUNDING_CACHE = {}
+
+
+def _feature_names():
+    if N_FEATURES == 36:
+        from research.grammar_reduced_36c import FEATURE_NAMES_36
+        return FEATURE_NAMES_36
+    return FEATURE_NAMES
+
+
+def _feature_count():
+    return 36 if N_FEATURES == 36 else 12
+
+
+def _build_features(d, coin):
+    """The active feature matrix for one coin.
+
+    The 36-factor set needs the sparse funding series, which load_data does not
+    return because the 12-factor evaluator never needed it. A zero funding
+    series is the documented fallback in load_real_funding for a coin with no
+    stored history, and using it here keeps a missing file from becoming a crash
+    in the middle of a search.
+    """
+    if N_FEATURES != 36:
+        return causal_features(d)
+    from research.grammar_reduced_36c import FEATURE_NAMES_36  # noqa: F401
+    ts = np.asarray(d['timestamp'], dtype=np.int64)
+    if coin not in _FUNDING_CACHE:
+        _FUNDING_CACHE[coin] = load_real_funding(coin, ts)
+    f = _FUNDING_CACHE[coin]
+    # The key is the full settlement grid, not the nonzero-rate subset. A
+    # settlement whose recorded rate is exactly 0.0 still happened, and dropping
+    # it collapses 4444 settlements to 912 on BNB, which makes a sign-change
+    # count degenerate on the one coin whose funding never settles at zero.
+    from research.causal_36f import _settlement_grid
+    key = _settlement_grid(ts)
+    f = f[np.searchsorted(ts, key, side="right") - 1]
+    # load_data keeps its aligned bars as plain lists because the 12-factor path
+    # wraps them in np.asarray internally. The 36-factor factors index with
+    # numpy semantics throughout, so they get arrays.
+    nb = {k: np.asarray(v, dtype=np.float64) for k, v in d.items()}
+    return shipped_with_funding(nb, (key, f))
+
+
 def load_data(null='none', null_seed=0, null_block=48):
     """Aligned bars, features and returns for the 28c contract.
 
@@ -200,11 +257,11 @@ def load_data(null='none', null_seed=0, null_block=48):
                 loaded=np.load(cache)
             except Exception:
                 loaded=None
-        if (loaded is not None and loaded.shape==(len(FEATURE_NAMES), n)
-                and not constant_features(loaded)):
+        if (loaded is not None and loaded.shape==(_feature_count(), n)
+                and not constant_features(loaded, names=_feature_names())):
             maps[c]=loaded
         else:
-            maps[c]=causal_features(d)
+            maps[c]=_build_features(d, c)
             if cache is not None:
                 np.save(cache,maps[c])
         # Refuse to hand a degenerate feature set to the search. Cheap, and it
@@ -253,6 +310,31 @@ def _spec():
 # this repository was produced by that code path, and a rewrite of it that
 # produced the same formulas "up to reimplementation" would silently
 # invalidate all of them.
+def _grammar36():
+    """The 36-factor reduced grammar, imported lazily.
+
+    Token indices are grammar-specific, exactly as the docstring on
+    resolve_grammar already says: reduced token 20 is DELAY1 under 12 factors
+    and SIGN_ENTROPY_20 under 36. Importing both at module scope and picking at
+    call time is the only way the validator and the evaluator can be guaranteed
+    to agree about which set a formula belongs to.
+    """
+    import research.grammar_reduced_36c as g
+    return g
+
+
+def _validate_reduced(formula):
+    if N_FEATURES == 36:
+        return _grammar36().validate_reduced(formula)
+    return validate_reduced(formula)
+
+
+def _evaluate_reduced(formula, features):
+    if N_FEATURES == 36:
+        return _grammar36().evaluate_formula_reduced(formula, features)
+    return evaluate_formula_reduced(formula, features)
+
+
 def _can_finish_r(depth, slots, n, arity):
     if slots==0: return depth==1
     if depth<1: return False
@@ -441,7 +523,7 @@ def resolve_grammar(formula=None, grammar=None):
     """
     if grammar is None:
         grammar = GRAMMAR
-    if formula is not None and grammar == 'reduced' and not validate_reduced(formula):
+    if formula is not None and grammar == 'reduced' and not _validate_reduced(formula):
         raise ValueError(
             f"formula {list(formula)} is not valid in the reduced grammar; "
             "refusing to evaluate it rather than mistranslate its tokens")
@@ -455,7 +537,7 @@ def formula_signal(formula,maps,c,grammar=None):
     # grammar chooses the evaluator, and resolve_grammar refuses a mismatch.
     grammar=resolve_grammar(formula,grammar)
     if grammar=='reduced':
-        return evaluate_formula_reduced(list(formula),maps[c])
+        return _evaluate_reduced(list(formula),maps[c])
     return evaluate_formula(list(formula),maps[c])
 
 
@@ -898,14 +980,27 @@ def main():
      'xsec: each coin paired with a neighbour bars. Both are false-positive '
      'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2','v3'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
      'walkforward: expanding folds, one selection pass per validation window, '
-     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); ap.add_argument('--seeded-init',action='store_true',help='Start from the four historical factor seeds (features 9, 5, 3, 11) instead of random formulas. Off by default: across a 100-seed batch feature 9 appeared in 63% of selected formulas against 22-36% for every other feature, because mutate() replaces one token and elitism keeps the seeds alive. Turn this on only to reproduce a historical batch.'); ap.add_argument('--formula-len',choices=('12','varlen'),default='12',help='12: every genome is exactly 12 tokens, the historical setting that every recorded batch used. varlen: sample each genome length uniformly from 6..20, which lifts the reachable factor-subset ceiling from 61.3%% (2510/4096) to 99.7%% (4083/4096). Default 12 so recorded batches stay reproducible; turn on varlen to run the A/B.'); ap.add_argument('--objective',choices=tuple(OBJECTIVES),default='v3',help='Selection objective preset. v3 is the frozen baseline. rank_ic makes rank-IC the primary selector. excess_bh optimises excess over buy-and-hold, which is what the gate tests. rank_ic_excess_bh combines them. v3_turn20 is v3 with a turnover weight large enough to matter. Every non-v3 preset is experimental and has no recorded batch behind it.'); args=ap.parse_args()
+     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); ap.add_argument('--seeded-init',action='store_true',help='Start from the four historical factor seeds (features 9, 5, 3, 11) instead of random formulas. Off by default: across a 100-seed batch feature 9 appeared in 63% of selected formulas against 22-36% for every other feature, because mutate() replaces one token and elitism keeps the seeds alive. Turn this on only to reproduce a historical batch.'); ap.add_argument('--formula-len',choices=('12','varlen'),default='12',help='12: every genome is exactly 12 tokens, the historical setting that every recorded batch used. varlen: sample each genome length uniformly from 6..20, which lifts the reachable factor-subset ceiling from 61.3%% (2510/4096) to 99.7%% (4083/4096). Default 12 so recorded batches stay reproducible; turn on varlen to run the A/B.'); ap.add_argument('--factors',choices=('12','36'),default='12',help='12: the historical factor set, which every recorded batch used. 36: adds the 24 measured-low-correlation factors from causal_36f; indices 0..11 keep their meaning so old artifacts stay decodable, and the reduced grammar operator indices shift to sit above the additions. Default 12 so recorded batches stay reproducible.'); ap.add_argument('--objective',choices=tuple(OBJECTIVES),default='v3',help='Selection objective preset. v3 is the frozen baseline. rank_ic makes rank-IC the primary selector. excess_bh optimises excess over buy-and-hold, which is what the gate tests. rank_ic_excess_bh combines them. v3_turn20 is v3 with a turnover weight large enough to matter. Every non-v3 preset is experimental and has no recorded batch behind it.'); args=ap.parse_args()
     if args.select_on == 'val_weighted':
         print('[select-on] WARNING: val_weighted restores the pre-PRP-0 selection key, NOT the '
               'pre-PRP-0 numbers (the meter repair also changed shape_reward in this tree). '
               'Validation carries half the key and is re-scored pop x generations times '
               'per fold. Diagnostic only; never reportable.', flush=True)
-    global GRAMMAR, FORMULA_MIN_LEN, FORMULA_MAX_LEN
+    global GRAMMAR, FORMULA_MIN_LEN, FORMULA_MAX_LEN, N_FEATURES
     GRAMMAR=args.grammar
+    N_FEATURES = 36 if args.factors == '36' else 12
+    if N_FEATURES == 36:
+        # The reduced grammar's operator token indices are absolute, so a
+        # 36-factor search needs them shifted above the 24 additions. Routing
+        # through the 12-factor validator instead would silently reject every
+        # genome that used a new factor, or worse, accept one that used a
+        # token whose meaning moved.
+        global REDUCED_ALL_TOKENS, REDUCED_OP_ARITY, FEATURE_COUNT
+        from research.grammar_reduced_36c import (
+            REDUCED_TOKENS as T36, REDUCED_ARITY as A36)
+        REDUCED_ALL_TOKENS = T36
+        REDUCED_OP_ARITY = A36
+        FEATURE_COUNT = 36
     # The length window is a flag, not a constant change, because every recorded
     # batch was produced at exactly 12 tokens. Making 6..20 the default would
     # silently invalidate all of them and break the same reproducibility rule
@@ -944,6 +1039,7 @@ def main():
         out={'status':'ga_paper_only','live_adopted':False,'mode':'walkforward','select_on':args.select_on,
              'grammar':GRAMMAR,'null_data':args.null,'reward_version':args.reward_version,
              'formula_len':[FORMULA_MIN_LEN,FORMULA_MAX_LEN],'seeded_init':args.seeded_init,
+             'n_features':N_FEATURES,
              'funding_source':args.funding,'accounting_version':funding_version,
              'seed':args.seed,'generations':args.generations,'population':args.population,
              'folds':fold_summaries(folds,n),'fold_records':wf_records,

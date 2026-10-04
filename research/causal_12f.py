@@ -251,18 +251,25 @@ FACTOR_INPUTS = {
 }
 
 
-def constant_features(features: np.ndarray, tol: float = CONSTANT_TOL) -> list:
-    """Names of factors that carry no information on this series."""
+def constant_features(features: np.ndarray, tol: float = CONSTANT_TOL,
+                      names=None) -> list:
+    """Names of factors that carry no information on this series.
+
+    `names` exists so a 36-factor matrix is reported with the 36 names instead
+    of the first 12 and "f12".."f35". The default keeps every existing caller
+    unchanged.
+    """
     features = np.asarray(features, dtype=np.float64)
     if features.ndim != 2:
         raise ValueError(f"expected a (n_factors, n_bars) array, got {features.shape}")
+    label = FEATURE_NAMES if names is None else names
     out = []
     for i in range(features.shape[0]):
         row = features[i]
         if row.size == 0:
             continue
         if float(np.ptp(row)) <= tol or float(np.std(row)) <= tol:
-            name = (FEATURE_NAMES[i] if i < len(FEATURE_NAMES) else f"f{i}")
+            name = (label[i] if i < len(label) else f"f{i}")
             out.append(name)
     return out
 
