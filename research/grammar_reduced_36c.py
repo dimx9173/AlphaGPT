@@ -17,6 +17,8 @@ grammar still means the same thing here.
 """
 from __future__ import annotations
 
+import sys
+
 import numpy as np
 
 from research.grammar_reduced_28c import (
@@ -29,6 +31,26 @@ from research.causal_12f import _delay, _corr  # noqa: F401
 
 FEATURE_COUNT = 36
 _SHIFT = FEATURE_COUNT - 12
+
+
+def with_feature_count(n):
+    """Rebind this module for a different feature count.
+
+    The operator table is absolute, so the shift and every derived
+    table move with the count. Doing it as a function rather than a
+    third copy of the module is what keeps the 12, 36 and 41
+    grammars provably the same operator set at different offsets.
+    """
+    shift = n - 12
+    ops = {k + shift: v for k, v in _OPS_12.items()}
+    g = sys.modules[__name__]
+    g.FEATURE_COUNT = n
+    g._SHIFT = shift
+    g.REDUCED_OPS = ops
+    g.REDUCED_ARITY = {k + shift: v for k, v in _ARITY_12.items()}
+    g.REDUCED_TOKENS = n + len(ops)
+    g.REDUCED_OP_COUNT = len(ops)
+    return g
 
 # Same 11 operators, same arities, re-indexed to sit above the 36 factors.
 REDUCED_OPS = {k + _SHIFT: v for k, v in _OPS_12.items()}
@@ -92,3 +114,6 @@ def evaluate_formula_reduced(formula, features):
     if len(stack) != 1:
         return None
     return np.nan_to_num(stack[0], nan=0.0, posinf=5.0, neginf=-5.0)
+
+
+FEATURE_NAMES_36_ALL = FEATURE_NAMES_36

@@ -41,10 +41,10 @@ BAR_SIZES = {
             "bars": 35553},
     "1h":  {"step_ms": 60 * 60 * 1000, "bpy": 8760.0,
             "data": "data/data_3y/1h", "cache": "data/data_3y/1h_causal",
-            "bars": 26280},
+            "bars": 18026},
     "4h":  {"step_ms": 4 * 60 * 60 * 1000, "bpy": 2190.0,
             "data": "data/data_3y/4h", "cache": "data/data_3y/4h_causal",
-            "bars": 6570},
+            "bars": 4507},
 }
 BAR = "30m"
 WINDOW_SCALE = 1.0
@@ -174,6 +174,9 @@ _FUNDING_CACHE = {}
 
 
 def _feature_names():
+    if N_FEATURES == 41:
+        from research.causal_36f import mtf_names
+        return tuple(mtf_names())
     if N_FEATURES == 36:
         from research.grammar_reduced_36c import FEATURE_NAMES_36
         return FEATURE_NAMES_36
@@ -181,7 +184,7 @@ def _feature_names():
 
 
 def _feature_count():
-    return 36 if N_FEATURES == 36 else 12
+    return N_FEATURES
 
 
 def _build_features(d, coin):
@@ -193,7 +196,7 @@ def _build_features(d, coin):
     stored history, and using it here keeps a missing file from becoming a crash
     in the middle of a search.
     """
-    if N_FEATURES != 36:
+    if N_FEATURES == 12:
         return causal_features(d)
     from research.grammar_reduced_36c import FEATURE_NAMES_36  # noqa: F401
     ts = np.asarray(d['timestamp'], dtype=np.int64)
@@ -211,6 +214,9 @@ def _build_features(d, coin):
     # wraps them in np.asarray internally. The 36-factor factors index with
     # numpy semantics throughout, so they get arrays.
     nb = {k: np.asarray(v, dtype=np.float64) for k, v in d.items()}
+    if N_FEATURES == 41:
+        from research.causal_36f import shipped_with_mtf
+        return shipped_with_mtf(nb, (key, f))
     return shipped_with_funding(nb, (key, f))
 
 
@@ -278,12 +284,19 @@ def load_data(null='none', null_seed=0, null_block=48):
                                          block=null_block)
                  for i,c in enumerate(COINS_28C)}
 
+    CACHE_DIR.mkdir(parents=True, exist_ok=True)
     maps={}; returns={}
     for c in COINS_28C:
         d=aligned[c]
         # A null run must recompute. An unversioned or coin-keyed cache would
         # silently return the real factors and invalidate the control.
-        cache=(None if null!='none' else CACHE_DIR/f'{c}-{FEATURE_CACHE_VERSION}.npy')
+        # The feature count is in the cache filename. Without it a 12-factor
+        # matrix loads into a 41-factor run, the shape check passes on the
+        # first 12 rows and the search silently searches the old set. That is
+        # the same failure mode as the LIQ_SCORE placeholder: the pipeline
+        # runs, the guards pass, and the answer is about something else.
+        cache=(None if null != 'none'
+               else CACHE_DIR / ('%s-f%d-%s.npy' % (c, N_FEATURES, FEATURE_CACHE_VERSION)))
         loaded=None
         if cache is not None and cache.exists():
             try:
@@ -357,13 +370,13 @@ def _grammar36():
 
 
 def _validate_reduced(formula):
-    if N_FEATURES == 36:
+    if N_FEATURES in (36, 41):
         return _grammar36().validate_reduced(formula)
     return validate_reduced(formula)
 
 
 def _evaluate_reduced(formula, features):
-    if N_FEATURES == 36:
+    if N_FEATURES in (36, 41):
         return _grammar36().evaluate_formula_reduced(formula, features)
     return evaluate_formula_reduced(formula, features)
 
@@ -1013,7 +1026,7 @@ def main():
      'xsec: each coin paired with a neighbour bars. Both are false-positive '
      'controls for the search, not market data.'); ap.add_argument('--null-seed',type=int,default=0); ap.add_argument('--reward-version',choices=('v1','v2','v3'),default='v1'); ap.add_argument('--null-block',type=int,default=48); ap.add_argument('--mode',choices=('standard','walkforward'),default='standard',help='standard: one train/validation split scored against a lockbox. '
      'walkforward: expanding folds, one selection pass per validation window, '
-     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); ap.add_argument('--seeded-init',action='store_true',help='Start from the four historical factor seeds (features 9, 5, 3, 11) instead of random formulas. Off by default: across a 100-seed batch feature 9 appeared in 63% of selected formulas against 22-36% for every other feature, because mutate() replaces one token and elitism keeps the seeds alive. Turn this on only to reproduce a historical batch.'); ap.add_argument('--formula-len',choices=('12','varlen'),default='12',help='12: every genome is exactly 12 tokens, the historical setting that every recorded batch used. varlen: sample each genome length uniformly from 6..20, which lifts the reachable factor-subset ceiling from 61.3%% (2510/4096) to 99.7%% (4083/4096). Default 12 so recorded batches stay reproducible; turn on varlen to run the A/B.'); ap.add_argument('--bars',choices=('30m','1h','4h'),default='30m',help='bar size. 30m is the historical default (data_3y/30m, 35553 bars, BPY 17520). 1h and 4h use the backfilled three-year sets (data_3y/1h 26280 bars BPY 8760, data_3y/4h 6570 bars BPY 2190), so the window is held constant and only the sampling changes. Results are still not comparable to any recorded batch, which are all 30m.'); ap.add_argument('--scale-windows',action='store_true',help='Halve the 36-factor window lengths so their horizons match the 30m values. Without this, doubling the bar size doubles every factor lookback and the run tests sampling and horizon together.'); ap.add_argument('--factors',choices=('12','36'),default='12',help='12: the historical factor set, which every recorded batch used. 36: adds the 24 measured-low-correlation factors from causal_36f; indices 0..11 keep their meaning so old artifacts stay decodable, and the reduced grammar operator indices shift to sit above the additions. Default 12 so recorded batches stay reproducible.'); ap.add_argument('--objective',choices=tuple(OBJECTIVES),default='v3',help='Selection objective preset. v3 is the frozen baseline. rank_ic makes rank-IC the primary selector. excess_bh optimises excess over buy-and-hold, which is what the gate tests. rank_ic_excess_bh combines them. v3_turn20 is v3 with a turnover weight large enough to matter. Every non-v3 preset is experimental and has no recorded batch behind it.'); args=ap.parse_args()
+     'final fold reserved as a holdout.'); ap.add_argument('--folds',type=int,default=4,help='walkforward fold count'); ap.add_argument('--grammar',choices=('full','reduced'),default='full',help='full: 29 tokens / ~3.1e15 valid formulas. reduced: 22 tokens, ten economically-motivated operators, a smaller hypothesis class. Default full so pre-94b59ca-style results stay reproducible.'); ap.add_argument('--select-on',choices=SELECT_ON_CHOICES,default=DEFAULT_SELECT_ON,help='train: selection keys on the train reward only, so the validation window cannot influence ranking, elitism or parent choice (PRP-0 default). val_weighted: restores the pre-PRP-0 SELECTION KEY (validation carried half the key and was re-scored every generation). It does NOT restore historical numbers: the meter repair also changed shape_reward in this tree, so a batch predating both needs its original commit. Diagnostic only, never a reportable result.'); ap.add_argument('--seeded-init',action='store_true',help='Start from the four historical factor seeds (features 9, 5, 3, 11) instead of random formulas. Off by default: across a 100-seed batch feature 9 appeared in 63% of selected formulas against 22-36% for every other feature, because mutate() replaces one token and elitism keeps the seeds alive. Turn this on only to reproduce a historical batch.'); ap.add_argument('--formula-len',choices=('12','varlen'),default='12',help='12: every genome is exactly 12 tokens, the historical setting that every recorded batch used. varlen: sample each genome length uniformly from 6..20, which lifts the reachable factor-subset ceiling from 61.3%% (2510/4096) to 99.7%% (4083/4096). Default 12 so recorded batches stay reproducible; turn on varlen to run the A/B.'); ap.add_argument('--bars',choices=('30m','1h','4h'),default='30m',help='bar size. 30m is the historical default (data_3y/30m, 35553 bars, BPY 17520). 1h and 4h use the backfilled three-year sets (data_3y/1h 26280 bars BPY 8760, data_3y/4h 6570 bars BPY 2190), so the window is held constant and only the sampling changes. Results are still not comparable to any recorded batch, which are all 30m.'); ap.add_argument('--scale-windows',action='store_true',help='Halve the 36-factor window lengths so their horizons match the 30m values. Without this, doubling the bar size doubles every factor lookback and the run tests sampling and horizon together.'); ap.add_argument('--factors',choices=('12','36','41'),default='12',help='12: the historical factor set, which every recorded batch used. 36: adds the 24 measured-low-correlation factors from causal_36f; indices 0..11 keep their meaning so old artifacts stay decodable, and the reduced grammar operator indices shift to sit above the additions. Default 12 so recorded batches stay reproducible.'); ap.add_argument('--objective',choices=tuple(OBJECTIVES),default='v3',help='Selection objective preset. v3 is the frozen baseline. rank_ic makes rank-IC the primary selector. excess_bh optimises excess over buy-and-hold, which is what the gate tests. rank_ic_excess_bh combines them. v3_turn20 is v3 with a turnover weight large enough to matter. Every non-v3 preset is experimental and has no recorded batch behind it.'); args=ap.parse_args()
     if args.select_on == 'val_weighted':
         print('[select-on] WARNING: val_weighted restores the pre-PRP-0 selection key, NOT the '
               'pre-PRP-0 numbers (the meter repair also changed shape_reward in this tree). '
@@ -1042,19 +1055,21 @@ def main():
           % (BAR, BAR_SIZES[BAR]['step_ms'], BPY, WINDOW_SCALE,
              '  (horizons held at the 30m values)' if WINDOW_SCALE != 1.0 else
              '  (every horizon scales with the bar)'), flush=True)
-    N_FEATURES = 36 if args.factors == '36' else 12
-    if N_FEATURES == 36:
+    N_FEATURES = {'12': 12, '36': 36, '41': 41}[args.factors]
+    if N_FEATURES in (36, 41):
         # The reduced grammar's operator token indices are absolute, so a
         # 36-factor search needs them shifted above the 24 additions. Routing
         # through the 12-factor validator instead would silently reject every
         # genome that used a new factor, or worse, accept one that used a
         # token whose meaning moved.
         global REDUCED_ALL_TOKENS, REDUCED_OP_ARITY, FEATURE_COUNT
-        from research.grammar_reduced_36c import (
-            REDUCED_TOKENS as T36, REDUCED_ARITY as A36)
-        REDUCED_ALL_TOKENS = T36
-        REDUCED_OP_ARITY = A36
-        FEATURE_COUNT = 36
+        import research.grammar_reduced_36c as g
+        g.with_feature_count(N_FEATURES)
+        REDUCED_ALL_TOKENS = g.REDUCED_TOKENS
+        REDUCED_OP_ARITY = g.REDUCED_ARITY
+        FEATURE_COUNT = N_FEATURES
+        print('[features] %d dimensions, reduced operators at %d..%d'
+              % (N_FEATURES, N_FEATURES, N_FEATURES + g.REDUCED_OP_COUNT - 1), flush=True)
     # The length window is a flag, not a constant change, because every recorded
     # batch was produced at exactly 12 tokens. Making 6..20 the default would
     # silently invalidate all of them and break the same reproducibility rule
@@ -1073,9 +1088,19 @@ def main():
     if args.funding=='real':
         from research.accounting_28c import real_funding_coverage
         _cov=real_funding_coverage(list(COINS_28C),np.asarray(common,dtype=np.int64))
-        _bad=[c for c,v in _cov.items() if v['events_matched']<v['scheduled_events']]
+        # Report the magnitude, not just the presence. A list of every coin
+        # whose history is not perfectly complete is noise when the shortfall is
+        # one percent, and it trains the reader to ignore the line. The
+        # unmatched events really are treated as zero, so the number has to be
+        # visible, but the threshold is what makes it readable.
+        _bad=[(c, v) for c,v in _cov.items() if v['events_matched']<v['scheduled_events']]
         if _bad:
-            print(f'[funding] incomplete history for {sorted(_bad)}; those events are treated as zero')
+            _worst=max(_bad, key=lambda cv: 1.0 - cv[1]['events_matched']/max(cv[1]['scheduled_events'],1))
+            _gap=_worst[1]['scheduled_events']-_worst[1]['events_matched']
+            _pct=100.0*_gap/max(_worst[1]['scheduled_events'],1)
+            print(f'[funding] {len(_bad)}/{len(_cov)} coins have an incomplete record; '
+                  f'worst is {_worst[0]} at {_gap}/{_worst[1]["scheduled_events"]} '
+                  f'events ({_pct:.1f}%). Unmatched events are charged zero.')
     funding_version = ACCOUNTING_VERSION_REAL if args.funding=='real' else ACCOUNTING_VERSION; n=len(common); contract_splits=split_indices(n, common[0], common[-1]); ranges=search_splits(n, common[0], common[-1]); scale_end=ranges['train'][1]
     lockbox_range=contract_splits['lockbox']
     if args.mode=='walkforward':

@@ -244,11 +244,19 @@ def _variance_ratio_8(b):
     variance is degenerate.
     """
     r = _logret(b["close"])
+    # The 48-bar window is six non-overlapping 8-bar sums. Both numbers scale,
+    # because a hardcoded reshape breaks the moment the window does, which is
+    # exactly what --scale-windows does.
     w = _wins(r, _w(48))
     v1 = w.var(axis=1)
-    groups = w.reshape(len(r), 6, 8).sum(axis=2)
-    v8 = groups.var(axis=1)
-    return np.where(v1 > 1e-18, v8 / (8 * v1 + 1e-18), 1.0)
+    horizon = max(2, int(round(8 * WINDOW_SCALE)))
+    n_groups = w.shape[1] // horizon
+    if n_groups < 2:
+        return np.ones(len(r))
+    usable = n_groups * horizon
+    bucket = w[:, :usable].reshape(len(w), n_groups, horizon).sum(axis=2)
+    vh = bucket.var(axis=1)
+    return np.where(v1 > 1e-18, vh / (horizon * v1 + 1e-18), 1.0)
 
 
 _reg("VARIANCE_RATIO_8", _variance_ratio_8, "efficiency")
@@ -345,7 +353,7 @@ _reg("MINRET_20", _minret_20, "tail")
 def _roll_spread(b):
     r = _logret(b["close"])
     a = _wins(r, _w(50))
-    bb = _wins(np.concatenate(([0.0], r[:-1])), 50)
+    bb = _wins(np.concatenate(([0.0], r[:-1])), _w(50))
     a = a - a.mean(axis=1, keepdims=True)
     bb = bb - bb.mean(axis=1, keepdims=True)
     cov = (a * bb).mean(axis=1)
@@ -821,3 +829,26 @@ def shipped_with_funding(coin_bars, funding):
             v = np.asarray(FUNDING_FACTORS[nm](coin_bars, funding), dtype=np.float64)
         cols.append(v[None, :])
     return np.concatenate(cols, axis=0)
+
+
+# ---------------------------------------------------------------------------
+# The multi-timeframe block. Five coarse-grid factors measured at |r| < 0.6
+# against the 36 and shipped; six more were measured and cut, with the reason
+# recorded in causal_mtf_28c.MTF_FACTORS. Indices 36..40.
+# ---------------------------------------------------------------------------
+
+def shipped_with_mtf(coin_bars, funding):
+    """All 41: the 36 plus the 5 surviving multi-timeframe factors."""
+    from research.causal_36f import shipped_with_funding
+    from research.causal_mtf_28c import MTF_FACTORS, mtf36
+    X = shipped_with_funding(coin_bars, funding)
+    m = mtf36(coin_bars)
+    extra = np.stack([m[n] for n in MTF_FACTORS], axis=0)
+    return np.concatenate([X, extra], axis=0)
+
+
+def mtf_names():
+    from research.causal_36f import shipped_with_funding  # noqa: F401
+    from research.grammar_reduced_36c import FEATURE_NAMES_36
+    from research.causal_mtf_28c import MTF_FACTORS
+    return list(FEATURE_NAMES_36) + list(MTF_FACTORS)
