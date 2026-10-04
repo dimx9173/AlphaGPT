@@ -27,6 +27,24 @@ import numpy as np
 
 NORM_WINDOW = 200
 
+# Window scaling. A window of N bars means N times the bar size, so switching
+# from 30m to 1h doubles every horizon in this module. WINDOW_SCALE exists so a
+# bar-size comparison can hold the horizons fixed instead: setting it to 0.5
+# makes a 100-bar window mean 100 hours at 1h, the same span it meant at 30m.
+# The default 1.0 keeps every window exactly as written in the specification the
+# three-round discussion produced.
+WINDOW_SCALE = 1.0
+
+
+def _w(n):
+    """Scale a window length, never below 2."""
+    return max(2, int(round(n * WINDOW_SCALE)))
+
+
+def set_window_scale(s):
+    global WINDOW_SCALE
+    WINDOW_SCALE = s
+
 
 def _wins(x, w):
     x = np.asarray(x, dtype=np.float64)
@@ -105,8 +123,8 @@ _reg("ATR_RATIO_100", _atr_ratio_100, "volreg", True)
 # --- BREAKOUT: supply and demand over the 50-100 bar horizon ---
 def _donch_pos_100(b):
     c, h, l = b["close"], b["high"], b["low"]
-    hh = _wins(h, 100).max(axis=1)
-    ll = _wins(l, 100).min(axis=1)
+    hh = _wins(h, _w(100)).max(axis=1)
+    ll = _wins(l, _w(100)).min(axis=1)
     return (c - ll) / (hh - ll + 1e-9)
 
 
@@ -121,7 +139,7 @@ def _breakout_dist_50(b):
     worth avoiding rather than flooring after the fact.
     """
     c, h = b["close"], b["high"]
-    hh = np.roll(_wins(h, 50).max(axis=1), 1)
+    hh = np.roll(_wins(h, _w(50)).max(axis=1), 1)
     hh[0] = h[0]
     return (c - hh) / (_atr(b, 14) + 1e-12)
 
@@ -131,7 +149,7 @@ _reg("BREAKOUT_DIST_50", _breakout_dist_50, "breakout")
 
 def _time_since_high_100(b):
     h = b["high"]
-    hh = _wins(h, 100).max(axis=1)
+    hh = _wins(h, _w(100)).max(axis=1)
     age = np.zeros(len(h))
     run = 0.0
     for t in range(len(h)):
@@ -145,8 +163,8 @@ _reg("TIME_SINCE_HIGH_100", _time_since_high_100, "breakout")
 
 # --- DRAWDOWN: disposition-effect supply overhang ---
 _reg("DD_200",
-     lambda b: (b["close"] - _wins(b["close"], 200).max(axis=1))
-               / (_wins(b["close"], 200).max(axis=1) + 1e-9),
+     lambda b: (b["close"] - _wins(b["close"], _w(200)).max(axis=1))
+               / (_wins(b["close"], _w(200)).max(axis=1) + 1e-9),
      "drawdown")
 
 
@@ -174,8 +192,8 @@ _reg("DD_DURATION", _dd_duration, "drawdown")
 def _dollar_imbal_12(b):
     dv = b["close"] * b["volume"]
     s = np.sign(b["close"] - b["open"])
-    num = _tsum(s * dv, 12)
-    den = _tsum(dv, 12)
+    num = _tsum(s * dv, _w(12))
+    den = _tsum(dv, _w(12))
     return np.where(den > 1e-12, num / (den + 1e-12), 0.0)
 
 
@@ -184,7 +202,7 @@ _reg("DOLLAR_IMBAL_12", _dollar_imbal_12, "volprice")
 
 def _obv_slope_20(b):
     obv = np.cumsum(np.sign(b["close"] - b["open"]) * b["volume"])
-    return (obv - _tmean(obv, 20)) / (_tstd(obv, 20) + 1e-9)
+    return (obv - _tmean(obv, _w(20))) / (_tstd(obv, _w(20)) + 1e-9)
 
 
 _reg("OBV_SLOPE_20", _obv_slope_20, "volprice")
@@ -192,8 +210,8 @@ _reg("OBV_SLOPE_20", _obv_slope_20, "volprice")
 
 def _vwap_dev_24(b):
     typ = (b["high"] + b["low"] + b["close"]) / 3.0
-    pv = _tsum(typ * b["volume"], 24)
-    vv = _tsum(b["volume"], 24)
+    pv = _tsum(typ * b["volume"], _w(24))
+    vv = _tsum(b["volume"], _w(24))
     vwap = np.where(vv > 1e-12, pv / (vv + 1e-12), b["close"])
     return _robust_z((b["close"] - vwap) / (vwap + 1e-12))
 
@@ -212,7 +230,7 @@ def _efficiency_12(b):
     net = np.abs(c - np.roll(c, 12))
     net[:12] = 0.0
     step = np.abs(c - np.concatenate(([c[0]], c[:-1])))
-    path = _tsum(step, 12)
+    path = _tsum(step, _w(12))
     return np.where(path > 1e-12, net / (path + 1e-12), 1.0)
 
 
@@ -226,7 +244,7 @@ def _variance_ratio_8(b):
     variance is degenerate.
     """
     r = _logret(b["close"])
-    w = _wins(r, 48)
+    w = _wins(r, _w(48))
     v1 = w.var(axis=1)
     groups = w.reshape(len(r), 6, 8).sum(axis=2)
     v8 = groups.var(axis=1)
@@ -244,7 +262,7 @@ def _autocorr_20(b):
     the two series aligned and the output length equal to the input length.
     """
     r = _logret(b["close"])
-    a = _wins(r, 20)
+    a = _wins(r, _w(20))
     bshift = np.zeros_like(a)
     bshift[20:] = a[19:-1]
     ac = a.std(axis=1)
@@ -315,8 +333,8 @@ _reg("KURT_50", _kurt_50, "tail")
 
 def _minret_20(b):
     r = _logret(b["close"])
-    mn = _wins(r, 20).min(axis=1)
-    sd = _tstd(r, 50)
+    mn = _wins(r, _w(20)).min(axis=1)
+    sd = _tstd(r, _w(50))
     return np.where(sd > 1e-12, mn / (sd + 1e-12), 0.0)
 
 
@@ -326,7 +344,7 @@ _reg("MINRET_20", _minret_20, "tail")
 # --- TURNOVER: cost of trading itself, from bars alone ---
 def _roll_spread(b):
     r = _logret(b["close"])
-    a = _wins(r, 50)
+    a = _wins(r, _w(50))
     bb = _wins(np.concatenate(([0.0], r[:-1])), 50)
     a = a - a.mean(axis=1, keepdims=True)
     bb = bb - bb.mean(axis=1, keepdims=True)
@@ -342,7 +360,7 @@ def _shadow_bal_12(b):
     rng = np.maximum(b["high"] - b["low"], 1e-12)
     uw = (b["high"] - np.maximum(b["close"], b["open"])) / rng
     lw = (np.minimum(b["close"], b["open"]) - b["low"]) / rng
-    return _tmean(uw - lw, 12)
+    return _tmean(uw - lw, _w(12))
 
 
 _reg("SHADOW_BAL_12", _shadow_bal_12, "micro")
@@ -350,7 +368,7 @@ _reg("SHADOW_BAL_12", _shadow_bal_12, "micro")
 
 # --- VOLPRICE rank: where this bar's volume sits in its own recent history ---
 def _vol_rank_100(b):
-    w = _wins(b["volume"], 100)
+    w = _wins(b["volume"], _w(100))
     return (w <= b["volume"][:, None]).sum(axis=1) / 100.0
 
 
@@ -532,7 +550,7 @@ _reg("GAP_1", _gap_1, "micro")
 def _range_expand(b):
     """Event-level range spike: this bar's range against its own trailing max."""
     rng = b["high"] - b["low"]
-    past = np.roll(_wins(rng, 20).max(axis=1), 1)
+    past = np.roll(_wins(rng, _w(20)).max(axis=1), 1)
     past[0] = rng[0]
     return rng / (past + 1e-12)
 
@@ -551,21 +569,21 @@ def _chop_14(b):
     tr = np.maximum.reduce([b["high"] - b["low"],
                             np.abs(b["high"] - pc),
                             np.abs(b["low"] - pc)])
-    span = _wins(b["high"], 14).max(axis=1) - _wins(b["low"], 14).min(axis=1)
-    return _tsum(tr, 14) / (span + 1e-12)
+    span = _wins(b["high"], _w(14)).max(axis=1) - _wins(b["low"], _w(14)).min(axis=1)
+    return _tsum(tr, _w(14)) / (span + 1e-12)
 
 
 _reg("CHOP_14", _chop_14, "efficiency")
 
 
 _reg("VOL_OF_VOL_30",
-     lambda b: _tstd(b["volume"], 30) / (_tmean(b["volume"], 30) + 1e-12),
+     lambda b: _tstd(b["volume"], _w(30)) / (_tmean(b["volume"], _w(30)) + 1e-12),
      "volprice")
 
 
 def _time_since_high_100b(b):
     h = b["high"]
-    hh = _wins(h, 100).max(axis=1)
+    hh = _wins(h, _w(100)).max(axis=1)
     age = np.zeros(len(h))
     run = 0.0
     for t in range(len(h)):
@@ -683,7 +701,7 @@ def _vol_price_corr_20(b):
     """
     r = np.abs(_logret(b["close"]))
     v = b["volume"]
-    a, bb = _wins(r, 20), _wins(v, 20)
+    a, bb = _wins(r, _w(20)), _wins(v, _w(20))
     ac = a - a.mean(axis=1, keepdims=True)
     bc = bb - bb.mean(axis=1, keepdims=True)
     den = (a.std(axis=1) * bb.std(axis=1)) * 20.0
@@ -699,7 +717,7 @@ def _relvol_10_60(b):
     A ratio of two volumes, so the price level cancels and it is not a restated
     LOG_VOL in the way VOL_RANK_100 turned out to be.
     """
-    return _tmean(b["volume"], 10) / (_tmean(b["volume"], 60) + 1e-12) - 1.0
+    return _tmean(b["volume"], _w(10)) / (_tmean(b["volume"], _w(60)) + 1e-12) - 1.0
 
 
 _reg("RELVOL_10_60", _relvol_10_60, "volprice")
@@ -714,7 +732,7 @@ def _illiq_change(b):
     dv = b["close"] * b["volume"]
     ill = np.log(np.maximum(np.abs(_logret(b["close"])), 1e-12)
                  / np.maximum(dv, 1e-12))
-    return _tmean(ill, 20) - _tmean(ill, 100)
+    return _tmean(ill, _w(20)) - _tmean(ill, _w(100))
 
 
 _reg("ILLIQ_CHANGE", _illiq_change, "impact")
@@ -753,7 +771,7 @@ def _post_fund_drift(b, funding):
         if j + 16 < len(bt):
             after[j:j + 16] = 1.0
     r = _logret(b["close"])
-    return _tmean(r, 16) * after
+    return _tmean(r, _w(16)) * after
 
 
 FUNDING_FACTORS["FUND_Z"] = _fund_z
