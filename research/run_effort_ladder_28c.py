@@ -69,14 +69,22 @@ def main():
     args.outdir.mkdir(parents=True, exist_ok=True)
     # The objective is a parameter here so the same harness can run the
     # reward-vs-gate experiment at one fixed effort level.
-    if args.outdir == ROOT / "results" / "effort_ladder" and args.objective != "v3":
-        args.outdir = ROOT / "results" / ("effort_ladder_" + args.objective)
-    if args.factors != "12" and args.outdir == ROOT / "results" / "effort_ladder":
-        args.outdir = ROOT / "results" / ("effort_ladder_f" + args.factors)
-    if args.bars != "30m" and args.outdir == ROOT / "results" / "effort_ladder":
-        args.outdir = ROOT / "results" / ("effort_ladder_" + args.bars + ("_sw" if args.scale_windows else ""))
-    elif args.bars != "30m":
-        args.outdir = ROOT / "results" / (args.outdir.name + "_" + args.bars + ("_sw" if args.scale_windows else ""))
+    # Suffix the default directory so the arms do not overwrite each other, and
+    # ONLY the default. An earlier version renamed unconditionally, which meant a
+    # caller who passed --outdir /somewhere/else had it silently rewritten to
+    # results/ under the repo root. That is how a run ends up writing into a path
+    # the caller did not ask for and, when that path is a dead symlink, fails
+    # after the compute has already been paid for.
+    _default = (args.outdir == ROOT / "results" / "effort_ladder")
+    if _default:
+        name = "effort_ladder"
+        if args.objective != "v3":
+            name += "_" + args.objective
+        if args.factors != "12":
+            name += "_f" + args.factors
+        if args.bars != "30m":
+            name += "_" + args.bars + ("_sw" if args.scale_windows else "")
+        args.outdir = ROOT / "results" / name
     seeds = [args.start_seed + i for i in range(args.seeds)]
     jobs = [(g, d, s, str(args.outdir), args.population, args.folds, args.objective, args.factors, args.bars, args.scale_windows) for g in args.efforts for d in ("real", "null") for s in seeds]
     print(str(len(jobs)) + " runs on " + str(args.workers) + " workers")
