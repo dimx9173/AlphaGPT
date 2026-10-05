@@ -24,12 +24,16 @@ EFFORTS = (2, 5, 10, 20)
 
 
 def one(job):
-    (gens, data, seed, outdir, pop, folds, objective, factors) = job
+    (gens, data, seed, outdir, pop, folds, objective, factors, bars, scale) = job
     tag = "g%02d_%s_s%d" % (gens, data, seed)
     if objective != "v3":
         tag += "_" + objective
     if factors != "12":
         tag += "_f" + factors
+    if bars != "30m":
+        tag += "_" + bars
+    if scale:
+        tag += "_sw"
     out = Path(outdir) / (tag + ".json")
     null = "iid" if data == "null" else "none"
     cmd = [sys.executable, str(ROOT / "research" / "ga_28c_30m_3y.py"),
@@ -37,7 +41,7 @@ def one(job):
            "--generations", str(gens), "--population", str(pop),
            "--grammar", "reduced", "--reward-version", "v3",
            "--objective", objective, "--select-on", "train",
-           "--formula-len", "12", "--factors", factors, "--seed", str(seed),
+           "--formula-len", "12", "--factors", factors, "--bars", bars, "--seed", str(seed),
            "--null", null, "--null-seed", str(seed),
            "--out", str(out)]
     t0 = time.time()
@@ -58,7 +62,9 @@ def main():
     ap.add_argument("--efforts", type=int, nargs="+", default=list(EFFORTS))
     ap.add_argument("--outdir", type=Path, default=ROOT / "results" / "effort_ladder")
     ap.add_argument("--objective", default="v3", help="reward preset; v3 is the control")
-    ap.add_argument("--factors", default="12", choices=["12", "36"], help="feature set")
+    ap.add_argument("--factors", default="12", choices=["12", "36", "41"], help="feature set")
+    ap.add_argument("--bars", default="30m", choices=["30m", "1h", "4h"])
+    ap.add_argument("--scale-windows", action="store_true")
     args = ap.parse_args()
     args.outdir.mkdir(parents=True, exist_ok=True)
     # The objective is a parameter here so the same harness can run the
@@ -67,8 +73,12 @@ def main():
         args.outdir = ROOT / "results" / ("effort_ladder_" + args.objective)
     if args.factors != "12" and args.outdir == ROOT / "results" / "effort_ladder":
         args.outdir = ROOT / "results" / ("effort_ladder_f" + args.factors)
+    if args.bars != "30m" and args.outdir == ROOT / "results" / "effort_ladder":
+        args.outdir = ROOT / "results" / ("effort_ladder_" + args.bars + ("_sw" if args.scale_windows else ""))
+    elif args.bars != "30m":
+        args.outdir = ROOT / "results" / (args.outdir.name + "_" + args.bars + ("_sw" if args.scale_windows else ""))
     seeds = [args.start_seed + i for i in range(args.seeds)]
-    jobs = [(g, d, s, str(args.outdir), args.population, args.folds, args.objective, args.factors) for g in args.efforts for d in ("real", "null") for s in seeds]
+    jobs = [(g, d, s, str(args.outdir), args.population, args.folds, args.objective, args.factors, args.bars, args.scale_windows) for g in args.efforts for d in ("real", "null") for s in seeds]
     print(str(len(jobs)) + " runs on " + str(args.workers) + " workers")
     done = []
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
