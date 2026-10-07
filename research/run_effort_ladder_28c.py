@@ -64,6 +64,11 @@ def main():
     ap.add_argument("--objective", default="v3", help="reward preset; v3 is the control")
     ap.add_argument("--factors", default="12", choices=["12", "36", "41"], help="feature set")
     ap.add_argument("--bars", default="30m", choices=["30m", "1h", "4h"])
+    ap.add_argument("--skip-existing", action="store_true",
+                    help="skip runs whose artifact already exists; without it a\n                          resumed batch recomputes the completed half")
+    ap.add_argument("--arms", nargs="+", default=["real", "null"],
+                    choices=["real", "null"],
+                    help="which data arms to run; resuming a batch that died\n                          mid-arm needs the null arm for seeds whose real arm\n                          already completed")
     ap.add_argument("--scale-windows", action="store_true")
     args = ap.parse_args()
     args.outdir.mkdir(parents=True, exist_ok=True)
@@ -86,8 +91,11 @@ def main():
             name += "_" + args.bars + ("_sw" if args.scale_windows else "")
         args.outdir = ROOT / "results" / name
     seeds = [args.start_seed + i for i in range(args.seeds)]
-    jobs = [(g, d, s, str(args.outdir), args.population, args.folds, args.objective, args.factors, args.bars, args.scale_windows) for g in args.efforts for d in ("real", "null") for s in seeds]
+    jobs = [(g, d, s, str(args.outdir), args.population, args.folds, args.objective, args.factors, args.bars, args.scale_windows) for g in args.efforts for d in args.arms for s in seeds]
     print(str(len(jobs)) + " runs on " + str(args.workers) + " workers")
+    if args.skip_existing:
+        skipped = 0
+        jobs = [j for j in jobs if not (Path(j[3]) / ("g%02d_%s_s%d" % (j[0], j[1], j[2]) + ("" if j[7] == "12" else "_f" + j[7]) + ("" if j[8] == "30m" else "_" + j[8] + ("_sw" if j[9] else "")) + ".json")).exists()]
     done = []
     with ProcessPoolExecutor(max_workers=args.workers) as ex:
         futs = [ex.submit(one, j) for j in jobs]
