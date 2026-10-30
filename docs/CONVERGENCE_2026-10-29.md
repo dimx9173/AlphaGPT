@@ -6,7 +6,7 @@
 
 ## 1. 現況判決
 
-* Real excess `-2.74±0.03`，null `-1.10±0.08`，gap `-1.64±0.09, t=-18.6`（n=1000 配對，seeds 501-1000）。
+* S0 re-run（2026-10-30，1000/1000 ok）：real -2.7429±0.0291（與舊 batch bit-identical，gate corr=1.0000 PASS），null -1.2226±0.0832，**gap -1.5203±0.0881, t=-17.25**，beat-hold real 0.4% / null 25.0%。舊 gap -1.64，新 gap -1.52，同帶，結論不變。
 * Null 打敗 buy-hold `27.6%`（138/500），real 僅 `0.4%`（2/500），70x 倒掛。
 * Breadth `+7.08 幣, t=+24.4`（real 21.0/28 vs null 14.0/28），但轉不成 excess，就是 drift + 付成本。
 * P2 pre-gate：`excess_vs_hold 0/10`，7/10 選出 `std<0.001` 固定 long，`corr(Sharpe,|position|)=+0.65`。
@@ -93,6 +93,9 @@ F --> A
   S0 +2.57 / A1 +1.64 / N0 +1.16（train 窗 fitness，min 聚合弱降 level 屬預期，只看 gap 不看 raw）；
   同窗半半 rank corr：1/3 切分 -0.094，1/2 切分 +0.40（p=1.2e-77），2/3 切分 +0.39。
   半窗 horizon 有結構，但這是窗內相關，與跨折 corr(train,valid)=-0.09 並存，不構成翻案，待五臂驗證。
+* A1 halves-min（2026-10-30，1000/1000 ok）：real -3.1930±0.0145，null -1.0563±0.0793，**gap -2.1367±0.0806, t=-26.52**，beat-hold real 0/500 / null 27.6%，coins real 13.37 / null 13.70。S0 gap -1.52 → A1 -2.14，**擴大 0.62，反方向**。real 往下、null 往上，asymmetry 反轉。第一條（壓縮≥0.40）即掛。
+* N0 odd/even min（2026-10-30，1000/1000 ok）：real -3.0009±0.0201，null -1.2167±0.0787，**gap -1.7843±0.0812, t=-21.97**，beat-hold real 0/500 / null 22.8%。N0 跟 A1 同方向擴大（-1.52→-1.78，差 0.26 超出 ±0.20容限）。
+* **Verdict: shared confound**。N0（故意 unphysical 的控制）跟 A1 同方向動，min-filter 本身是 artefact 製造機，不是 temporal agreement 在起作用。min 家族雙死。FM（median，同類聚合）翻案概率極低；B1 待定。NO-GO 維持。
 
 ---
 ## 8. 專案目標（2026-10-29 更新）
