@@ -98,7 +98,7 @@ TURNOVER_WEIGHT = float(os.getenv("ALPHAGPT_TURNOVER_WEIGHT", "0.02"))
 # and exists ONLY so the recorded historical batches stay reproducible; it must
 # never be used to produce a reportable result.
 DEFAULT_SELECT_ON = "train"
-SELECT_ON_CHOICES = ("train", "val_weighted")
+SELECT_ON_CHOICES = ("train", "val_weighted", "a1", "n0")
 
 # Objective presets, each a kwargs dict for shape_reward.
 #
@@ -157,6 +157,11 @@ def selection_score(a, b, mode=DEFAULT_SELECT_ON):
     Pinned by tests/test_validation_selection_leak.py, including a scan that fails
     if any weighted expression reappears in an active code path.
     """
+    if mode in ("a1", "n0"):
+        # FINAL_SPEC S0-gate: A1/N0 reuse the S0 reward machinery, only the
+        # fitness scalar changes. min() over two train-window halves.
+        halves = train_split_sharpes(a["_pnet"], a["_timestamps"], mode)
+        return min(halves)
     if mode == "val_weighted":
         return 0.5 * a["reward"] + 0.5 * b["reward"]
     return a["reward"]
@@ -713,6 +718,29 @@ def mean_act_guard(mean_turn):
 
 
 
+def train_split_sharpes(pnet_all, timestamps_all, rule):
+    """A1/N0 fitness helper: split train-window pnet, Sharpe each half."""
+    from research.accounting_28c import metrics as _metrics
+    import numpy as _np
+    T = len(pnet_all)
+    if rule == 'a1':
+        m = T // 2
+        halves = [(pnet_all[:m], timestamps_all[:m]),
+                  (pnet_all[m:], timestamps_all[m:])]
+    elif rule == 'n0':
+        halves = [(pnet_all[0::2], timestamps_all[0::2]),
+                  (pnet_all[1::2], timestamps_all[1::2])]
+    else:
+        raise ValueError(f"unknown split rule {rule!r}")
+    out = []
+    for pne, tse in halves:
+        try:
+            s = _metrics(_np.asarray(pne, dtype=_np.float64), tse)['sharpe']
+        except Exception:
+            s = float('nan')
+        out.append(-10.0 if not _np.isfinite(s) else float(s))
+    return out
+
 def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, psh_peer=None, funding_by_coin=None, reward_version='v1', grammar=None, objective=None):
     grammar=resolve_grammar(formula,grammar)
     leg_net = []; leg_sh = []; leg_turn = []; leg_ic = []; activity = []; leg_bh = []
@@ -805,7 +833,7 @@ def evaluate(formula, maps, returns, start, end, funding_mask, scale_end, bars, 
                           **(objective or {})) + activity_penalty
     return {'reward': float(reward), 'portfolio_sharpe': psh, 'portfolio_mdd': mdd,
             'buy_and_hold_sharpe': bh_sh, 'excess_sharpe_vs_buy_and_hold': active_sh,
-            'mean_position': float(np.mean([float(np.mean(p[start:end])) for c in COINS_28C])) if COINS_28C else 0.0, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent']}
+            'mean_position': float(np.mean([float(np.mean(p[start:end])) for c in COINS_28C])) if COINS_28C else 0.0, 'min_leg_sharpe': float(min_leg), 'mean_ic': mean_ic, 'activity': mean_act, 'positive_coins': sum(x > 0 for x in leg_sh), 'leg_sharpes': leg_sh, 'turnover': mean_turn, 'solvent': pm['solvent'], '_pnet': pnet, '_timestamps': timestamps}
 def run_walkforward(args, maps, returns, common, funding_mask, funding_by_coin,
                      folds, rng, scale_end_hint):
     """Run the search fold by fold.

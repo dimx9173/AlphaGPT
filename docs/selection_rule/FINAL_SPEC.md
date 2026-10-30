@@ -39,6 +39,14 @@ aggregation is the mean unless stated. A non-finite half-Sharpe sets that fold's
 | **FM** fold-median | `median(S_1..S_5)`, IQR logged not penalised | B across folds | 1.00x | 500x2 |
 | **N0** odd/even min | `mean_f min(Sharpe(pnet_f[0::2]), Sharpe(pnet_f[1::2]))` | A, unphysical by design | 1.05x | 500x2 |
 | **B1** halves-min refit | as A1 but `scale` refitted inside each half, smoother reset, first 50 bars of each half discarded | B temporal | 1.4-1.6x | 150x2 pilot |
+> **FM cost note (2026-10-29, implementation)**: FM as a true joint-evolution
+> fitness (median over all selection folds per genome per generation) costs
+> ~4x, not the 1.00x tabled here. The tabled 1.00x assumes the walkforward
+> per-fold loop, in which a cross-fold median is undefined as a within-generation
+> fitness. True FM needs a joint loop; FM-as-post-hoc-reselect needs the 160
+> visited genomes per fold, which the stored batch does not keep (champion only).
+> Decision deferred until the S0 gate passes: either pay ~4x for true FM, or
+> downgrade FM to a free diagnostic on a future instrumented batch.
 
 All full-scale rules run on the same seeds 501-1000, real and null, so every
 comparison is paired.
